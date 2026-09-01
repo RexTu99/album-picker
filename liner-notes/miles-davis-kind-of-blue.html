@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深度導聆</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#14131a; --card:#1a1922; --line:#2a2833; --line2:#3a3747;
+    --txt:#ece9f2; --dim:#9b95ab; --dim2:#6f6a7d;
+    --accent:#fa4b6e; --accent2:#ffb26b; --gold:#e8c27a; --cyan:#7ad3e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1000px 560px at 82% -12%, rgba(250,75,110,.13), transparent 62%),
+      radial-gradient(760px 520px at -5% 100%, rgba(120,110,255,.11), transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.8; min-height:100vh;
+  }
+  a{color:inherit}
+  .shell{max-width:1240px;margin:0 auto;padding:0 22px 110px;display:grid;
+    grid-template-columns:200px minmax(0,1fr);gap:38px;align-items:start}
+  @media(max-width:900px){ .shell{grid-template-columns:1fr;gap:0} }
+
+  /* ---------- 側邊目錄 ---------- */
+  nav.toc{position:sticky;top:22px;padding-top:34px}
+  @media(max-width:900px){
+    nav.toc{position:static;padding:16px 0 0;overflow-x:auto;white-space:nowrap;
+      border-bottom:1px solid var(--line);margin-bottom:18px}
+    nav.toc .tocTitle{display:none}
+    nav.toc a{display:inline-block;margin:0 6px 10px 0}
+  }
+  .tocTitle{font-size:11px;letter-spacing:.24em;color:var(--dim2);text-transform:uppercase;margin-bottom:12px}
+  nav.toc a{display:block;font-size:13px;color:var(--dim2);text-decoration:none;padding:6px 10px;
+    border-radius:8px;border-left:2px solid transparent;transition:.16s}
+  nav.toc a:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+  nav.toc a.on{color:var(--accent2);border-left-color:var(--accent);background:rgba(250,75,110,.07)}
+  @media(max-width:900px){ nav.toc a{border-left:0;border-bottom:2px solid transparent}
+    nav.toc a.on{border-left:0;border-bottom-color:var(--accent)} }
+
+  main{padding-top:34px;min-width:0}
+
+  /* ---------- HERO ---------- */
+  .back{display:inline-block;font-size:12.5px;color:var(--dim2);text-decoration:none;margin-bottom:20px}
+  .back:hover{color:var(--txt)}
+  .hero{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+  .hart{width:250px;height:250px;flex:none;border-radius:14px;overflow:hidden;background:#211f2b;
+    position:relative;box-shadow:0 22px 56px rgba(0,0,0,.6)}
+  .hart img{width:100%;height:100%;object-fit:cover;display:block}
+  .hart .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;color:rgba(255,255,255,.2)}
+  .hmeta{flex:1;min-width:280px}
+  .kicker{font-size:11px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+  .hmeta h1{font-size:38px;line-height:1.2;letter-spacing:-.02em;margin:9px 0 5px;font-weight:750}
+  .hmeta .who{font-size:18px;color:var(--dim);margin-bottom:4px}
+  .hmeta .yl{font-size:12.5px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{font-size:11.5px;background:#252331;border:1px solid var(--line);color:var(--dim);
+    padding:4px 11px;border-radius:999px}
+  .chip.g{border-color:rgba(232,194,122,.4);color:var(--gold)}
+  .chip.c{border-color:rgba(122,211,232,.34);color:var(--cyan)}
+  .btns{display:flex;gap:9px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:14px;
+    padding:10px 20px;border-radius:999px;transition:.18s;border:1px solid var(--line2);color:var(--txt);
+    background:var(--card)}
+  .btn:hover{transform:translateY(-1px);border-color:var(--dim2)}
+  .btn.am{background:#fff;color:#111;border-color:#fff}
+  .btn.yt{background:#2a1418;color:#ff8fa3;border-color:#4a2028}
+  .tagline{margin-top:26px;font-size:17.5px;line-height:1.75;color:#ded9ec;
+    border-left:3px solid var(--accent);padding-left:18px;font-weight:520}
+
+  /* ---------- 快速事實 ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px}
+  .facts div{background:var(--bg2);padding:13px 16px}
+  .facts dt{font-size:10.5px;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase;margin-bottom:3px}
+  .facts dd{font-size:14px;color:var(--txt);line-height:1.55}
+
+  /* ---------- 區塊 ---------- */
+  section{margin-top:56px;scroll-margin-top:24px}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;
+    padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .snum{font-size:11px;letter-spacing:.16em;color:var(--dim2);font-variant-numeric:tabular-nums}
+  .shead h2{font-size:19px;letter-spacing:.02em;font-weight:700;color:var(--accent2)}
+  .shead .sen{font-size:11px;letter-spacing:.2em;color:var(--dim2);text-transform:uppercase;margin-left:auto}
+  .prose p{font-size:15.5px;color:#d8d4e4;margin-bottom:14px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{color:var(--gold);font-style:normal;font-weight:600}
+
+  /* ---------- 逐曲導聆 ---------- */
+  .trk{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--bg2),#111017)}
+  .trkhead{display:flex;align-items:center;gap:14px;padding:14px 17px;cursor:pointer;transition:.16s}
+  .trkhead:hover{background:rgba(255,255,255,.03)}
+  .tn{font-size:12px;color:var(--dim2);font-variant-numeric:tabular-nums;width:22px;flex:none}
+  .tt{flex:1;min-width:0}
+  .tt b{display:block;font-size:15.5px;font-weight:640;line-height:1.4}
+  .tt span{font-size:12px;color:var(--dim2)}
+  .tlen{font-size:12.5px;color:var(--dim2);font-variant-numeric:tabular-nums;flex:none}
+  .tcar{font-size:11px;color:var(--dim2);flex:none;transition:.2s}
+  .trk.open .tcar{transform:rotate(90deg)}
+  .trkbody{display:none;padding:2px 17px 18px 53px;border-top:1px solid var(--line)}
+  .trk.open .trkbody{display:block}
+  .trkbody p{font-size:14.5px;color:#d3cfe0;margin:14px 0}
+  .cues{border-left:2px solid var(--line2);padding-left:14px;margin:14px 0}
+  .cue{display:flex;gap:12px;font-size:13.5px;margin-bottom:7px;align-items:baseline}
+  .cue b{color:var(--cyan);font-variant-numeric:tabular-nums;flex:none;font-weight:600;font-size:12.5px}
+  .cue span{color:var(--dim)}
+  .tmeta{font-size:12.5px;color:var(--dim2);margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}
+  .tmeta b{color:var(--dim)}
+  /* ---------- 影音延伸 ---------- */
+  .vnote{font-size:13px;color:var(--dim2);line-height:1.75;margin-bottom:16px;
+    border-left:2px solid var(--line2);padding-left:14px}
+  .vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:11px}
+  .vid{display:block;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:15px 17px;text-decoration:none;transition:.18s}
+  .vid:hover{border-color:#ff8fa3;transform:translateY(-2px);background:#1e1c27}
+  .vtop{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .vkind{font-size:10.5px;letter-spacing:.1em;background:#2a1418;border:1px solid #4a2028;
+    color:#ff8fa3;padding:3px 9px;border-radius:999px}
+  .vsearch{font-size:10.5px;letter-spacing:.1em;background:#1f1d29;border:1px solid var(--line);
+    color:var(--dim2);padding:3px 9px;border-radius:999px}
+  .vlen{font-size:11.5px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  .vid b{display:block;font-size:14.5px;color:var(--txt);font-weight:640;line-height:1.45;margin-bottom:4px}
+  .vby{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+  .vnt{display:block;font-size:12.5px;color:var(--dim2);line-height:1.6}
+
+  /* ---------- 人物誌 ---------- */
+  .people{display:grid;gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:15px;padding:19px 20px;background:var(--bg2)}
+  .prole{font-size:10.5px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .plife{font-size:12.5px;color:var(--dim2);margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .pcard p{font-size:14.5px;color:#d3cfe0;margin-bottom:11px}
+  .phere{background:rgba(250,75,110,.07);border-left:2px solid var(--accent);
+    padding:11px 14px;border-radius:0 9px 9px 0;font-size:14px;color:#e2dded;margin-bottom:12px}
+  .pkey{display:flex;gap:7px;flex-wrap:wrap}
+  .pkey a{font-size:12px;background:#232130;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;border-radius:8px;text-decoration:none;transition:.16s}
+  .pkey a:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- 表格 ---------- */
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .tbl th{background:#1f1d29;color:var(--dim);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-align:left;padding:11px 14px;font-weight:600;border-bottom:1px solid var(--line)}
+  .tbl td{padding:12px 14px;border-bottom:1px solid var(--line);color:#d3cfe0;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tr:hover td{background:rgba(255,255,255,.022)}
+  .tbl .rec{color:var(--gold);white-space:nowrap;font-size:12.5px}
+  .tblwrap{overflow-x:auto}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;font-size:14px}
+  .kv dt{color:var(--dim2);white-space:nowrap}
+  .kv dd{color:#d8d4e4}
+
+  /* ---------- 通用小卡 ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+  .cards a,.cards div.nc{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-decoration:none;transition:.18s}
+  .cards a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .cards b{display:block;font-size:14px;color:var(--txt);margin-bottom:3px;font-weight:640;line-height:1.4}
+  .cards span{font-size:12.5px;color:var(--dim2);line-height:1.5;display:block}
+
+  /* ---------- 時間軸 ---------- */
+  .tl{border-left:2px solid var(--line2);padding-left:20px;margin-left:6px}
+  .tlitem{position:relative;margin-bottom:20px}
+  .tlitem::before{content:'';position:absolute;left:-26px;top:8px;width:9px;height:9px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+  .tlitem .ty{font-size:11.5px;letter-spacing:.14em;color:var(--gold);font-variant-numeric:tabular-nums}
+  .tlitem b{display:block;font-size:15px;margin:2px 0 4px}
+  .tlitem span{font-size:14px;color:var(--dim);line-height:1.65;display:block}
+
+  /* ---------- 路線圖 ---------- */
+  .road{display:grid;gap:12px}
+  .rstep{border:1px solid var(--line);border-radius:14px;padding:17px 19px;background:var(--bg2);
+    display:flex;gap:16px;align-items:flex-start}
+  .rnum{width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0d12;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .rstep b{display:block;font-size:15.5px;margin-bottom:5px}
+  .rstep p{font-size:14.5px;color:#d3cfe0;margin:0}
+
+  .srcs{font-size:12.5px;color:var(--dim2);line-height:2}
+  .srcs a{color:var(--dim);text-decoration:none;border-bottom:1px dotted var(--line2)}
+  .srcs a:hover{color:var(--accent2)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--dim2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .none{color:var(--dim2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc"><div class="tocTitle">目錄</div><div id="toc"></div></nav>
+<main id="main"></main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   資料區 —— 每張專輯只需要換掉這個 D 物件，其餘引擎完全不動
+   ═══════════════════════════════════════════════════════════════ */
+const D = {
+
+/* ── 基本識別 ── */
+artist:"Miles Davis",
+album:"Kind of Blue",
+year:1959,
+label:"Columbia",
+catalog:"CL 1355 (mono) / CS 8163 (stereo)",
+genre:"爵士 · 調式爵士",
+styles:["Modal Jazz","Cool Jazz","Hard Bop 後期","六重奏"],
+moods:["深夜","專注","週末黑膠"],
+itunesTerm:"Miles Davis Kind of Blue",
+ytTerm:"Miles Davis Kind of Blue full album 1959",
+wiki:"https://en.wikipedia.org/wiki/Kind_of_Blue",
+compiled:"2026-08-19",
+
+tagline:"九個小時的錄音，改寫了往後六十年爵士樂對「空間」的定義。這不是一張技巧的唱片，而是一張關於「少放幾個音會發生什麼事」的唱片。",
+
+facts:[
+  ["錄音日期","1959-03-02、1959-04-22（兩次 session，合計約九小時）"],
+  ["錄音地點","Columbia 30th Street Studio，紐約"],
+  ["發行日","1959 年 8 月 17 日"],
+  ["監製","Irving Townsend（Columbia 專屬製作人）"],
+  ["錄音師","Fred Plaut"],
+  ["錄音格式","三軌 Ampex 盤帶（同步製作 mono 與 stereo）"],
+  ["總長度","約 45 分 44 秒 · 5 軌"],
+  ["內頁文字","Bill Evans〈Improvisation in Jazz〉"],
+  ["銷量認證","RIAA 5× Platinum（2019）—— 史上最暢銷爵士專輯"]
+],
+
+/* ── 1 錄音製作全紀錄 ── */
+production:`1958 年底的 Miles Davis 正處在一個矛盾的位置上：他的六重奏是全美最強的現場樂團，但他自己已經對 bebop 那套「和弦跑得越快越好」的語言徹底厭倦。他在《Milestones》（1958）裡試過一次調式寫法，效果讓他確信可以走得更遠。真正的推力來自 Bill Evans——這位受過古典訓練、迷戀德布西與拉威爾的鋼琴手，把印象派的和聲觀念帶進了樂團，也把音樂理論家 George Russell 的《Lydian Chromatic Concept》介紹給 Miles。Evans 1958 年 11 月已經離團，Miles 是專程把他請回來錄這張的。
+
+Miles 的做法在當時近乎挑釁：他沒有給樂手完整的譜。1959 年 3 月 2 日星期一，六個人走進 Columbia 位於東 30 街的 30th Street Studio——那是一座改建自東正教教堂的錄音室，天花板挑高、木質殘響長達近兩秒，是全紐約公認最好的空間。Miles 在現場才發下幾行手寫的調式與音階草稿，有些曲子只給了一段旋律和「用這個音階」的指示。所有人被迫放棄背熟的和弦套路，當場即興。
+
+那天的錄音完成了〈So What〉、〈Freddie Freeloader〉、〈Blue in Green〉。四月二十二日星期三，同一批人回來，錄下〈All Blues〉與〈Flamenco Sketches〉。兩次 session 全部加起來大約九小時。Bill Evans 在內頁裡宣稱「幾乎所有曲子都是第一次 take」——這個說法後來被 1997 年 Legacy 版收錄的替代 take 稍微修正了，但方向是對的：這張唱片幾乎沒有修補、沒有剪接，你聽到的是六個人在同一個房間裡同時發生的事。
+
+錄音師 Fred Plaut 用的是三軌 Ampex 機。也正因為這台機器，這張唱片留下了爵士史上最有名的技術意外：3 月 2 日那場的機器轉速略慢，導致母帶回放時整個第一面偏高將近四分之一音。這個問題直到 1992 年才被工程師 Mark Wilder 從安全備份帶（safety tape）比對出來並修正——換句話說，1992 年之前全世界聽到的〈So What〉，調性都是錯的。`,
+
+/* ── 2 深度樂評 ── */
+review:`《Kind of Blue》最容易被誤解的地方，是它聽起來太舒服了。它常常被當成咖啡館背景音樂，而那恰恰是它最厲害也最危險的地方：它把一場語法革命藏在了一層極度優雅的表面底下。
+
+革命是這樣發生的。bebop 的邏輯是「垂直的」——和弦一個接一個高速換，樂手的任務是在每個和弦上找到正確的音，本質上是一場障礙賽。Miles 把它換成「水平的」：一首曲子可能十六小節都待在同一個調式裡，樂手不需要再閃避和弦，而是必須在一個幾乎沒有限制的空間裡，自己決定要說什麼。少了外部的障礙，樂手的品味與想像力就無所遁形。這是為什麼〈So What〉裡 Miles 只用了極少的音卻成為典範，而同一段落上 Coltrane 卻能鋪出密如織網的樂句——調式沒有告訴他們該怎麼做，只告訴他們可以做什麼。
+
+三位管樂手的性格對比是這張的核心戲劇。Miles 的小號帶著 Harmon 弱音器，貼在麥克風前，聲音細、脆、帶著呼吸雜訊，像有人在你耳邊低聲說話；Cannonball Adderley 的中音薩克斯風是明亮的、藍調的、幾乎在微笑；Coltrane 的次中音則是燙的，他當時正處在「sheets of sound」時期的尾聲，即使在最放鬆的段落裡也帶著一種要突破什麼的緊迫。三種溫度輪流上場，同一個調式因此被翻出三種完全不同的顏色。
+
+節奏組則是這張能夠「慢下來」的真正原因。Paul Chambers 的低音線幾乎是第二個旋律聲部，他不斷在調式內做微小的轉向，第一次聽是氣氛，聽了十年才會發現他一直在悄悄改變重心。Jimmy Cobb 全張幾乎沒有一次強擊——除了〈So What〉主題進入時那一記著名的鑔擊——他用刷子與 ride 把時間拉成一片可以呼吸的膜。而 Bill Evans 的鋼琴不彈傳統的 comping，他放和聲的方式接近德布西：不是支撐，而是上色。
+
+錄音本身也是內容的一部分。30th Street Studio 的長殘響讓每一個音都有尾巴，Fred Plaut 沒有把樂器擠在一起，而是讓那個房間被聽見。這是為什麼這張唱片幾乎所有版本、所有器材上都好聽，也是為什麼它在音響圈被當成試機的基準片。
+
+最後值得說的是它的克制。四十六分鐘、五首曲子、沒有一首快歌、沒有一次炫技的意圖、沒有任何一段是為了證明什麼而存在。1959 年是爵士史上最擁擠的一年——同年還有《Giant Steps》《Time Out》《The Shape of Jazz to Come》《Mingus Ah Um》，每一張都在往外衝。只有《Kind of Blue》是往內收的。六十多年後，往外衝的那些成了里程碑，往內收的這張成了空氣。`,
+
+/* ── 3 逐曲導聆 ── */
+tracks:[
+{n:1, title:"So What", len:"9:22", writer:"Miles Davis｜錄於 1959-03-02",
+ personnel:"Miles Davis (tp)、Cannonball Adderley (as)、John Coltrane (ts)、Bill Evans (p)、Paul Chambers (b)、Jimmy Cobb (ds)",
+ note:`全張的開場，也是調式爵士的教科書第一頁。結構極簡：AABA 三十二小節，A 段停在 D 多利安調式十六小節，B 段整個往上移半音到 E♭ 多利安八小節，再回來。整首曲子只有兩個「和弦」，而它們甚至不是和弦，是音階。
+
+開頭那段自由的鋼琴與貝斯導奏一般認為出自 Gil Evans 之手，交由 Bill Evans 與 Paul Chambers 演奏，沒有拍點，像在調整呼吸。主題本身則是一句貝斯提問、管樂用兩個和弦回答「So what」——那是 Miles 當時的口頭禪，也是整張專輯的態度。
+
+Evans 用的四度堆疊和聲（俗稱 So What voicing）從這裡進入爵士鋼琴的標準詞彙，往後六十年沒有一個爵士鋼琴手能繞過它。`,
+ cues:[["0:00","Evans 與 Chambers 的自由導奏，沒有拍子，注意鋼琴左手幾乎不動"],
+       ["0:33","Chambers 的貝斯提出主題動機，管樂以兩下和弦回應——這就是『So What』"],
+       ["1:33","Jimmy Cobb 那一記 ride 鑔擊，Miles 的獨奏正式開始。整張唱片最有名的一秒"],
+       ["3:26","Coltrane 進場，密度立刻翻倍，和 Miles 的留白形成全張最大的落差"],
+       ["5:16","Cannonball 進場，藍調味最重的一段，聽起來像在微笑"],
+       ["7:05","Evans 獨奏，四度和聲大量出現"]],
+ yt:"Miles Davis So What Kind of Blue 1959"},
+
+{n:2, title:"Freddie Freeloader", len:"9:46", writer:"Miles Davis｜錄於 1959-03-02",
+ personnel:"Miles Davis (tp)、Cannonball Adderley (as)、John Coltrane (ts)、Wynton Kelly (p)、Paul Chambers (b)、Jimmy Cobb (ds)",
+ note:`全張唯一一首藍調，也是全張唯一一首不是 Bill Evans 彈的。Miles 特地把 Wynton Kelly 找來錄這一軌——因為他要的是 Kelly 那種毫不猶豫、往前推的藍調律動，而不是 Evans 的印象派色彩。這個決定本身就是編曲。
+
+曲式是十二小節藍調，但 Miles 在最後兩小節換掉了慣用的收尾和聲，讓循環結束時帶著一點未解決的懸浮感。曲名來自費城一位總是想辦法混進後台、蹭酒喝的酒吧常客 Freddie。
+
+Kelly 只在這一軌出現，卻留下全張最「開心」的六分鐘。把它放在第二軌是精算過的：第一軌把你帶進真空，第二軌把血液放回去。`,
+ cues:[["0:00","Wynton Kelly 直接進主題，律動感和第一軌完全不同"],
+       ["0:44","Kelly 的獨奏——全張唯一一次你會想跟著點頭的段落"],
+       ["2:12","Miles 進場，即使在藍調裡他還是用最少的音"],
+       ["4:29","Coltrane，樂句密度陡增但仍守住藍調語法"],
+       ["6:23","Cannonball，最正統的藍調薩克斯風"],
+       ["8:12","Chambers 的貝斯獨奏，只有短短兩輪，注意他的音準與音色"]],
+ yt:"Miles Davis Freddie Freeloader"},
+
+{n:3, title:"Blue in Green", len:"5:37", writer:"Miles Davis 掛名（實際作者高度可能為 Bill Evans）｜錄於 1959-03-02",
+ personnel:"Miles Davis (tp)、John Coltrane (ts)、Bill Evans (p)、Paul Chambers (b)、Jimmy Cobb (ds)——無 Cannonball Adderley",
+ note:`全張最短、最私密的一軌，也是唯一一首 Cannonball 沒有參與的。原始唱片把作曲掛在 Miles 名下，但 Bill Evans 終其一生都堅持這首是他寫的，多數研究者現在也採信這個說法；Miles 自傳裡的說法則含糊帶過。這場爭議本身已經是爵士史的一部分。
+
+結構是一個只有十個小節的循環——不是常見的十二或十六，那兩小節的「缺口」讓每一輪結束時都像少了一級樓梯。獨奏時循環還會被拉成兩倍或縮成一半長度，時間感因此變得極不穩定。
+
+這是整張唱片裡最不適合當背景音樂的一首。它沒有出口。`,
+ cues:[["0:00","Evans 獨自進入，注意左手那組懸浮和聲一直沒有落地"],
+       ["0:30","Miles 帶弱音器進入主題，麥克風極近，你聽得到吹嘴的氣音"],
+       ["1:38","Evans 第一段獨奏，循環被拉長一倍，時間開始融化"],
+       ["2:26","Coltrane 唯一一段獨奏，收得非常克制——這在 1959 年的他身上很罕見"],
+       ["3:10","Evans 第二段獨奏。整首曲子的結構是回文式的：Miles → Evans → Coltrane → Evans → Miles"],
+       ["4:00","Miles 回到主題，同樣的旋律但重量完全不同"]],
+ yt:"Miles Davis Blue in Green"},
+
+{n:4, title:"All Blues", len:"11:33", writer:"Miles Davis｜錄於 1959-04-22",
+ personnel:"Miles Davis (tp)、Cannonball Adderley (as)、John Coltrane (ts)、Bill Evans (p)、Paul Chambers (b)、Jimmy Cobb (ds)",
+ note:`第二面開場，也是全張最長的一軌。表面上是 G 大調十二小節藍調，但 Miles 把它放進 6/8 的搖擺裡，整首曲子因此變成一台緩慢轉動的機器。Evans 那組持續不斷的顫音式和聲（tremolo）像遠處的引擎聲，從頭到尾幾乎沒有停過。
+
+真正的關鍵在於它不解決。傳統藍調的張力來自和聲回家，而這裡的循環被鋪成一個平面，你會在某個時刻失去對「第幾小節」的意識——那正是調式想要的效果：不是走到終點，而是待在裡面。
+
+值得注意的是，1959 年 8 月首版 LP 的第二面標籤把〈Flamenco Sketches〉印成第一軌、〈All Blues〉印成第二軌，順序完全弄反。唱片標籤約在同年 11 月的壓片改正，但封底的曲目表從未修正過。`,
+ cues:[["0:00","導奏：Cobb 的刷子、Chambers 的固定低音、Evans 的顫音和聲——三層機器同時啟動"],
+       ["0:31","管樂齊奏主題，那組三度和聲是全張最容易記住的旋律"],
+       ["1:24","Miles 獨奏，注意他如何用重複製造催眠感"],
+       ["4:00","Cannonball 進場，藍調語彙全開。注意這裡順序變了——前幾軌都是 Coltrane 先，只有這首 Cannonball 排在第二"],
+       ["6:05","Coltrane，全張他最舒展的一段"],
+       ["8:25","Evans 獨奏，顫音動機終於被他自己拆解"]],
+ yt:"Miles Davis All Blues"},
+
+{n:5, title:"Flamenco Sketches", len:"9:26", writer:"Miles Davis / Bill Evans｜錄於 1959-04-22",
+ personnel:"Miles Davis (tp)、Cannonball Adderley (as)、John Coltrane (ts)、Bill Evans (p)、Paul Chambers (b)、Jimmy Cobb (ds)",
+ note:`全張的終點，也是調式概念推到最極端的一首。它沒有主題旋律、沒有固定曲式——只有五個音階，依序排列，每位獨奏者自己決定在每一個音階裡待幾小節才往下走。整個樂團必須全程盯著獨奏者，靠聽力跟著換。這在 1959 年是前所未有的演奏方式。
+
+第四個音階是西班牙弗里吉亞（Phrygian）調式，那抹突然出現的異國色彩就是曲名的由來。它和 Miles 與 Gil Evans 同期發展的西班牙音樂興趣同源——不過《Sketches of Spain》的錄音其實要到 1959 年 11 月才開始，晚於這張。
+
+最後一個音符落下時，你會發現這張唱片從頭到尾沒有一次真正的高潮。它就這樣結束了，像有人輕輕把門帶上。`,
+ cues:[["0:00","Evans 與 Chambers 建立第一個音階，速度是全張最慢"],
+       ["0:25","Miles 進入。從這裡開始，樂團完全靠聽覺跟隨他換音階"],
+       ["1:20","第四個音階——西班牙弗里吉亞調式登場，那抹異國色彩就是曲名的由來"],
+       ["2:02","Coltrane，他把每個音階都待得比 Miles 久"],
+       ["3:45","Cannonball"],
+       ["5:53","Evans 獨奏，回到最初的靜止"],
+       ["7:30","Miles 再次進入收尾。全張最後一個音就落在這一段之後"]],
+ yt:"Miles Davis Flamenco Sketches"}
+],
+
+/* ── 4 人物誌 ── */
+people:[
+{role:"領班 · 小號 · 作曲", name:"Miles Davis", life:"1926–1991 · 美國伊利諾州 Alton",
+ bio:`牙醫之子，茱莉亞音樂學院輟學，1945 年為了追隨 Charlie Parker 而來到紐約。他的一生幾乎就是戰後爵士的斷代史：1949 年《Birth of the Cool》開啟冷爵士、1950 年代中期第一代五重奏確立 hard bop、1959 年《Kind of Blue》開啟調式、1969 年錄下的《Bitches Brew》把爵士接上電。
+
+他不是技術最好的小號手，也從不假裝是。他的武器是音色與取捨——Harmon 弱音器貼著麥克風的那種近乎耳語的聲音，和他一貫的信念：「別怕彈錯音，錯音的下一個音才決定一切。」他也是最狠的樂團經營者，永遠在找比自己年輕、比自己餓的樂手。`,
+ here:"他是這張唱片的建築師而非主角。他寫下的東西少到近乎不負責任——幾行音階、一段旋律——但正是那份不完整逼出了所有人的即興。他的獨奏在全張裡音符最少，卻定義了往後六十年『留白』的標準。",
+ key:[["Birth of the Cool","1949 錄音 / 1957 發行"],["Milestones","1958"],["Sketches of Spain","1960"],["In a Silent Way","1969"],["Bitches Brew","1970"]]},
+
+{role:"鋼琴 · 和聲設計", name:"Bill Evans", life:"1929–1980 · 美國紐澤西州 Plainfield",
+ bio:`受過完整古典訓練，深受德布西、拉威爾、史克里亞賓影響，是 1950 年代末唯一能把印象派和聲毫無違和地放進爵士的人。1958 年短暫加入 Miles 六重奏，八個月後因不堪巡演壓力與種族敵意離團——他是團裡唯一的白人，這件事在當時的爵士圈是持續的摩擦。
+
+離團後他組了自己的三重奏，把「鋼琴、貝斯、鼓三者平等對話」變成現代爵士鋼琴三重奏的標準模型。一生為毒癮所困，1980 年去世時年僅 51 歲。`,
+ here:"Miles 是專程把已經離團的他請回來錄這張的，因為沒有他就沒有這套和聲語言。他寫了唱片內頁那篇〈Improvisation in Jazz〉，用日本水墨畫比喻即興——那篇短文本身已是爵士文獻的經典。〈Blue in Green〉幾乎確定出自他手。他唯一沒參與的是〈Freddie Freeloader〉。",
+ key:[["Sunday at the Village Vanguard","1961"],["Waltz for Debby","1961 錄音 / 1962 發行"],["Everybody Digs Bill Evans","1959"],["Conversations with Myself","1963"]]},
+
+{role:"次中音薩克斯風", name:"John Coltrane", life:"1926–1967 · 美國北卡羅來納州 Hamlet",
+ bio:`1955 年被 Miles 挖進第一代五重奏，1957 年因海洛因與酒精被開除，同年在費城家中經歷了一次他自述為宗教性的戒斷與覺醒，回來後判若兩人。1959 年前後正是他的「sheets of sound」時期——用極高密度的音群把和聲整片鋪滿。
+
+錄《Kind of Blue》的同一年，他自己也在錄《Giant Steps》，那是與調式完全相反的極端：和聲密到幾乎無法即興。兩張唱片同年出自同一人之手，是爵士史上最不可思議的分岔。1965 年的《A Love Supreme》之後他一路走向自由爵士，1967 年因肝癌去世，年僅 40 歲。`,
+ here:"他是這張唱片裡的異物與熱源。在一張以留白為信仰的專輯裡，他每次進場都讓密度陡增，那份不安定感是全張最重要的對比。〈Blue in Green〉裡他反常地極度克制，只吹了一段，是他一生最節制的錄音之一。",
+ key:[["Giant Steps","1960"],["My Favorite Things","1961"],["A Love Supreme","1965"],["Blue Train","1958"],["Crescent","1964"]]},
+
+{role:"中音薩克斯風", name:"Julian \"Cannonball\" Adderley", life:"1928–1975 · 美國佛羅里達州 Tampa",
+ bio:`原本是佛州的高中音樂老師，1955 年到紐約度假，臨時被拉上 Café Bohemia 的台頂替，一夜成名。綽號 Cannonball 來自 cannibal（形容他的食量）的訛傳。他的中音薩克斯風延續 Charlie Parker 的線條，但加進大量福音與藍調語彙，明亮、外向、幾乎在笑。
+
+離開 Miles 之後，他自己的五重奏在 1960 年代把 soul jazz 帶進流行榜，〈Mercy, Mercy, Mercy〉最高衝上 Billboard Hot 100 第 11 名、R&B 榜第 2 名。`,
+ here:"他是全張的體溫。Miles 冷、Coltrane 燙，Adderley 剛好是人的溫度——每次他進場，音樂就重新落回地面。他是唯一沒有參與〈Blue in Green〉的管樂手，那也讓那首曲子的孤獨感更加完整。首版 LP 封底把他的姓氏誤植為「Adderly」，這個錯字延續了十多年才更正。",
+ key:[["Somethin' Else","1958"],["Mercy, Mercy, Mercy! Live at the Club","1967"],["Know What I Mean?","1961"]]},
+
+{role:"低音提琴", name:"Paul Chambers", life:"1935–1969 · 美國賓州 Pittsburgh",
+ bio:`17 歲就在職業樂團工作，20 歲進 Miles 五重奏，是 hard bop 時代錄音量最大的貝斯手之一。他把弓拉獨奏（arco solo）帶進主流爵士，音準與音色在當時無人能及。1969 年因結核病去世，年僅 33 歲。`,
+ here:"這張唱片真正的地基。在幾乎沒有和弦變化的調式裡，是他的低音線在暗中決定重心往哪裡移。〈So What〉的主題動機由他提出；〈All Blues〉的固定低音是那台機器的曲軸。第一次聽你不會注意到他，聽第十年你會發現他一直在做決定。",
+ key:[["Bass on Top","1957"],["Whims of Chambers","1956"],["Miles Davis · Milestones","1958"]]},
+
+{role:"鼓", name:"Jimmy Cobb", life:"1929–2020 · 美國華盛頓特區",
+ bio:`1958 年接替 Philly Joe Jones 進入 Miles 六重奏，是這張唱片裡最長壽的參與者——他活到 2020 年，晚年仍持續巡演並帶領「Kind of Blue 樂團」重現這張專輯。`,
+ here:"他全張幾乎沒有一次真正的強擊，用刷子與 ride 把時間拉成一片可以呼吸的膜。唯一的例外是〈So What〉在 1:33 那一記鑔擊——那可能是爵士史上最有名的一下鈸。他自己說過：那天他只是覺得該有人推 Miles 一把。",
+ key:[["Cobb's Corner","2006"],["Wynton Kelly Trio · Smokin' at the Half Note","1965"]]},
+
+{role:"鋼琴（僅第 2 軌）", name:"Wynton Kelly", life:"1931–1971 · 牙買加 / 美國紐約 Brooklyn",
+ bio:`牙買加出生、布魯克林長大，1959 年正式加入 Miles 樂團。他的律動被公認是 hard bop 鋼琴的黃金標準——輕、彈、永遠往前推半步。Bill Evans 本人說過：「Wynton 是我聽過最會 swing 的鋼琴手。」1971 年因癲癇發作去世，年僅 39 歲。`,
+ here:"他只出現在〈Freddie Freeloader〉一軌，而那正是 Miles 的編曲決定：那首藍調需要的是律動，不是色彩。這個「換人一軌」的安排讓全張唯一的藍調有了完全不同的空氣，也讓 Evans 的印象派在其餘四軌顯得更加一致。",
+ key:[["Kelly Blue","1959"],["Smokin' at the Half Note","1965"]]}
+],
+
+/* ── 5 完整 Credits ── */
+credits:[
+ ["監製 / Producer","Irving Townsend（Columbia 專屬製作人）"],
+ ["錄音師 / Engineer","Fred Plaut"],
+ ["錄音室","Columbia 30th Street Studio, 207 East 30th Street, New York City（改建自東正教教堂）"],
+ ["錄音格式","三軌盤帶，同步製作單聲道與立體聲版本"],
+ ["內頁文字 / Liner Notes","Bill Evans —〈Improvisation in Jazz〉"],
+ ["封面攝影","Jay Maisel（1959 年拍攝的 Miles 演出照）"],
+ ["1992 修正 / 1997 重製","Mark Wilder（母帶工程）、Steve Berkowitz（製作）"],
+ ["首版目錄編號","CL 1355（mono, 6-eye 標籤）／CS 8163（stereo）"],
+ ["已知首版錯誤","① 第二面標籤曲序顛倒，約 1959 年 11 月改正；② 封底曲序從未修正；③ 封底將 Adderley 誤植為「Adderly」，錯字延續十多年"]
+],
+
+/* ── 6 評價與歷史地位 ── */
+reception:{
+ scores:[
+  ["Rolling Stone《史上 500 大專輯》","2003 年第 12 名；2020 年改版第 31 名"],
+  ["AllMusic","五星 · 編輯精選"],
+  ["The Penguin Guide to Jazz","Core Collection（核心館藏）"],
+  ["Acclaimed Music 綜合排名","歷年榜單綜合計算長期位居爵士類第一"]
+ ],
+ chart:[
+  ["RIAA 認證","5× Platinum（2019 年，美國累計出貨逾 500 萬張）"],
+  ["銷量地位","公認為史上最暢銷的爵士專輯；銷量逐年增加而非衰退，這在流行音樂史上極為罕見"],
+  ["當代榜單","2000 年代之後仍持續進榜 Billboard Jazz Albums 與 Catalog Albums"]
+ ],
+ awards:[
+  ["美國國會圖書館 · 國家錄音登記處","2002 年首屆入選五十張錄音之一"],
+  ["Grammy Hall of Fame","已入選"],
+  ["美國國會決議","2009 年通過決議紀念此專輯發行 50 週年"]
+ ],
+ legacy:`《Kind of Blue》的歷史地位有一個特別之處：它幾乎沒有經歷過「被重新發現」的階段。1959 年發行時樂評就是好評，此後六十多年從未跌出過任何一份重要榜單，銷量逐年增加而非衰退——這在流行音樂史上極為罕見。
+
+它的影響力也遠遠溢出了爵士。1960 年代的搖滾樂手把調式當成脫離藍調十二小節框架的出口：The Byrds、The Doors、Pink Floyd 都直接引用過這套語言；Bill Evans 的和聲觀念後來滲進了 bossa nova、電影配樂、乃至於 1990 年代的 downtempo 與 lo-fi。至於 Miles 的留白美學，則成了往後所有「少即是多」音樂論述的原點。
+
+一個反面的觀察也值得記著：正因為它太容易入耳，它成了全世界最常被當成裝飾品的偉大唱片——放在餐廳、飯店大廳、汽車廣告裡。這張專輯真正的難度不在於聽懂，而在於願不願意真的坐下來聽完。`
+},
+
+/* ── 7 脈絡與影響網絡 ── */
+context:{
+ era:`1959 年是爵士史上最擁擠的一年，也是最分裂的一年。同一年出現了 Coltrane 的《Giant Steps》（和聲複雜度的極限）、Dave Brubeck 的《Time Out》（節拍的實驗）、Charles Mingus 的《Mingus Ah Um》（作曲的野心）、以及 Ornette Coleman 的《The Shape of Jazz to Come》（乾脆廢掉和聲）。bebop 建立起來的那套語言在這一年同時被四個方向撕開。
+
+《Kind of Blue》是其中唯一往內收的答案。它不增加複雜度，而是移除；不加快，而是停留。這也是它最後成為所有人共同起點的原因——其他四張是分岔，這一張是地基。
+
+同一時期的美國，民權運動正在升溫，爵士俱樂部是少數種族混合的公共空間。Bill Evans 作為團裡唯一的白人成員承受了相當的敵意，Miles 為此公開護航過多次。這張唱片本身沒有任何政治語言，但它的組成方式在 1959 年就是一種立場。`,
+ timeline:[
+  ["1955","Miles 第一代五重奏成軍","Coltrane、Chambers、Red Garland、Philly Joe Jones。hard bop 的頂峰。"],
+  ["1958-03","《Milestones》","專輯同名曲第一次完整使用調式寫法，是《Kind of Blue》的直接前身。"],
+  ["1958-11","Bill Evans 離團","八個月的團員生涯結束，但和聲觀念已經留下。"],
+  ["1959-03-02","第一場錄音","〈So What〉〈Freddie Freeloader〉〈Blue in Green〉。Evans 被專程請回。"],
+  ["1959-04-22","第二場錄音","〈All Blues〉〈Flamenco Sketches〉。全部錄音時間合計約九小時。"],
+  ["1959-08-17","發行","首版第二面標籤曲序印反，11 月改正。"],
+  ["1960","《Sketches of Spain》","Miles 與 Gil Evans 的西班牙計畫，與〈Flamenco Sketches〉同源。"],
+  ["1992","速度錯誤被發現","Mark Wilder 從安全備份帶比對出第一面偏高近四分之一音並修正。"],
+  ["1997","Legacy 重製版","以三軌安全帶重新混音，成為此後所有數位與黑膠版本的基礎母帶。"]
+ ],
+ influencedBy:[
+  ["Miles Davis","Milestones","同名曲是調式概念的第一次實驗"],
+  ["George Russell","Lydian Chromatic Concept","Bill Evans 帶進樂團的理論基礎（著作，非唱片）"],
+  ["Claude Debussy","Préludes","Evans 和聲語言的源頭"],
+  ["Ahmad Jamal","Chamber Music of the New Jazz","Miles 公開承認的留白美學來源"]
+ ],
+ influenced:[
+  ["John Coltrane","My Favorite Things","把調式推到長篇即興的極致"],
+  ["Bill Evans Trio","Sunday at the Village Vanguard","這張的和聲觀念發展成三重奏標準"],
+  ["Herbie Hancock","Maiden Voyage","1960 年代調式爵士的下一站"],
+  ["Wayne Shorter","Speak No Evil","調式與作曲的結合"],
+  ["Pink Floyd","The Dark Side of the Moon","搖滾樂裡最直接的調式／空間繼承者之一"],
+  ["Brad Mehldau","Day Is Done","當代鋼琴三重奏對 Evans 血脈的延續"]
+ ],
+ covers:[
+  ["Ronnie Ross / 眾多爵士樂手","So What","已成為爵士標準曲，收錄版本數以千計"],
+  ["Eddie Harris","Freedom Jazz Dance","以〈All Blues〉的節奏概念延伸"],
+  ["Q-Tip / A Tribe Called Quest 世代","取樣與引用","1990 年代 jazz-rap 大量取材自此時期 Columbia 錄音"]
+ ]
+},
+
+/* ── 8 版本／音質指南 ── */
+versions:[
+ {name:"1959 首版 mono（CL 1355, 6-eye 標籤）", year:"1959", source:"原始三軌母帶 → 單聲道混音 / 黑膠",
+  note:"第一面速度未修正（偏高近 1/4 音）。中央凝聚、密度最高，許多老派收藏家認為這才是「當年的聲音」。狀態良好的原版售價極高。", rec:4},
+ {name:"1959 首版 stereo（CS 8163）", year:"1959", source:"原始三軌母帶 → 立體聲混音 / 黑膠",
+  note:"三軌分離造成極寬的聲場（管樂偏一側、節奏組偏另一側），今日聽來有點不自然，但空間感驚人。同樣未修正速度。", rec:4},
+ {name:"1990 年代早期 CD（未修正）", year:"1986–1992", source:"舊二軌拷貝帶 / CD",
+  note:"速度未修正、動態被壓縮，是這張唱片流傳最廣但最不推薦的版本。若手上 CD 是這個年代的，值得換掉。", rec:2},
+ {name:"1997 Legacy 重製版", year:"1997", source:"三軌安全備份帶重新混音 · Mark Wilder / CD · LP",
+  note:"速度已修正，動態與音色公認是數位版的基準。此後幾乎所有串流與再版都源自這份母帶。CP 值最高的選擇。", rec:5},
+ {name:"2008 五十週年紀念版 / Legacy Edition", year:"2008–2009", source:"1997 母帶 · 不同回放機 / CD · SACD · LP · 盒裝",
+  note:"母帶與 1997 相同，差異在回放與後製。附替代 take、現場錄音與紀錄片，資料價值高於音質差異。", rec:4},
+ {name:"Analogue Productions / Classic Records 等發燒黑膠", year:"1995–2015", source:"類比母帶 · 180g / 200g / 單面 45 轉",
+  note:"發燒圈長年比較的對象，各版評價分歧。單面 45 轉版動態最好但需換六次面。價格是一般版的數倍。", rec:4},
+ {name:"Mobile Fidelity（MoFi）版", year:"2015", source:"MoFi 母帶處理 / 45 轉雙 LP · SACD",
+  note:"評價兩極——部分評論者認為高頻與低頻被修飾過度，失去了 30th Street Studio 的中頻密度。建議先試聽。", rec:3},
+ {name:"Apple Music 串流（現行）", year:"—", source:"1997 系母帶 · ALAC 無損 / Hi-Res / 部分曲目有 Dolby Atmos 空間音訊",
+  note:"日常聆聽完全足夠。Atmos 版把三軌拆進多聲道，空間效果驚人但與原始意圖差距最大，建議當成另一種版本而非升級。", rec:4}
+],
+versionsNote:`實務建議：日常就用 Apple Music 的無損版（1997 系母帶），已經非常好。若要買實體，1997 Legacy CD 是最安全的入門；黑膠預算充足的話，Analogue Productions 的類比版本值得一試。除非你想聽「1959 年當時的錯誤」，否則不必刻意追未修正速度的老版本。
+
+一個聽得出來的判斷方式：播〈So What〉，如果你的版本聽起來比別人的快一點、亮一點、調子偏高，那就是 1992 年之前的未修正版。`,
+
+/* ── 9 聆聽路線圖 ── */
+roadmap:[
+ {title:"第一次聽 · 不要做任何事", body:"從頭到尾四十六分鐘，不要跳軌、不要分心、不要當背景。這張唱片的整體結構是設計過的：第一軌把你帶進真空，第二軌把血液放回去，第三軌把你獨自留下，第二面則是兩台緩慢轉動的機器。第一次聽只需要感覺那個空間，不必聽出任何東西。"},
+ {title:"第二次聽 · 只追一個人", body:"選 Paul Chambers。全程只聽低音提琴，忽略所有管樂。你會發現這張唱片真正在做決定的人是他——每一次重心的移動、每一次調式內部的轉向，都是低音線先動的。聽完再換 Jimmy Cobb 聽一次，你會聽見一個幾乎沒有強擊卻推動了全張的鼓手。"},
+ {title:"第三次聽 · 比較三支管樂", body:"專注在同一首曲子裡 Miles、Coltrane、Cannonball 的三段獨奏。同樣的音階、同樣的節奏組、同樣的房間，三個人做出三種完全不同的東西。這是理解「調式為什麼是革命」最直接的方式：限制被移除之後，剩下的就只有這個人是誰。"},
+ {title:"進階 · 對照聽 1959 年", body:"聽完之後，接著放 Coltrane 的《Giant Steps》（同年、同一位薩克斯風手、完全相反的方向），再放 Ornette Coleman 的《The Shape of Jazz to Come》。三張唱片放在一起，你會看見 1959 年爵士樂在同一時間往三個方向裂開的現場。"},
+ {title:"情境 · 音量 · 訊源", body:"最適合的時段是深夜或清晨獨處，音量比你習慣的再小一點——這張唱片的動態範圍不大，開太大反而會壓掉 30th Street Studio 的殘響尾巴。耳機優於喇叭（Miles 的弱音器氣音、Cobb 的刷子細節都在極低音量層），但若有安靜的房間，喇叭能還原那個教堂空間。避免在通勤或工作時當背景播放——那正是這張唱片最常被浪費的方式。"}
+],
+
+/* ── 10 視覺與實體 ── */
+physical:{
+ "封面":"Jay Maisel 拍攝的 Miles 側面演出照，深藍色調、大量陰影、人物幾乎被壓在畫面下半部。刻意不放樂器全景、不放樂團合照，只有一個側身低頭的剪影——這在 1959 年的爵士唱片封面裡相當反常，當時主流是明亮的人像或抽象設計。",
+ "字體與版式":"Columbia 標準的無襯線標題配置，專輯名與藝人名壓在左上角，沒有任何裝飾。這種極簡在同時期的 Blue Note 唱片（Reid Miles 的強烈平面設計）旁邊顯得非常安靜，也剛好呼應了音樂。",
+ "內頁文字":"背面印有 Bill Evans 的短文〈Improvisation in Jazz〉。他用日本水墨畫作比喻：畫在薄紙上，筆一落就無法修改，猶豫會被看見，擦改會毀掉紙。這篇短文本身已成為爵士文獻的經典，也是理解這張唱片最好的一把鑰匙。",
+ "已知首版錯誤":"① 第二面標籤把〈Flamenco Sketches〉與〈All Blues〉的曲序印反，約 1959 年 11 月的壓片改正；② 封底的曲序從未修正，錯到底；③ 封底將 Cannonball Adderley 誤植為「Adderly」，這個錯字延續了十多年才更正。這三個錯誤是辨識首版的重要線索。",
+ "黑膠刻片與辨識":"首版為 Columbia「6-eye」標籤（標籤外圈六個 Columbia 眼睛圖案）。1962 年後改為兩眼「2-eye」，1970 年代為紅標。刻片母模編號（matrix number）刻在唱片內圈，是收藏市場判斷版本的主要依據。",
+ "收藏價值":"狀態接近全新的 1959 年 6-eye 首版（尤其是 mono）在拍賣市場屬於四位數美金級距，立體聲首版略低。後續的 70 年代紅標版本音質評價其實不差，價格卻只有零頭，是實用派的選擇。"
+},
+
+/* ── 11 延伸聆聽 ── */
+further:[
+ {artist:"Miles Davis", album:"Milestones", why:"1958，調式概念的第一次實驗，聽這張才知道 Kind of Blue 從哪裡來"},
+ {artist:"Bill Evans Trio", album:"Sunday at the Village Vanguard", why:"1961，Evans 把這裡的和聲觀念發展成鋼琴三重奏的新標準"},
+ {artist:"John Coltrane", album:"Giant Steps", why:"1959，同年、同一人，完全相反的極端。對照聽最有價值"},
+ {artist:"Cannonball Adderley", album:"Somethin' Else", why:"1958，Miles 反過來當 sideman 的名盤，同一批人的另一面"},
+ {artist:"Wynton Kelly Trio", album:"Smokin' at the Half Note", why:"1965，Kelly 與 Chambers、Cobb 的三重奏，聽那個律動的完整版"},
+ {artist:"Miles Davis", album:"Sketches of Spain", why:"1960，〈Flamenco Sketches〉那抹西班牙色彩的完整展開"},
+ {artist:"Herbie Hancock", album:"Maiden Voyage", why:"1965，調式爵士在下一個世代長成的樣子"},
+ {artist:"Ahmad Jamal", album:"At the Pershing: But Not for Me", why:"1958，Miles 公開承認的留白美學來源"}
+],
+
+/* ── 影音延伸：介紹／紀錄片／訪談，不是聽音樂的連結 ── */
+videos:[
+ {kind:"紀錄片", title:"The Making of Kind of Blue", by:"原為 Columbia／Legacy 製作（亦流傳作《1959: The Making of Kind of Blue》）",
+  url:"https://www.youtube.com/watch?v=m1MzAGjcktI",
+  note:"認識這張唱片的第一順位。含罕見檔案影像、未發行的錄音室對話與當事人訪談。此為非官方轉載，若失效請直接搜尋片名。"},
+ {kind:"官方影片", title:"Miles Davis – Kind of Blue 50th Anniversary", by:"Legacy Recordings（Sony／Columbia 官方頻道）",
+  url:"https://www.youtube.com/watch?v=pBpLKm8vw4M",
+  note:"唱片公司為 50 週年 Collector's Edition 拍的官方介紹短片，是唯一貨真價實的原廠介紹影片。"},
+ {kind:"紀錄片", title:"1959, the Year that Changed Jazz", by:"BBC（2009）",
+  url:"https://www.youtube.com/watch?v=PKYa3wwc1SU",
+  note:"用 1959 年四張改變爵士的專輯互相對照，並訪到 Jimmy Cobb、Herbie Hancock、Ornette Coleman。把這張唱片放回它的時代裡看。非官方轉載。"},
+ {kind:"分析導讀", title:"Kind of Blue: How Miles Davis Changed Jazz", by:"Polyphonic",
+  url:"https://www.youtube.com/watch?v=nfroW6KaXXc",
+  note:"講清楚「調式取代和弦進行」到底改變了什麼。想懂〈So What〉的 D 多利安／E♭ 多利安結構，從這支入門最快。"},
+ {kind:"分析導讀", title:"How Important Really Is Miles Davis's \"Kind Of Blue\"?", by:"Ted Gioia（《The History of Jazz》作者本人頻道）",
+  url:"https://www.youtube.com/watch?v=jPnkmuPgylg",
+  note:"當代最重要的爵士史家親自重估這張唱片的地位，唱反調式的觀點。唯一一支會逼你重想「它憑什麼是經典」的影片。"},
+ {kind:"訪談", title:"Ashley Kahn 談《Kind of Blue: The Making of the Miles Davis Masterpiece》", by:"Mr. Media Interviews（2009）",
+  url:"https://www.youtube.com/watch?v=s1UOoCjja2Q",
+  note:"Kahn 翻出 Columbia 原始檔案與未剪輯母帶逐字稿，也訪到當時唯一在世的樂手 Jimmy Cobb。聽作者本人講書裡的第一手發現。"},
+ {kind:"紀錄片", title:"Miles Davis: Birth of the Cool 官方預告", by:"American Masters | PBS",
+  url:"https://www.youtube.com/watch?v=edbeyKJgza4",
+  note:"Stanley Nelson 執導的 2019 年傳記紀錄片，取得遺產管理會全面授權，含未曝光的錄音室毛片。看完這張再看人。"},
+ {kind:"錄音技術", title:"Mixing Miles Davis 'Kind of Blue' in Dolby Atmos", by:"PMC Speakers",
+  url:"https://www.youtube.com/watch?v=FU5-ZdprCrc",
+  note:"從工程角度看 1959 年 30th Street Studio 的三軌母帶如何被重新混成 Atmos。對版本與音質有興趣的人會很享受。"},
+ {kind:"訪談", title:"Jimmy Cobb 談錄音現場", q:"Jimmy Cobb Kind of Blue interview BBC Miles Davis recording session",
+  note:"Cobb 是 1959 年陣容最後一位在世者（2020 年逝世）。他轉述 Miles 那句「你知道該怎麼做，讓它聽起來像漂浮著」是這張唱片最有名的口述史。網路流傳的訪談版本多，用搜尋比較保險。"},
+ {kind:"分析導讀", title:"〈Blue in Green〉的作者權公案", q:"Blue in Green Bill Evans Miles Davis who wrote it analysis",
+  note:"這張唱片最有意思的爭議：實際作者到底是 Evans 還是 Miles。順便可以找 Evans 寫的原版內頁〈Improvisation in Jazz〉全文。"}
+],
+
+/* ── 12 資料來源 ── */
+sources:[
+ {title:"Wikipedia — Kind of Blue", url:"https://en.wikipedia.org/wiki/Kind_of_Blue"},
+ {title:"Miles Davis 官方網站 — Kind of Blue", url:"https://www.milesdavis.com/albums/kind-of-blue/"},
+ {title:"Album Liner Notes — Kind of Blue（Bill Evans 內頁全文）", url:"http://albumlinernotes.com/Kind_of_Blue.html"},
+ {title:"LondonJazzCollector — 首版壓片辨識指南", url:"https://londonjazzcollector.wordpress.com/2016/11/08/search-for-the-earliest-pressings-of-kind-of-blue-a-collectors-guide/"},
+ {title:"Analog Planet — The Best Ever Kind of Blue?", url:"https://www.analogplanet.com/content/best-ever-kind-blue"},
+ {title:"Discogs — Kind of Blue 版本資料庫", url:"https://www.discogs.com/master/25164"},
+ {title:"OUPblog — An analysis of Miles Davis's Kind of Blue", url:"https://blog.oup.com/2014/08/miles-davis-kind-of-blue-classic-jazz-album/"}
+]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   渲染引擎 —— 以下不需要修改
+   ═══════════════════════════════════════════════════════════════ */
+const E = s => String(s==null?'':s);
+const has = x => Array.isArray(x) ? x.length>0 : (x && Object.keys(x).length>0);
+const amURL = t => 'https://music.apple.com/tw/search?term=' + encodeURIComponent(t);
+const ytURL = t => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(t);
+const P = txt => E(txt).split(/\n\s*\n/).map(x=>`<p>${x.trim()}</p>`).join('');
+
+document.title = `${D.album} · 深度導聆`;
+
+const SEC = [];
+function sec(id, zh, en, html){ if(html) SEC.push({id, zh, en, html}); }
+
+/* 1 · 錄音製作全紀錄 */
+sec('production','錄音製作全紀錄','Production', D.production ? `<div class="prose">${P(D.production)}</div>` : '');
+
+/* 2 · 深度樂評 */
+sec('review','深度樂評','Critique', D.review ? `<div class="prose">${P(D.review)}</div>` : '');
+
+/* 3 · 逐曲導聆 */
+sec('tracks','逐曲導聆','Track by Track', has(D.tracks) ? D.tracks.map((t,i)=>`
+  <div class="trk" data-i="${i}">
+    <div class="trkhead">
+      <span class="tn">${t.n||i+1}</span>
+      <span class="tt"><b>${E(t.title)}</b>${t.writer?`<span>${E(t.writer)}</span>`:''}</span>
+      <span class="tlen">${E(t.len)}</span>
+      <span class="tcar">▶</span>
+    </div>
+    <div class="trkbody">
+      ${t.note?P(t.note):''}
+      ${has(t.cues)?`<div class="cues">${t.cues.map(c=>`<div class="cue"><b>${E(c[0])}</b><span>${E(c[1])}</span></div>`).join('')}</div>`:''}
+      ${t.personnel?`<div class="tmeta"><b>編制：</b>${E(t.personnel)}</div>`:''}
+    </div>
+  </div>`).join('') : '');
+
+/* 4 · 人物誌 */
+sec('people','人物誌 · 作曲家／演奏家／主唱','People', has(D.people) ? `<div class="people">${
+  D.people.map(p=>`
+  <div class="pcard">
+    <div class="prole">${E(p.role)}</div>
+    <div class="pname">${E(p.name)}</div>
+    <div class="plife">${E(p.life)}</div>
+    ${p.bio?P(p.bio):''}
+    ${p.here?`<div class="phere"><b style="color:var(--accent)">在這張專輯裡 · </b>${E(p.here)}</div>`:''}
+    ${has(p.key)?`<div class="pkey">${p.key.map(k=>`<a href="${amURL(p.name+' '+k[0])}" target="_blank" rel="noopener">${E(k[0])}${k[1]?` · ${k[1]}`:''}</a>`).join('')}</div>`:''}
+  </div>`).join('')}</div>` : '');
+
+/* 5 · 完整 Credits */
+sec('credits','完整 Credits','Credits', has(D.credits) ?
+  `<dl class="kv">${D.credits.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl>` : '');
+
+/* 6 · 評價與歷史地位 */
+let recHTML = '';
+if(has(D.reception)){
+  const R = D.reception;
+  if(has(R.scores)) recHTML += `<div class="tblwrap"><table class="tbl"><thead><tr><th>來源</th><th>評價</th></tr></thead><tbody>${
+    R.scores.map(s=>`<tr><td>${E(s[0])}</td><td>${E(s[1])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(has(R.chart)) recHTML += `<div style="margin-top:16px"><dl class="kv">${
+    R.chart.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl></div>`;
+  if(has(R.awards)) recHTML += `<div style="margin-top:16px" class="cards">${
+    R.awards.map(a=>`<div class="nc"><b>${E(a[0])}</b><span>${E(a[1])}</span></div>`).join('')}</div>`;
+  if(R.legacy) recHTML += `<div class="prose" style="margin-top:20px">${P(R.legacy)}</div>`;
+}
+sec('reception','評價與歷史地位','Reception & Legacy', recHTML);
+
+/* 7 · 脈絡與影響網絡 */
+let ctxHTML = '';
+if(has(D.context)){
+  const C = D.context;
+  if(C.era) ctxHTML += `<div class="prose">${P(C.era)}</div>`;
+  if(has(C.timeline)) ctxHTML += `<div class="tl" style="margin-top:22px">${
+    C.timeline.map(t=>`<div class="tlitem"><div class="ty">${E(t[0])}</div><b>${E(t[1])}</b><span>${E(t[2])}</span></div>`).join('')}</div>`;
+  const grp = (title, arr) => has(arr) ? `<div style="margin-top:24px">
+    <div style="font-size:11px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase;margin-bottom:9px">${title}</div>
+    <div class="cards">${arr.map(x=>`<a href="${amURL(x[0]+' '+(x[1]||''))}" target="_blank" rel="noopener">
+      <b>${E(x[1]||x[0])}</b><span>${E(x[1]?x[0]:'')}${x[2]?` — ${E(x[2])}`:''}</span></a>`).join('')}</div></div>` : '';
+  ctxHTML += grp('影響了這張的作品', C.influencedBy);
+  ctxHTML += grp('被這張影響的作品', C.influenced);
+  ctxHTML += grp('翻唱 · 取樣 · 引用', C.covers);
+}
+sec('context','脈絡與影響網絡','Context & Influence', ctxHTML);
+
+/* 8 · 版本／音質指南 */
+sec('versions','版本／音質指南','Editions & Sound', has(D.versions) ? `<div class="tblwrap">
+  <table class="tbl"><thead><tr><th>版本</th><th>年份</th><th>母帶／載體</th><th>說明</th><th>推薦</th></tr></thead>
+  <tbody>${D.versions.map(v=>`<tr>
+    <td><b style="color:var(--txt)">${E(v.name)}</b></td><td>${E(v.year)}</td>
+    <td>${E(v.source)}</td><td>${E(v.note)}</td>
+    <td class="rec">${'★'.repeat(v.rec||0)}${'☆'.repeat(Math.max(0,5-(v.rec||0)))}</td></tr>`).join('')}
+  </tbody></table></div>${D.versionsNote?`<div class="prose" style="margin-top:18px">${P(D.versionsNote)}</div>`:''}` : '');
+
+/* 9 · 聆聽路線圖 */
+sec('roadmap','聆聽路線圖','How to Listen', has(D.roadmap) ? `<div class="road">${
+  D.roadmap.map((r,i)=>`<div class="rstep"><div class="rnum">${i+1}</div>
+    <div><b>${E(r.title)}</b><p>${E(r.body)}</p></div></div>`).join('')}</div>` : '');
+
+/* 10 · 視覺與實體 */
+sec('physical','視覺與實體','Artwork & Object', has(D.physical) ?
+  `<dl class="kv">${Object.entries(D.physical).map(([k,v])=>`<dt>${E(k)}</dt><dd>${E(v)}</dd>`).join('')}</dl>` : '');
+
+/* 11 · 影音延伸 —— 介紹、紀錄片、訪談；不是聽音樂的連結 */
+sec('videos','影音延伸','Watch', has(D.videos) ? `
+  <div class="vnote">以下都是「認識這張唱片」的影音資料——官方介紹、紀錄片、分析與訪談，不是拿來聽音樂的。
+  標示「搜尋」的項目會帶你到 YouTube 的搜尋結果頁（影片會下架、網址會失效，用搜尋比較耐放）。</div>
+  <div class="vids">${D.videos.map(v=>`
+    <a class="vid" href="${v.url ? E(v.url) : ytURL(v.q || (D.artist+' '+D.album))}" target="_blank" rel="noopener">
+      <div class="vtop">
+        <span class="vkind">${E(v.kind||'影片')}</span>
+        ${v.url ? '' : '<span class="vsearch">搜尋</span>'}
+        ${v.len ? `<span class="vlen">${E(v.len)}</span>` : ''}
+      </div>
+      <b>${E(v.title)}</b>
+      ${v.by ? `<span class="vby">${E(v.by)}</span>` : ''}
+      ${v.note ? `<span class="vnt">${E(v.note)}</span>` : ''}
+    </a>`).join('')}</div>` : '');
+
+/* 12 · 延伸聆聽 */
+sec('further','延伸聆聽','Go Deeper', has(D.further) ? `<div class="cards">${
+  D.further.map(f=>`<a href="${amURL(f.artist+' '+f.album)}" target="_blank" rel="noopener">
+    <b>${E(f.album)}</b><span>${E(f.artist)}${f.why?`<br>${E(f.why)}`:''}</span></a>`).join('')}</div>` : '');
+
+/* 13 · 資料來源 */
+sec('sources','資料來源','Sources', has(D.sources) ? `<div class="srcs">${
+  D.sources.map(s=>s.url?`<a href="${E(s.url)}" target="_blank" rel="noopener">${E(s.title)}</a>`:E(s.title)).join(' · ')}</div>` : '');
+
+/* ---------- HERO ---------- */
+const heroHTML = `
+  ${D.backLink!==false?`<a class="back" href="${E(D.backLink||'../index.html')}">← 回專輯推薦</a>`:''}
+  <div class="hero">
+    <div class="hart" id="hart"><div class="ph">${E(D.album).slice(0,2)}</div></div>
+    <div class="hmeta">
+      <div class="kicker">深度導聆 · Deep Listening</div>
+      <h1>${E(D.album)}</h1>
+      <div class="who">${E(D.artist)}</div>
+      <div class="yl">${E(D.year)}${D.label?` · ${E(D.label)}`:''}${D.catalog?` · ${E(D.catalog)}`:''}</div>
+      <div class="chips">
+        ${D.genre?`<span class="chip g">${E(D.genre)}</span>`:''}
+        ${(D.styles||[]).map(s=>`<span class="chip">${E(s)}</span>`).join('')}
+        ${(D.moods||[]).map(s=>`<span class="chip c">${E(s)}</span>`).join('')}
+      </div>
+      <div class="btns">
+        <a class="btn am" href="${amURL(D.itunesTerm || (D.artist+' '+D.album))}" target="_blank" rel="noopener">▶ 在 Apple Music 聽</a>
+        ${has(D.videos)?`<a class="btn yt" href="#videos">▶ 影音延伸 · ${D.videos.length}</a>`:''}
+        ${D.wiki?`<a class="btn" href="${E(D.wiki)}" target="_blank" rel="noopener">Wikipedia</a>`:''}
+      </div>
+    </div>
+  </div>
+  ${D.tagline?`<div class="tagline">${E(D.tagline)}</div>`:''}
+  ${has(D.facts)?`<dl class="facts">${D.facts.map(f=>`<div><dt>${E(f[0])}</dt><dd>${E(f[1])}</dd></div>`).join('')}</dl>`:''}`;
+
+document.getElementById('main').innerHTML = heroHTML + SEC.map((s,i)=>`
+  <section id="${s.id}">
+    <div class="shead"><span class="snum">${String(i+1).padStart(2,'0')}</span>
+      <h2>${s.zh}</h2><span class="sen">${s.en}</span></div>
+    ${s.html}
+  </section>`).join('') + `
+  <footer><span>${E(D.artist)} — ${E(D.album)}</span><span>由 Claude 整理 · ${E(D.compiled||'')}</span></footer>`;
+
+document.getElementById('toc').innerHTML = SEC.map(s=>`<a href="#${s.id}">${s.zh.split(' · ')[0]}</a>`).join('');
+
+/* 逐曲展開 */
+document.querySelectorAll('.trkhead').forEach(h=>{
+  h.onclick = ()=> h.parentElement.classList.toggle('open');
+});
+
+/* 目錄高亮 */
+const links = [...document.querySelectorAll('#toc a')];
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-10% 0px -75% 0px'});
+SEC.forEach(s=>{ const el=document.getElementById(s.id); if(el) obs.observe(el); });
+
+/* 封面：iTunes Search API（JSONP，可在 file:// 直接跑） */
+(function(){
+  if(D.cover){ document.getElementById('hart').innerHTML = `<img src="${D.cover}" alt="">`; return; }
+  const cb = '__amcb1';
+  const s = document.createElement('script');
+  window[cb] = j => {
+    const r = (j.results||[])[0];
+    if(r && r.artworkUrl100)
+      document.getElementById('hart').innerHTML =
+        `<img src="${r.artworkUrl100.replace('100x100bb','1000x1000bb')}" alt="">`;
+    s.remove(); delete window[cb];
+  };
+  s.src = `https://itunes.apple.com/search?term=${encodeURIComponent(D.itunesTerm||(D.artist+' '+D.album))}`
+        + `&entity=album&media=music&limit=1&country=tw&callback=${cb}`;
+  s.onerror = ()=>{ s.remove(); };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深度導聆</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#14131a; --card:#1a1922; --line:#2a2833; --line2:#3a3747;
+    --txt:#ece9f2; --dim:#9b95ab; --dim2:#6f6a7d;
+    --accent:#fa4b6e; --accent2:#ffb26b; --gold:#e8c27a; --cyan:#7ad3e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1000px 560px at 82% -12%, rgba(250,75,110,.13), transparent 62%),
+      radial-gradient(760px 520px at -5% 100%, rgba(120,110,255,.11), transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.8; min-height:100vh;
+  }
+  a{color:inherit}
+  .shell{max-width:1240px;margin:0 auto;padding:0 22px 110px;display:grid;
+    grid-template-columns:200px minmax(0,1fr);gap:38px;align-items:start}
+  @media(max-width:900px){ .shell{grid-template-columns:1fr;gap:0} }
+
+  /* ---------- 側邊目錄 ---------- */
+  nav.toc{position:sticky;top:22px;padding-top:34px}
+  @media(max-width:900px){
+    nav.toc{position:static;padding:16px 0 0;overflow-x:auto;white-space:nowrap;
+      border-bottom:1px solid var(--line);margin-bottom:18px}
+    nav.toc .tocTitle{display:none}
+    nav.toc a{display:inline-block;margin:0 6px 10px 0}
+  }
+  .tocTitle{font-size:11px;letter-spacing:.24em;color:var(--dim2);text-transform:uppercase;margin-bottom:12px}
+  nav.toc a{display:block;font-size:13px;color:var(--dim2);text-decoration:none;padding:6px 10px;
+    border-radius:8px;border-left:2px solid transparent;transition:.16s}
+  nav.toc a:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+  nav.toc a.on{color:var(--accent2);border-left-color:var(--accent);background:rgba(250,75,110,.07)}
+  @media(max-width:900px){ nav.toc a{border-left:0;border-bottom:2px solid transparent}
+    nav.toc a.on{border-left:0;border-bottom-color:var(--accent)} }
+
+  main{padding-top:34px;min-width:0}
+
+  /* ---------- HERO ---------- */
+  .back{display:inline-block;font-size:12.5px;color:var(--dim2);text-decoration:none;margin-bottom:20px}
+  .back:hover{color:var(--txt)}
+  .hero{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+  .hart{width:250px;height:250px;flex:none;border-radius:14px;overflow:hidden;background:#211f2b;
+    position:relative;box-shadow:0 22px 56px rgba(0,0,0,.6)}
+  .hart img{width:100%;height:100%;object-fit:cover;display:block}
+  .hart .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;color:rgba(255,255,255,.2)}
+  .hmeta{flex:1;min-width:280px}
+  .kicker{font-size:11px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+  .hmeta h1{font-size:38px;line-height:1.2;letter-spacing:-.02em;margin:9px 0 5px;font-weight:750}
+  .hmeta .who{font-size:18px;color:var(--dim);margin-bottom:4px}
+  .hmeta .yl{font-size:12.5px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{font-size:11.5px;background:#252331;border:1px solid var(--line);color:var(--dim);
+    padding:4px 11px;border-radius:999px}
+  .chip.g{border-color:rgba(232,194,122,.4);color:var(--gold)}
+  .chip.c{border-color:rgba(122,211,232,.34);color:var(--cyan)}
+  .btns{display:flex;gap:9px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:14px;
+    padding:10px 20px;border-radius:999px;transition:.18s;border:1px solid var(--line2);color:var(--txt);
+    background:var(--card)}
+  .btn:hover{transform:translateY(-1px);border-color:var(--dim2)}
+  .btn.am{background:#fff;color:#111;border-color:#fff}
+  .btn.yt{background:#2a1418;color:#ff8fa3;border-color:#4a2028}
+  .tagline{margin-top:26px;font-size:17.5px;line-height:1.75;color:#ded9ec;
+    border-left:3px solid var(--accent);padding-left:18px;font-weight:520}
+
+  /* ---------- 快速事實 ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px}
+  .facts div{background:var(--bg2);padding:13px 16px}
+  .facts dt{font-size:10.5px;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase;margin-bottom:3px}
+  .facts dd{font-size:14px;color:var(--txt);line-height:1.55}
+
+  /* ---------- 區塊 ---------- */
+  section{margin-top:56px;scroll-margin-top:24px}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;
+    padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .snum{font-size:11px;letter-spacing:.16em;color:var(--dim2);font-variant-numeric:tabular-nums}
+  .shead h2{font-size:19px;letter-spacing:.02em;font-weight:700;color:var(--accent2)}
+  .shead .sen{font-size:11px;letter-spacing:.2em;color:var(--dim2);text-transform:uppercase;margin-left:auto}
+  .prose p{font-size:15.5px;color:#d8d4e4;margin-bottom:14px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{color:var(--gold);font-style:normal;font-weight:600}
+
+  /* ---------- 逐曲導聆 ---------- */
+  .trk{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--bg2),#111017)}
+  .trkhead{display:flex;align-items:center;gap:14px;padding:14px 17px;cursor:pointer;transition:.16s}
+  .trkhead:hover{background:rgba(255,255,255,.03)}
+  .tn{font-size:12px;color:var(--dim2);font-variant-numeric:tabular-nums;width:22px;flex:none}
+  .tt{flex:1;min-width:0}
+  .tt b{display:block;font-size:15.5px;font-weight:640;line-height:1.4}
+  .tt span{font-size:12px;color:var(--dim2)}
+  .tlen{font-size:12.5px;color:var(--dim2);font-variant-numeric:tabular-nums;flex:none}
+  .tcar{font-size:11px;color:var(--dim2);flex:none;transition:.2s}
+  .trk.open .tcar{transform:rotate(90deg)}
+  .trkbody{display:none;padding:2px 17px 18px 53px;border-top:1px solid var(--line)}
+  .trk.open .trkbody{display:block}
+  .trkbody p{font-size:14.5px;color:#d3cfe0;margin:14px 0}
+  .cues{border-left:2px solid var(--line2);padding-left:14px;margin:14px 0}
+  .cue{display:flex;gap:12px;font-size:13.5px;margin-bottom:7px;align-items:baseline}
+  .cue b{color:var(--cyan);font-variant-numeric:tabular-nums;flex:none;font-weight:600;font-size:12.5px}
+  .cue span{color:var(--dim)}
+  .tmeta{font-size:12.5px;color:var(--dim2);margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}
+  .tmeta b{color:var(--dim)}
+  /* ---------- 影音延伸 ---------- */
+  .vnote{font-size:13px;color:var(--dim2);line-height:1.75;margin-bottom:16px;
+    border-left:2px solid var(--line2);padding-left:14px}
+  .vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:11px}
+  .vid{display:block;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:15px 17px;text-decoration:none;transition:.18s}
+  .vid:hover{border-color:#ff8fa3;transform:translateY(-2px);background:#1e1c27}
+  .vtop{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .vkind{font-size:10.5px;letter-spacing:.1em;background:#2a1418;border:1px solid #4a2028;
+    color:#ff8fa3;padding:3px 9px;border-radius:999px}
+  .vsearch{font-size:10.5px;letter-spacing:.1em;background:#1f1d29;border:1px solid var(--line);
+    color:var(--dim2);padding:3px 9px;border-radius:999px}
+  .vlen{font-size:11.5px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  .vid b{display:block;font-size:14.5px;color:var(--txt);font-weight:640;line-height:1.45;margin-bottom:4px}
+  .vby{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+  .vnt{display:block;font-size:12.5px;color:var(--dim2);line-height:1.6}
+
+  /* ---------- 人物誌 ---------- */
+  .people{display:grid;gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:15px;padding:19px 20px;background:var(--bg2)}
+  .prole{font-size:10.5px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .plife{font-size:12.5px;color:var(--dim2);margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .pcard p{font-size:14.5px;color:#d3cfe0;margin-bottom:11px}
+  .phere{background:rgba(250,75,110,.07);border-left:2px solid var(--accent);
+    padding:11px 14px;border-radius:0 9px 9px 0;font-size:14px;color:#e2dded;margin-bottom:12px}
+  .pkey{display:flex;gap:7px;flex-wrap:wrap}
+  .pkey a{font-size:12px;background:#232130;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;border-radius:8px;text-decoration:none;transition:.16s}
+  .pkey a:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- 表格 ---------- */
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .tbl th{background:#1f1d29;color:var(--dim);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-align:left;padding:11px 14px;font-weight:600;border-bottom:1px solid var(--line)}
+  .tbl td{padding:12px 14px;border-bottom:1px solid var(--line);color:#d3cfe0;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tr:hover td{background:rgba(255,255,255,.022)}
+  .tbl .rec{color:var(--gold);white-space:nowrap;font-size:12.5px}
+  .tblwrap{overflow-x:auto}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;font-size:14px}
+  .kv dt{color:var(--dim2);white-space:nowrap}
+  .kv dd{color:#d8d4e4}
+
+  /* ---------- 通用小卡 ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+  .cards a,.cards div.nc{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-decoration:none;transition:.18s}
+  .cards a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .cards b{display:block;font-size:14px;color:var(--txt);margin-bottom:3px;font-weight:640;line-height:1.4}
+  .cards span{font-size:12.5px;color:var(--dim2);line-height:1.5;display:block}
+
+  /* ---------- 時間軸 ---------- */
+  .tl{border-left:2px solid var(--line2);padding-left:20px;margin-left:6px}
+  .tlitem{position:relative;margin-bottom:20px}
+  .tlitem::before{content:'';position:absolute;left:-26px;top:8px;width:9px;height:9px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+  .tlitem .ty{font-size:11.5px;letter-spacing:.14em;color:var(--gold);font-variant-numeric:tabular-nums}
+  .tlitem b{display:block;font-size:15px;margin:2px 0 4px}
+  .tlitem span{font-size:14px;color:var(--dim);line-height:1.65;display:block}
+
+  /* ---------- 路線圖 ---------- */
+  .road{display:grid;gap:12px}
+  .rstep{border:1px solid var(--line);border-radius:14px;padding:17px 19px;background:var(--bg2);
+    display:flex;gap:16px;align-items:flex-start}
+  .rnum{width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0d12;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .rstep b{display:block;font-size:15.5px;margin-bottom:5px}
+  .rstep p{font-size:14.5px;color:#d3cfe0;margin:0}
+
+  .srcs{font-size:12.5px;color:var(--dim2);line-height:2}
+  .srcs a{color:var(--dim);text-decoration:none;border-bottom:1px dotted var(--line2)}
+  .srcs a:hover{color:var(--accent2)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--dim2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .none{color:var(--dim2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc"><div class="tocTitle">目錄</div><div id="toc"></div></nav>
+<main id="main"></main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   資料區 —— 每張專輯只需要換掉這個 D 物件，其餘引擎完全不動
+   ═══════════════════════════════════════════════════════════════ */
+const D = {
+
+/* ── 基本識別 ── */
+artist:"Los Angeles Philharmonic & Gustavo Dudamel",
+album:"Schumann: The Complete Symphonies",
+year:2026,
+label:"Platoon",
+catalog:"PLAT31895",
+genre:"古典 · 浪漫派交響曲",
+styles:["Robert Schumann","交響曲全集","現場錄音","四首交響曲 · 17 軌"],
+moods:["專注","週末黑膠","深夜"],
+itunesTerm:"Schumann Complete Symphonies Dudamel Los Angeles Philharmonic",
+ytTerm:"Dudamel Los Angeles Philharmonic Schumann Complete Symphonies",
+wiki:"https://en.wikipedia.org/wiki/Gustavo_Dudamel",
+compiled:"2026-08-19",
+
+tagline:"2018 年錄下、2026 年才發行的八年封存。杜達美用這套舒曼，替他在洛杉磯的十七年畫下句點——而舒曼寫這四首曲子，也剛好用了十年，同樣是一場從春天走到崩潰邊緣的旅程。",
+
+facts:[
+  ["錄音","2018 年，Walt Disney Concert Hall（現場錄音）"],
+  ["錄音場合","LA Phil「Schumann Focus」音樂節，2018 年 5 月 17 日起連續三個週末"],
+  ["發行日","2026 年 8 月 7 日"],
+  ["廠牌","Platoon（2018 年被 Apple 收購的廠牌）· PLAT31895"],
+  ["版權標示","2026 Los Angeles Philharmonic，獨家授權 PLATOON Ltd."],
+  ["內容","17 軌 · 總長 2 小時 12 分 41 秒"],
+  ["第四號採用版本","1851 年杜塞道夫修訂版（Op.120）"],
+  ["杜達美 LA Phil 任期","2009–2026，共 17 個樂季；現為榮譽音樂與藝術總監"],
+  ["音質","Qobuz 標示 16-bit/44.1kHz 立體聲；未見官方標示 Hi-Res 或空間音訊版本"]
+],
+
+/* ── 1 錄音製作全紀錄 ── */
+production:`這套錄音有一個罕見的時間差：演奏發生在 2018 年 5 月，唱片卻等到 2026 年 8 月才出版。中間隔了八年。
+
+事情的起點是 LA Phil 2017–18 樂季末的「Schumann Focus」音樂節。2018 年 5 月 17 日星期四，杜達美在 Walt Disney Concert Hall 開場，上半場是內田光子睽違十三年重返該廳的舒曼鋼琴協奏曲，下半場是《第一號》。接著 5 月 19–20 日《第二號》、5 月 24–25 日《第三號「萊茵」》、5 月 26–27 日《第四號》，後兩組音樂會都搭配《傑諾維瓦》序曲與 Sol Gabetta 的大提琴協奏曲。5 月 22 日還有一場團員自組的全舒曼室內樂音樂會，整個系列在 6 月 1–3 日以 Peter Sellars 執導、Refik Anadol 影像設計的清唱劇《天堂與仙子》收尾。
+
+當時在場的樂評 Richard S. Ginell 就在報導裡寫明：「這些演出同時在錄音，準備日後發行——但還不知道何時、由哪個廠牌。」答案要等八年後才揭曉：Platoon。這是一家 2018 年被 Apple 收購的廠牌，近年積極簽下古典陣容，LA Phil 與杜達美是其中最重要的一組。
+
+錄音場地本身是這套唱片的主角之一。Walt Disney Concert Hall 由 Frank Gehry 設計、Nagata Acoustics 的豐田泰久負責音響，2003 年 10 月啟用，2,265 席的葡萄園式廳堂以極高的解析度著稱。Ginell 對這件事有一段很具體的觀察：舒曼的音樂似乎改變了這個廳的聲音本身——殘響變得更明顯，銅管的音色也和平常不同。他還特別點名首席定音鼓 Joseph Pereira 換上了小頭鼓槌，敲出接近十八世紀古樂團的槍響式聲響，把空氣「清出來」。這是理解這套錄音音響性格的一把鑰匙：它不是靠 EQ 修出來的透明，而是演奏方式本身就選擇了透明。
+
+編制上，杜達美在協奏曲用室內樂團規模，交響曲則擴編——但擴的是弦樂，管樂與銅管維持一個聲部一人。這是當代舒曼演奏的主流解法：既要有交響的重量，又不能讓管樂堆疊把織體糊掉。另一個小細節：5 月 17 日那場，協奏曲他看譜，交響曲背譜。
+
+需要誠實說明的是，各串流平台的頁面都沒有列出錄音製作人、錄音師與母帶工程師的姓名。LA Phil 的官方新聞稿附了一份可下載的內頁 PDF（Schumann Symphonies Nos 1–4），技術 credits 是否收錄其中尚未確認——若你手邊能打開那份檔案，這一欄可以再補上。`,
+
+/* ── 2 深度樂評 ── */
+review:`舒曼的交響曲有一個延續了一百多年的罪名：說他不會配器。這個說法的核心指控是，他把同一條線寫給太多樂器重複疊置，導致總譜「能演奏，但混濁」。二十世紀有整整幾代指揮家為此動手術——馬勒替《萊茵》重新配器，George Szell 大幅修剪，之後又出現用室內樂團從根本上稀釋織體的做法。
+
+2010 年舒曼兩百週年之後，這件事變成了顯學。2013 年起 Rattle、Nézet-Séguin、Ticciati、Zacharias、Holliger、Tilson Thomas 接連推出全集，主流答案是「輕、快、透明」。杜達美 2018 年這套錄音就站在這個潮流裡，但他的做法有一點不同：他沒有縮編，而是靠廳堂、靠演奏方式、靠平衡的控制去換取清晰度。用 Ginell 的話說，Disney Hall 的高解析音響「盡其所能地把配器澄清了」。
+
+結果是一種相當特別的質地：聲音是飽滿的、弦樂是厚的，但你依然聽得見中聲部。這在舒曼身上並不容易——他最麻煩的地方就是內聲部，中提琴、第二小提琴、法國號常常在同一個音區互相掩蓋。這套錄音裡那些平常會糊掉的地方大多站得住。
+
+杜達美的詮釋取向可以用一個詞概括：結構優先。《洛杉磯時報》當年的評語說得很準——他「強調舒曼緊密的交響結構，並以令人豁然開朗的清晰度處理器樂平衡」，「這場演出重視方法而非瘋狂」。這句話同時是讚美也是保留。舒曼的音樂裡確實有「瘋狂」的那一面——他一生都在恐懼發瘋，最後也真的死在療養院裡——而杜達美選擇不去放大那個部分。他給的是一個健康的、明亮的、往前推的舒曼。
+
+《第二號》的詼諧曲是全集裡最能說明他長處的一軌：節奏咬得極緊、輪廓刀刻一樣、樂團的技術完全跟得上。而同一首的 Adagio espressivo 則揭示了另一面——樂團在這裡提煉出舒曼作品裡那種迷人的抒情性與情感上的脆弱。這兩個樂章放在一起聽，你會理解為什麼《第二號》是舒曼最不像交響曲、卻最像自傳的一首。
+
+Ginell 對 2018 年首場的保留意見值得一併記下：他認為當時杜達美「還沒有把個別器樂線條的分句與重音刻畫得夠銳利」，並建議去聽伯恩斯坦與維也納愛樂的版本當作示範。這是一個公允的比較點——伯恩斯坦那套的個性更強、更任性，杜達美這套則更均衡、更好聽、也更容易一次聽完四首。要哪一種，取決於你要的是舒曼這個人，還是舒曼這些作品。
+
+最後一件事值得說。這套錄音發行的時間點不是偶然：它是杜達美十七年任期的告別禮。也因此，把它當成一場總結來聽是合理的——這是一個他從 28 歲帶到 45 歲的樂團，在他離開前留下的聲音樣本。從這個角度，錄音時間比發行時間早八年反而變成優點：你聽到的不是一場刻意為告別而製作的演出，而是一段關係正處在最穩定狀態時的實況。`,
+
+/* ── 3 逐曲導聆（全 17 軌） ── */
+tracks:[
+/* ══ 第一號「春」 ══ */
+{n:1, title:"第一號「春」· I. Andante un poco maestoso – Allegro molto vivace", len:"11:14",
+ writer:"降B大調 Op.38｜1841 年 1 月，草稿只花四天",
+ personnel:"洛杉磯愛樂 · 杜達美指揮 · 2018 年現場錄音",
+ note:`舒曼三十歲才寫第一首交響曲。1840 年他終於打贏官司娶到克拉拉，那一年他寫了一百多首藝術歌曲，史稱「歌曲年」；1841 年他把火力全轉向管弦樂，這首曲子的草稿在 1 月 23 日到 26 日，四天內完成，2 月 20 日配器就寫完了。3 月 31 日在萊比錫布商大廈首演，由孟德爾頌指揮，反應熱烈。
+
+開頭那個銅管齊奏的動機是全曲的種子——後面 Allegro 的主題其實就是它加速後的樣子。舒曼給朋友的信裡說，他要「第一聲小號聽起來像從高處傳來、像一聲喚醒的召集令」。關於這個動機還有一個流傳很廣的說法：舒曼原本把它寫低了幾個音，排練時發現當時的自然銅管吹不出來，只好整體移高。這個典故在樂團導聆與唱片解說裡很常見，但沒有進入嚴謹的學術文獻，姑且當成掌故。
+
+還有一個常被提到的技術細節：第一樂章要求三顆定音鼓，調音是不尋常的 B♭–G♭–F，據說出自舒曼表親、萊比錫定音鼓手 Ernst Pfundt 的建議。一般說法稱它是同類型管弦作品中最早這麼要求的；不過也有研究指出第三顆鼓是後來修訂時才加入的，這個「第一」姑且存疑。這一軌長 11:14，代表杜達美有反覆呈示部。`,
+ cues:[["開頭","銅管齊奏的召集令。記住這個音型，它會貫穿整個樂章"],
+       ["導奏轉快板","同一個動機被加速、變成主題本身——舒曼最擅長的手法"],
+       ["呈示部反覆","注意杜達美第二遍的處理和第一遍不同"],
+       ["發展部","中聲部最容易糊掉的地方，聽這裡就知道這套錄音的透明度值不值得"],
+       ["尾聲","三顆定音鼓的音高設計在此完全展開"]],
+ yt:"Schumann Symphony No 1 Spring Dudamel Los Angeles Philharmonic"},
+
+{n:2, title:"第一號「春」· II. Larghetto", len:"7:07",
+ writer:"降E大調｜舒曼原本給它的標題是「黃昏」",
+ note:`舒曼原先替四個樂章都寫了標題——①春之始 ②黃昏 ③快樂的玩伴 ④春滿——但出版前全部撤掉了。他對這件事的理由後來說得很清楚：一旦眼睛被引向某一點，耳朵就再也無法獨立判斷。
+
+這是一段幾乎不間斷的長旋律，弦樂主導，是全曲最接近歌曲的部分——別忘了他前一年才剛寫完一百多首藝術歌曲。樂章結尾長號悄悄進來，直接接進第三樂章，沒有停頓。那三支長號自第一樂章之後就沒再出現過，這次再現等於替下一個樂章開門。`,
+ cues:[["開頭","第一小提琴的長旋律，注意它幾乎不換氣"],
+       ["中段","木管接手同一條線，音色轉暗"],
+       ["結尾","長號自第一樂章後再度現身，預告下一樂章的動機，不要按暫停"]],
+ yt:"Schumann Symphony 1 Larghetto Dudamel"},
+
+{n:3, title:"第一號「春」· III. Scherzo: Molto vivace – Trio", len:"5:31",
+ writer:"d小調｜兩個三聲中部，是舒曼的招牌設計",
+ note:`一個帶著重量的三拍子詼諧曲，但舒曼給了它兩個三聲中部而不是一個——第一個是明亮的 D 大調，第二個轉到降B大調，性格完全不同。「一個詼諧曲配兩個性格不同的三聲中部」後來成為舒曼自己的習慣寫法，第二號的詼諧曲用的是同一套設計。
+
+留意詼諧曲主題與第二樂章結尾長號那句的關聯：那不是巧合，是舒曼在做主題連結。`,
+ cues:[["開頭","主題來自上一樂章結尾的長號動機"],
+       ["第一個三聲中部","轉大調，木管群主導，突然變得輕盈"],
+       ["第二個三聲中部","性格再變一次，這是舒曼比貝多芬多走的一步"],
+       ["尾聲","逐漸消散而不是收在強奏，接得很漂亮"]],
+ yt:"Schumann Symphony 1 Scherzo Dudamel"},
+
+{n:4, title:"第一號「春」· IV. Allegro animato e grazioso", len:"7:56",
+ writer:"降B大調｜原標題「春滿」",
+ note:`全曲最無憂無慮的一段。Ginell 在 2018 年的樂評裡特別稱讚了這個終樂章「充滿衝勁與生氣」，即使他對前面幾個樂章的分句有保留。
+
+中段有一個很少被注意的細節：一段由法國號與長笛擔綱的慢速華彩，是全曲唯一一次把樂團完全停下來讓獨奏說話。舒曼在給 Wilhelm Taubert 的信裡形容整個終樂章時說：「關於最後一個樂章，我可以告訴你，我想像的是春天的告別。」
+
+LA Phil 官網把這一軌的影像片段放上 YouTube 當作專輯預告，如果你只有八分鐘，就聽這一軌。`,
+ cues:[["開頭","弦樂的下行音階，輕快得幾乎像嬉遊曲"],
+       ["中段","法國號與長笛的慢速華彩，全曲唯一一次讓獨奏獨當一面"],
+       ["再現","主題回來時的配器比第一次厚，注意銅管的加入時機"],
+       ["尾聲","加速收尾，杜達美在這裡放得很開"]],
+ yt:"Schumann Symphony 1 Spring finale Allegro animato e grazioso Dudamel"},
+
+/* ══ 第二號 ══ */
+{n:5, title:"第二號 · I. Sostenuto assai – Un poco più vivace – Allegro, ma non troppo", len:"12:04",
+ writer:"C大調 Op.61｜1845 年 12 月起草，1846 年 10 月才配器完成",
+ note:`這是舒曼在崩潰之後寫的曲子。1844 年他陪克拉拉去俄國巡演，回程時已經身心俱疲，年底舉家搬到德勒斯登。醫生的記錄是：失眠、全身無力、聽覺障礙、顫抖、腳部冰冷，加上一整組恐懼症。他自己說這首曲子是在「半病半好」的狀態下寫的，並形容音樂「透露出我當時的狀態」。
+
+開頭那個極弱的銅管 motto 是全曲的骨架，四個樂章都會回到它。它的質地像巴哈的眾讚歌前奏曲——這不是巧合，舒曼寫這首之前剛完成六首以 B-A-C-H 為主題的管風琴賦格。也有人指出這個開頭與海頓第 104 號「倫敦」的陰鬱銅管號角有親緣關係，兩者用了同樣的主音—屬音進行；不過這個關聯在文獻上只是「可能」，不是定論。
+
+在那個 motto 底下，弦樂同時進行一條完全不同的、蜿蜒不安的線。兩層東西疊在一起卻互不理睬——這是全曲最早的一個訊號：這首交響曲是分裂的。`,
+ cues:[["開頭","極弱的銅管 motto，像遠處的眾讚歌。記住它，四個樂章都會回來"],
+       ["弦樂進入","注意弦樂的線條和銅管完全不同步，兩層各走各的"],
+       ["轉入快板","導奏的張力終於釋放，但主題本身仍帶著焦慮"],
+       ["發展部","全曲最擁擠的段落，也是最能檢驗這套錄音平衡功力的地方"],
+       ["尾聲","銅管 motto 再現，第一次以勝利的姿態出現"]],
+ yt:"Schumann Symphony No 2 Dudamel Los Angeles Philharmonic"},
+
+{n:6, title:"第二號 · II. Scherzo: Allegro vivace", len:"6:53",
+ writer:"C大調｜十九世紀常見的安排：詼諧曲放在慢板之前",
+ note:`全集裡最能展示樂團技術的一軌，也是這套錄音最容易讓人一聽就服氣的地方。小提琴從頭到尾是不間斷的十六分音符無窮動，速度快到接近極限，任何一點鬆散都會立刻暴露。
+
+結構上這裡也有兩個三聲中部。第二個中部直接使用了 B-A-C-H 動機——降B、A、C、B——用流動的八分音符寫成巴洛克風格。舒曼剛寫完 B-A-C-H 賦格 Op.60，顯然還沒從巴哈裡走出來。
+
+聽這一軌的時候可以特別注意舒曼把主 motto 藏在哪裡。它在結尾以銅管的形式回來，把這個看似獨立的樂章重新綁回全曲的架構。`,
+ cues:[["開頭","小提琴的無窮動，速度極快，聽整齊度"],
+       ["第一個三聲中部","三連音，重心突然改變"],
+       ["第二個三聲中部","B-A-C-H 動機出現，巴洛克質地"],
+       ["結尾","第一樂章的銅管 motto 回來，把樂章綁回全曲"]],
+ yt:"Schumann Symphony 2 Scherzo Allegro vivace Dudamel"},
+
+{n:7, title:"第二號 · III. Adagio espressivo", len:"9:57",
+ writer:"c小調｜舒曼最私密的慢板樂章",
+ note:`舒曼寫過最動人的慢板，也是全集的情感核心。旋律先由第一小提琴唱出，隨後雙簧管接手——那是一條下行的、幾乎在嘆息的線。
+
+中段的織體高度對位化，這直接連結到 1845 年他與克拉拉一起密集研究對位法的那段時間。舒曼自己說：「直到 1845 年，我開始在腦中構思與完成一切，一種全然不同的作曲方式才開始成形。」換句話說，這個樂章是他寫作方法改變之後的第一批成果。
+
+樂團在這裡提煉出的東西，是舒曼作品裡那種抒情性與情感上的脆弱——和詼諧曲的鋼鐵精準完全是同一批人做出來的兩種聲音。這兩軌連著聽，是理解這套錄音的最短路徑。`,
+ cues:[["開頭","第一小提琴的下行主題，注意它一直在往下掉"],
+       ["雙簧管接手","同一條線換了音色，孤獨感加倍"],
+       ["中段","對位織體展開——1845 年那場對位法自習的成果"],
+       ["再現","主題回來時弦樂的音量控制，是全集最考驗指揮的地方"],
+       ["尾聲","極弱收束，不要在這裡調大音量"]],
+ yt:"Schumann Symphony 2 Adagio espressivo Dudamel"},
+
+{n:8, title:"第二號 · IV. Allegro molto vivace", len:"8:08",
+ writer:"C大調｜舒曼稱這首曲子讓他「重新感覺自己是個人」",
+ note:`終樂章前半是慶典式的進行，但真正的關鍵在第 280 小節：一個全新的主題突然出現，此後主導全曲收尾。
+
+這個新主題被廣泛認為呼應了貝多芬《致遠方的愛人》的末曲，同時也和〈歡樂頌〉有關；同一素材在舒曼的《C大調幻想曲 Op.17》與《弦樂四重奏 Op.41/2》裡也出現過。不過要說明的是，這屬於「靈感與指涉」層次的分析，沒有文獻證據顯示舒曼是有意識地引用——研究者對同類說法一向有保留。真正可以確定的是：舒曼自己說過，寫完這首之後他「重新感覺自己是個人」。
+
+四個樂章全在 C 大調（只有慢板前段在 c 小調），這種同主調寫法在浪漫派交響曲裡相當少見，效果是整首曲子被綁得很緊——所有的掙扎都發生在同一個房間裡。`,
+ cues:[["開頭","慶典式的進行曲節奏，和第三樂章的落差極大"],
+       ["第 280 小節前後","一個全新的主題出現，此後接管全曲——就是那個被認為與貝多芬有關的旋律"],
+       ["新主題發展","注意它如何逐步把第一樂章的銅管 motto 吸收進來"],
+       ["尾聲","全曲唯一一次無保留的勝利。舒曼說寫完這首之後他重新感覺自己是個人"]],
+ yt:"Schumann Symphony 2 finale Allegro molto vivace Dudamel"},
+
+/* ══ 第三號「萊茵」 ══ */
+{n:9, title:"第三號「萊茵」· I. Lebhaft", len:"9:12",
+ writer:"降E大調 Op.97｜1850 年 11 月 2 日至 12 月 9 日，寫於杜塞道夫",
+ note:`1850 年舒曼接下杜塞道夫市音樂總監一職，搬到萊茵河畔。這首曲子在一個多月內寫完，是他最後完成的交響曲——編號第三，卻是四首裡最晚寫的。
+
+開頭沒有導奏，樂團直接衝出來。真正的招牌是節奏：舒曼在三拍子裡不斷用 hemiola（把三拍聽成兩拍），讓整個樂章像一條有暗流的河，你會一直感覺重心在滑動卻抓不住它。這是全集最外向、最陽光的一段，也是 LA Phil 官方選來當預告的樂章之一。
+
+Ginell 提到杜達美這套的取向是「輕、快、透明」——在這一軌上這個取向最佔便宜，因為舒曼在這裡的織體本來就厚，稍微一慢就會變成泥漿。`,
+ cues:[["開頭","沒有導奏，主題直接爆發，注意那個往上衝的音型"],
+       ["hemiola 出現","三拍被聽成兩拍，重心開始滑動——這是全樂章的核心趣味"],
+       ["第二主題","突然安靜下來，木管群主導"],
+       ["再現","法國號齊奏把主題帶回來，是全集最華麗的銅管時刻之一"],
+       ["尾聲","不斷加速，河水終於出海"]],
+ yt:"Schumann Symphony No 3 Rhenish Lebhaft Dudamel Los Angeles Philharmonic"},
+
+{n:10, title:"第三號「萊茵」· II. Scherzo: Sehr mäßig", len:"6:34",
+ writer:"C大調｜原標題「萊茵河上的早晨」，出版前刪除",
+ note:`名為詼諧曲，實際上是一支德國民間舞曲 Ländler——慢的、搖擺的、農民式的三拍子。舒曼原本給它的標題是「萊茵河上的早晨」，出版前刪掉了。
+
+中段有一個很低沉的段落，中提琴、大提琴與低音管在低音區持續盤旋，一般認為那是在描寫河水本身。整個樂章的姿態是往後靠的，和第一樂章的往前衝正好相反。`,
+ cues:[["開頭","Ländler 的搖擺三拍，不是詼諧曲該有的速度"],
+       ["低音段落","中提琴、大提琴、低音管在低音區盤旋——被認為是萊茵河本身"],
+       ["主題再現","變奏而非重複，舒曼把三段體和變奏曲混在一起"],
+       ["尾聲","逐漸淡出，河面歸於平靜"]],
+ yt:"Schumann Symphony 3 Rhenish Scherzo Sehr massig Dudamel"},
+
+{n:11, title:"第三號「萊茵」· III. Nicht schnell", len:"5:45",
+ writer:"降A大調｜全曲最短、最安靜的樂章，省略定音鼓與銅管",
+ note:`舒曼在這裡把定音鼓、小號與長號全部拿掉，只留木管、法國號與弦樂。這是全曲的中場休息，也是五樂章結構能成立的關鍵——如果沒有這五分鐘的清空，接下來的「大教堂樂章」不會有那麼大的衝擊。
+
+單簧管與低音管的對答是這一軌的主體，法國號則在底下托住那條抒情線。速度標示 Nicht schnell（不快）而不是慢板，指揮很容易處理得太拖；杜達美選的速度偏流動，維持了往前的感覺。`,
+ cues:[["開頭","定音鼓、小號、長號全數退場，只剩木管、法國號與弦樂——聲音世界突然縮小"],
+       ["木管對答","單簧管與低音管的往來，法國號在底下托著，室內樂的規模"],
+       ["中段","弦樂加入但仍極克制"],
+       ["結尾","停在一個沒有解決感的地方，直接為下一樂章讓路"]],
+ yt:"Schumann Symphony 3 Rhenish Nicht schnell Dudamel"},
+
+{n:12, title:"第三號「萊茵」· IV. Feierlich", len:"6:19",
+ writer:"降e小調｜俗稱「大教堂樂章」，全集最著名的段落",
+ note:`這是舒曼寫過最不像他自己的音樂，也是整套全集的重心。
+
+背景是 1850 年 11 月，科隆大教堂舉行了 Johannes von Geissel 晉封樞機主教的典禮，舒曼夫婦曾造訪科隆。手稿上原本有一句題辭，大意是「具有伴隨一場莊嚴儀式的性格」，出版前照例刪掉了。舒曼的理由一貫：不要讓標題綁架耳朵。
+
+音樂上，弦樂以 sforzando 的和弦劈開空間，隨即進入極弱的法國號與長號眾讚歌——三支長號在前面三個樂章一次都沒有吹過，整首曲子的第一個長號音就是這裡。這在演奏上是惡名昭彰的難關：冷的樂器、極弱的音量、暴露的和聲，任何一點不準都無所遁形。
+
+聽這一軌等於在測試三件事：樂團銅管的控制力、廳堂的殘響、以及錄音有沒有把極弱音收住。Disney Hall 的解析度在這裡是決定性的。`,
+ cues:[["開頭","弦樂的 sforzando 和弦，像大門被推開"],
+       ["長號進入","全曲前三樂章長號完全沒吹過。第一個音就是極弱的眾讚歌——這是整套錄音最難的十秒"],
+       ["對位展開","主題被層層堆疊，織體愈來愈密，像穹頂往上長"],
+       ["高潮","銅管全奏，但注意舒曼從未讓它變成噪音"],
+       ["尾聲","回到極弱，儀式結束，門重新關上"]],
+ yt:"Schumann Symphony 3 Rhenish Feierlich cathedral movement Dudamel"},
+
+{n:13, title:"第三號「萊茵」· V. Lebhaft", len:"5:23",
+ writer:"降E大調｜舒曼最後一首交響曲的最後一個樂章",
+ note:`從大教堂的陰影裡直接跳回陽光。這個對比是刻意的，也是五樂章結構真正的目的：如果沒有第四樂章，這個終曲只是一場愉快的節慶；有了第四樂章，它變成一種劫後餘生。
+
+結尾處第四樂章的眾讚歌動機以明亮的方式再現一次，把整首曲子綁起來。這是舒曼在交響曲寫作上最成熟的手筆——也是他最後一次。三年後他投進了萊茵河。`,
+ cues:[["開頭","明亮的降E大調，和上一樂章的降e小調只差一個調式"],
+       ["中段","節慶式的推進，木管群的細節很多"],
+       ["眾讚歌再現","第四樂章的動機以明亮的姿態回來，全曲在此完成閉環"],
+       ["尾聲","舒曼交響曲寫作的終點。他三年後投進了萊茵河"]],
+ yt:"Schumann Symphony 3 Rhenish finale Lebhaft Dudamel"},
+
+/* ══ 第四號 ══ */
+{n:14, title:"第四號 · I. Ziemlich langsam – Lebhaft", len:"11:09",
+ writer:"d小調 Op.120（1851 年修訂版）｜原曲寫於 1841 年",
+ note:`這首曲子的身世最複雜。它其實是舒曼第二部完成的交響曲，1841 年下半年寫成（各家對起訖日期說法不一，草稿據說只花了約一週），同年 12 月 6 日在萊比錫首演——但孟德爾頌無法出席，改由樂團首席 Ferdinand David 指揮，效果平庸；同場克拉拉還和李斯特合奏了雙鋼琴版《六人變奏》，風頭全被搶走。舒曼把總譜收了回去。
+
+十年後的 1851 年，他在杜塞道夫用大約一週的時間重寫，1853 年由 Breitkopf & Härtel 以「第四號 Op.120」出版。這套錄音用的就是 1851 年版。
+
+要先澄清一個常見的誤解：四樂章不間斷並不是 1851 年才有的設計，1841 年的原版本來就是這樣寫的（原標題甚至叫《交響幻想曲》）。修訂真正改掉的是兩件事：① 配器明顯加厚，聲部疊置更多——1851 版是濃湯，1841 版是清湯；② 終樂章把第一樂章的主題正式整合進來，主題統一感更強。另外修訂版把義大利文速度術語全部換成德文，樂章之間的接縫也重寫得更順。
+
+這件事後來變成一場家族爭議。克拉拉在她主編的全集裡寫下「1841 年只是草稿、1851 年才完整配器」——這句話並不屬實。布拉姆斯極偏愛 1841 年版，不顧克拉拉強烈反對，於 1891 年把它出版了。
+
+還有一個彩蛋：全曲的核心動機 F–E–D–C♯–D 被認為是移調過的「克拉拉主題」（C–B–A–G♯–A）。整首曲子從頭到尾都在念同一個人的名字。`,
+ cues:[["開頭","極慢的導奏，注意那個下行五音動機——它是全曲的種子，也被認為是「克拉拉主題」"],
+       ["轉入 Lebhaft","導奏的動機加速變成主題本身，和第一號用的是同一招"],
+       ["發展部","1851 年版加厚配器的效果在這裡最明顯"],
+       ["樂章結尾","不要停——四個樂章在這一版是連續不中斷的"]],
+ yt:"Schumann Symphony No 4 D minor Dudamel Los Angeles Philharmonic"},
+
+{n:15, title:"第四號 · II. Romanze: Ziemlich langsam", len:"4:12",
+ writer:"a小調｜全集最短的一軌",
+ note:`四分鐘，是整套全集最短的樂章，也是最溫柔的。雙簧管與大提琴齊奏出一段民謠式的旋律，簡單到近乎樸素。
+
+中段獨奏小提琴的華彩線條是全曲最美的幾十秒——那條線在第一樂章的動機上盤旋，「克拉拉主題」在這裡以最原始的形態出現。舒曼寫這首曲子的 1841 年，是他和克拉拉結婚的第二年。
+
+這一軌短到很容易被跳過，但它是整首曲子的心臟。`,
+ cues:[["開頭","雙簧管與大提琴的齊奏，民謠質地"],
+       ["獨奏小提琴進入","全曲最美的段落。那條華彩線繞著第一樂章的動機打轉"],
+       ["結尾","不解決、直接接進詼諧曲"]],
+ yt:"Schumann Symphony 4 Romanze Ziemlich langsam Dudamel"},
+
+{n:16, title:"第四號 · III. Scherzo: Lebhaft", len:"6:00",
+ writer:"d小調｜主題是第一樂章動機的倒影",
+ note:`詼諧曲的開頭是核心動機的倒影——原本往下走的線被翻過來往上走。舒曼在這首曲子裡把「主題循環」推到了 1841 年的極限，這種寫法比李斯特的交響詩還早。
+
+三聲中部把第二樂章那段獨奏小提琴的華彩直接搬過來，是全曲最明顯的一次跨樂章引用。
+
+另外一個學術上的小發現：詼諧曲的音型被指出借用自 Kalliwoda 的第一號交響曲 Op.7。`,
+ cues:[["開頭","主題是第一樂章動機的倒影——原本往下，現在往上"],
+       ["三聲中部","第二樂章的獨奏小提琴華彩被直接搬過來"],
+       ["再現","比第一次更急促"],
+       ["結尾","不收尾，而是直接懸空進入終樂章的長段過渡"]],
+ yt:"Schumann Symphony 4 Scherzo Lebhaft Dudamel"},
+
+{n:17, title:"第四號 · IV. Langsam – Lebhaft", len:"9:17",
+ writer:"D大調｜從詼諧曲的黑暗長出來的過渡，是全曲最著名的段落",
+ note:`終樂章前面那段 Langsam 過渡是舒曼寫過最有戲劇性的幾十小節：從詼諧曲結尾的懸空狀態出發，弦樂在極弱中不斷試探，銅管一點一點透進來，然後突然爆發成 D 大調的主題。這一段常被拿來和貝多芬第五號從第三樂章接到終樂章的過渡相提並論，而舒曼寫它的時候是 1841 年。
+
+主題本身是第一樂章主題的大調化——同一個素材走了四十分鐘，終於從 d 小調翻成 D 大調。1851 年修訂版還多做了一件事：把第一樂章主題與終曲的凱旋主題正式整合起來，1841 年版沒有走到這一步。這是修訂版最有力的辯護理由。
+
+呈示部末尾的銅管眾讚歌在修訂版有反覆，原版沒有。最後的加速衝刺，就是你在專輯介紹裡讀到的「令人血脈賁張的終章」。`,
+ cues:[["開頭 Langsam","從黑暗中試探——舒曼版的貝多芬第五號過渡，而且早了很多人一步"],
+       ["爆發進入 Lebhaft","d 小調終於翻成 D 大調。同一個動機走了四十分鐘才走到這裡"],
+       ["銅管眾讚歌","1851 年修訂版在這裡加了反覆，1841 年版沒有"],
+       ["主題整合","第一樂章主題與終曲凱旋主題正式合流，這是修訂版最重要的改動"],
+       ["尾聲加速","全集的終點。杜達美在這裡完全放開"]],
+ yt:"Schumann Symphony 4 finale Langsam Lebhaft Dudamel"}
+],
+
+/* ── 4 人物誌 ── */
+people:[
+{role:"作曲", name:"Robert Schumann 羅伯特・舒曼", life:"1810 年 6 月 8 日–1856 年 7 月 29 日 · 生於薩克森茨維考，卒於波昂近郊 Endenich 療養院",
+ bio:`書商之子，本來要當鋼琴家，因手指出問題（原因至今無定論）而轉向作曲與樂評。他同時是十九世紀最重要的音樂評論家之一，創辦《新音樂雜誌》，用「弗洛雷斯坦」與「歐塞比烏斯」兩個虛構人格輪流寫作——一個外向衝動、一個內省憂鬱。那不只是文學遊戲，那是他真實的內在結構。
+
+1840 年他打贏與克拉拉父親的官司終於結婚，那一年寫了一百多首藝術歌曲；1841 年火力全轉向管弦樂，一年內寫出第一號與 d 小調（後來的第四號）。之後 1845–46 年寫第二號、1850 年寫第三號。四首交響曲，剛好橫跨十年。
+
+1850 年他到杜塞道夫任市音樂總監，但因害羞與精神狀態不穩無法駕馭樂團，三年後辭職。1853 年他認識了二十歲的布拉姆斯，寫下人生最後一篇樂評〈新的道路〉。1854 年 2 月 27 日他投入萊茵河自殺未遂，被漁夫救起，依他自己的要求住進 Endenich 療養院。院方認為病患與親屬接觸有害，布拉姆斯與姚阿幸獲准探視，克拉拉卻直到他去世前兩天才見到丈夫。官方死亡記錄是肺炎，真正死因至今仍有爭議。`,
+ here:"四首交響曲是他一生最清醒與最危險的十年的橫切面。第一號寫於新婚後的亢奮期，四天完成草稿；第二號寫於 1844 年崩潰之後，他自己說音樂「透露出我當時的狀態」；第三號寫於杜塞道夫上任那年，是他最外向的作品，也是他最後一首交響曲；第四號則是 1841 年的舊作在十年後被重新打磨。按寫作順序聽這四首，你會聽見一個人如何用同樣的形式，記錄自己從春天走到療養院的路。",
+ key:[["鋼琴協奏曲 a小調 Op.54","1845"],["幻想曲集《克萊斯勒魂》","1838"],["聯篇歌曲《詩人之戀》","1840"],["《童年即景》","1838"],["《狂歡節》Op.9","1835"],["大提琴協奏曲 a小調","1850"]]},
+
+{role:"推手 · 版本守門人", name:"Clara Schumann 克拉拉・舒曼", life:"1819–1896 · 十九世紀最重要的鋼琴家之一",
+ bio:`九歲登台，十九世紀最負盛名的演奏家之一，職業生涯橫跨六十年。她也是作曲家，但婚後幾乎停筆，把精力放在演奏、教學、養育八個孩子，以及推廣丈夫的作品上。羅伯特死後她又活了四十年，成為舒曼作品最權威也最強勢的守護者。`,
+ here:`這四首交響曲能存在，很大程度上是她推的。她在日記裡寫過：「最好他能為管弦樂團作曲；他的想像力在鋼琴上找不到足夠的空間……但願我能促成此事。」1845 年她與羅伯特一起密集研究對位法，那段自習直接改變了第二號的寫法。
+
+但她也是第四號版本爭議的中心。她在自己主編的全集裡寫下「1841 年只是草稿、1851 年才完整配器」——這句話並不屬實。布拉姆斯堅信 1841 年原版更好，不顧她強烈反對於 1891 年出版。這場爭執到今天都還沒結束：這張唱片選的是克拉拉那一邊。
+
+還有一個更私密的線索：第四號的核心動機被認為是移調過的「克拉拉主題」。整首曲子從頭到尾都在念同一個人的名字。`,
+ key:[["鋼琴三重奏 g小調 Op.17","1846"],["鋼琴協奏曲 a小調 Op.7","1835"],["六首歌曲 Op.13","1844"]]},
+
+{role:"指揮", name:"Gustavo Dudamel 古斯塔沃・杜達美", life:"1981 年 1 月 26 日生 · 委內瑞拉巴基西梅托",
+ bio:`長號手的兒子，五歲進入委內瑞拉的音樂教育體系 El Sistema，先學小提琴，1995 年開始學指揮，師從 El Sistema 創辦人 José Antonio Abreu。1999 年、十八歲時就當上西蒙・玻利瓦交響樂團音樂總監，2004 年贏得馬勒國際指揮大賽，2007 年起任哥德堡交響樂團首席指揮。
+
+2007 年 4 月，二十六歲的他被宣布將接掌洛杉磯愛樂，2009 年 9 月正式上任。這是古典樂界近三十年最受矚目的任命之一。他也曾任巴黎歌劇院音樂總監（2021–2023）。2023 年 2 月宣布將於 2025–26 樂季結束後卸任 LA Phil，轉任紐約愛樂音樂與藝術總監，2026–27 樂季正式就任——是史上第一位擔任該職的拉丁美洲人。
+
+他偏愛「全集」這種形式：在洛杉磯的十七年間，他已經做過貝多芬、布拉姆斯、柴可夫斯基、舒伯特，以及 2012 年那次在二十四天內跑完馬勒全集的瘋狂計畫。`,
+ here:`舒曼全集是他這一系列全集裡的最後一套，也是任期的收尾之作。他的取向是結構優先：《洛杉磯時報》的評語是他「強調舒曼緊密的交響結構，並以令人豁然開朗的清晰度處理器樂平衡」，「重視方法而非瘋狂」。
+
+具體做法上，他沒有像 Ticciati、Nézet-Séguin 那樣用室內樂團稀釋織體，而是擴編弦樂、管樂與銅管維持一個聲部一人，靠平衡的控制去換清晰度。2018 年首場（第一號）他協奏曲看譜、交響曲全程背譜。
+
+當年也有保留意見：樂評 Richard S. Ginell 認為 2018 年首場時他「還沒把個別器樂線條的分句與重音刻畫得夠銳利」，並推薦去聽伯恩斯坦與維也納愛樂的版本作對照。這個比較點到今天仍然成立。`,
+ key:[["Beethoven Symphonies 5 & 7","2006"],["The Rite of Spring","2010"],["Mahler Symphony No. 8","2012"],["Tchaikovsky Symphony No. 5","2009"],["Ives Complete Symphonies","2020"]]},
+
+{role:"演奏", name:"Los Angeles Philharmonic 洛杉磯愛樂", life:"1919 年創立 · 駐地 Walt Disney Concert Hall",
+ bio:`1919 年由銅礦大亨、業餘小提琴家 William Andrews Clark Jr. 獨資創辦。他原本邀請拉赫瑪尼諾夫擔任首任音樂總監，被婉拒後改聘馬勒的前助理 Walter Henry Rothwell。1922 年起在好萊塢露天劇場舉行夏季樂季，那是全美規模最大的戶外古典樂系列。
+
+歷任音樂總監包括 Otto Klemperer、Zubin Mehta、Carlo Maria Giulini、André Previn、Esa-Pekka Salonen，然後是杜達美。2026 年 5 月宣布由 Daniel Harding 自 2027–28 樂季接任。這是全美最勇於委創新作的大型樂團之一。`,
+ here:"這套錄音真正的主角其實是樂團的技術水準。《第二號》詼諧曲那段全速的無窮動、《第三號》第四樂章長號在冷的狀態下吹出的極弱眾讚歌——這兩處都是只有頂級樂團才做得到的。當年的樂評也特別點名首席定音鼓 Joseph Pereira 換用小頭鼓槌，敲出接近古樂團的槍響式聲響，把織體「清出來」。這種細節不會寫在唱片封面上，但它決定了這套錄音聽起來的樣子。",
+ key:[["Ives: Complete Symphonies","2020"],["Adams: City Noir","2014"],["Mahler: Symphony No. 8","2012"]]},
+
+{role:"首席定音鼓", name:"Joseph Pereira", life:"1974 年生 · 兼作曲家與教師",
+ bio:`茱莉亞音樂院打擊樂碩士，1997 至 2008 年在紐約愛樂，2007 年由 Esa-Pekka Salonen 拔擢為洛杉磯愛樂首席定音鼓。他同時是作曲家，作品受 LA Phil、Colin Currie Group、Miró Quartet 等委約，也主持 USC Thornton 音樂院的打擊樂教研室。`,
+ here:"當年的現場樂評特別點名了他：在這批舒曼演出裡，他改用小頭鼓槌敲擊鼓面，做出接近十八世紀古樂團的乾脆槍響聲，把空氣暫時「清出來」。這是一個非常具體的技術決定，也直接影響了整套錄音的透明度——尤其在第一號，那是史上第一部要求三顆定音鼓的大型管弦作品。",
+ key:[]}
+],
+
+/* ── 5 完整 Credits ── */
+credits:[
+ ["作曲","Robert Schumann（1810–1856）"],
+ ["指揮","Gustavo Dudamel"],
+ ["樂團","Los Angeles Philharmonic"],
+ ["錄音場地","Walt Disney Concert Hall, Los Angeles（現場錄音）"],
+ ["錄音年份","2018 年（LA Phil「Schumann Focus」音樂節期間）"],
+ ["音樂廳","Frank Gehry 設計 · Nagata Acoustics 豐田泰久音響設計 · 2003 年 10 月啟用 · 2,265 席"],
+ ["廠牌","Platoon（2018 年被 Apple 收購）"],
+ ["目錄編號","PLAT31895"],
+ ["發行日","2026 年 8 月 7 日"],
+ ["版權","℗ 2026 Los Angeles Philharmonic，獨家授權 PLATOON Ltd."],
+ ["樂譜版本","第四號採用 1851 年杜塞道夫修訂版（Op.120, Breitkopf & Härtel 1853 出版）"],
+ ["製作 · 錄音 · 母帶","各串流平台未列出；官方新聞稿附有內頁 PDF，內容待查"]
+],
+
+/* ── 6 評價與歷史地位 ── */
+reception:{
+ scores:[
+  ["Apple Music 編輯評語","「堪稱史上最出色的版本之一」——並特別點名《第二號》詼諧曲的節奏與細節、慢板樂章的抒情與脆弱"],
+  ["Los Angeles Times（2018 年現場）","「杜達美強調舒曼緊密的交響結構，並以令人豁然開朗的清晰度處理器樂平衡。這場演出重視方法而非瘋狂，可能正是此刻藝術所能給予這個世界最成熟的東西。」"],
+  ["Classical Voice North America（2018 年首場）","肯定終樂章的衝勁與樂團狀態，但認為當時杜達美「尚未把個別器樂線條的分句與重音刻畫得夠銳利」"],
+  ["San Francisco Classical Voice（2018 年《第二號》）","「高能量的貝多芬式閃電戰，充滿衝勁與機動性」；認為 Disney Hall 的澄清型音響大幅緩解了舒曼配器的平衡難題"]
+ ],
+ chart:[
+  ["發行形式","數位發行為主（串流與下載平台），未見廣泛的實體版本流通資訊"],
+  ["發行時機","刻意安排在杜達美 2025–26 樂季卸任 LA Phil 音樂總監之後"],
+  ["錄音與發行時差","八年（2018 年錄音、2026 年發行）"]
+ ],
+ awards:[
+  ["紀念性質","Platoon 官方定位為「紀念杜達美十七年任期的里程碑錄音」"],
+  ["杜達美現職","LA Phil 榮譽音樂與藝術總監、YOLA 創始總監；2026–27 樂季起任紐約愛樂音樂與藝術總監"],
+  ["發行時尚無主要獎項紀錄","本頁整理於 2026 年 8 月，距發行僅兩週"]
+ ],
+ legacy:`要判斷這套錄音的歷史地位，現在還太早——它才發行兩週。但可以先把它放進脈絡裡。
+
+2010 年舒曼兩百週年之後出現了一波「舒曼交響曲熱」，2013 年起 Rattle、Nézet-Séguin、Ticciati、Zacharias、Holliger、Tilson Thomas、Skrowaczewski 陸續推出全集，共同的問題意識是：如何洗掉「舒曼不會配器」這個罪名。主流答案是縮編、加速、增加透明度。
+
+杜達美這套的位置很特別：它站在同一個潮流裡，卻沒有用縮編這個手段。它靠的是廳堂與演奏方式。這使它成為少數在「現代大型樂團 ＋ 高解析廳堂」這個條件下做出來的當代舒曼全集，音響上的參考價值不低。
+
+另一個會被記住的點是它的發行脈絡。這不是一套為了錄音而錄音的唱片，而是一段十七年關係的封存與告別。八年的時差反而讓它更像一份文件——2018 年那個 37 歲、已經在洛杉磯待了九年的杜達美，和他的樂團當時的樣子。`
+},
+
+/* ── 7 脈絡與影響網絡 ── */
+context:{
+ era:`舒曼的四首交響曲橫跨 1841 到 1851 年，剛好是他一生中最清醒與最危險的十年。
+
+這十年的背景是：貝多芬 1827 年去世，留下一個所有人都不知道該怎麼接的問題——交響曲之後還能怎麼寫。舒伯特的「偉大」C 大調交響曲在 1839 年才由舒曼本人發現、孟德爾頌首演，那次經驗直接刺激他動筆寫自己的第一首。同時代的白遼士往標題音樂走、孟德爾頌往古典形式的精緻化走、李斯特之後往交響詩走，而舒曼選的是第三條路：保留古典的四樂章架構，但用主題循環把整首曲子綁成一個有機體。
+
+第四號在 1841 年就做到了四樂章不間斷、全曲共用一個核心動機——這比李斯特的交響詩早，也比法朗克、辛克的循環形式早了幾十年。它當年沒有成功，但那個想法後來成了整個晚期浪漫派的標準配備。
+
+至於「舒曼不會配器」這個罪名，它有一半是技術問題（他指揮經驗不足，習慣用重複疊置來確保聲部被聽見），另一半是時代問題（十九世紀後期的大編制演奏方式讓那些疊置變成泥漿）。二十一世紀的解法通常是回到較輕的織體——這套錄音就是這個潮流裡的一員。`,
+ timeline:[
+  ["1839","舒曼發現舒伯特「偉大」C大調交響曲","由孟德爾頌在萊比錫首演。這次經驗直接刺激他動筆寫交響曲"],
+  ["1840","「歌曲年」","與克拉拉結婚，一年內寫出一百多首藝術歌曲"],
+  ["1841-01","《第一號「春」》草稿四天完成","1 月 23–26 日，2 月 20 日配器完成；3 月 31 日萊比錫首演，孟德爾頌指揮，反應熱烈"],
+  ["1841-12-06","d 小調交響曲首演失利","孟德爾頌無法出席，改由樂團首席 Ferdinand David 指揮。舒曼把總譜收回"],
+  ["1844","俄國巡演後崩潰","返德後遷居德勒斯登。醫生記錄：失眠、聽覺障礙、顫抖、一整組恐懼症"],
+  ["1845","與克拉拉共同研究對位法","直接改變了《第二號》的寫法"],
+  ["1846-11-05","《第二號》首演","萊比錫布商大廈，孟德爾頌指揮。首演反應普通，十天後的第二場才較受好評"],
+  ["1850-11","《第三號「萊茵」》","上任杜塞道夫市音樂總監，一個多月寫完。1851 年 2 月 6 日親自指揮首演"],
+  ["1851","d 小調交響曲修訂","在杜塞道夫用約一週重寫，1853 年以「第四號 Op.120」出版"],
+  ["1854-02-27","投萊茵河自殺未遂","依自己的要求住進 Endenich 療養院，1856 年 7 月 29 日於院中去世"],
+  ["1891","布拉姆斯出版 1841 年原版","不顧克拉拉強烈反對。兩個版本的爭議延續至今"],
+  ["2018-05","LA Phil「Schumann Focus」音樂節","四首交響曲於 Walt Disney Concert Hall 現場錄音，當時未定發行日與廠牌"],
+  ["2026-08-07","唱片發行","Platoon 發行，作為杜達美十七年任期的紀念"]
+ ],
+ influencedBy:[
+  ["Franz Schubert","Symphony No. 9 \"Great\"","舒曼親手發現的樂譜，直接催生了他的第一號"],
+  ["Ludwig van Beethoven","Symphony No. 5","第四號終樂章前的過渡段是它的直系後裔"],
+  ["Ludwig van Beethoven","Symphony No. 7","舒曼一生最推崇的節奏書寫範本之一"],
+  ["Johann Sebastian Bach","The Art of Fugue","1845 年的 B-A-C-H 賦格直接滲進了《第二號》"],
+  ["Felix Mendelssohn","Symphony No. 3 \"Scottish\"","同時代最親近的對照組，也是第一、二號的首演指揮"]
+ ],
+ influenced:[
+  ["Johannes Brahms","Symphony No. 1","舒曼是他的發掘者。布拉姆斯終其一生為 1841 年版第四號辯護"],
+  ["César Franck","Symphony in D minor","循環主題形式的直系繼承"],
+  ["Gustav Mahler","Symphony No. 1","馬勒曾親自替《萊茵》重新配器"],
+  ["Edward Elgar","Symphony No. 1","英國浪漫派交響曲對舒曼式厚重織體的繼承"],
+  ["Dmitri Shostakovich","Symphony No. 5","「從黑暗到光明」的四樂章敘事原型之一"]
+ ],
+ covers:[
+  ["Gustav Mahler","《萊茵》重新配器版","二十世紀初為了讓織體更清楚而做的大幅修改，今日仍偶有演出"],
+  ["Johannes Brahms","第四號 1841 年原版","1891 年出版，如今是與 1851 版並行的獨立選項"],
+  ["George Szell / Cleveland Orchestra","修剪過的演出版本","二十世紀中期最有影響力的「動手術」路線"]
+ ]
+},
+
+/* ── 8 版本／音質指南 ── */
+versions:[
+ {name:"本片：Dudamel / LA Phil", year:"2018 錄音 / 2026 發行", source:"現場錄音 · 數位串流",
+  note:"現代大型樂團＋高解析廳堂的當代解法。結構清楚、平衡好、音色溫潤，是四首一次聽完最不吃力的選擇之一。第四號用 1851 版。", rec:5},
+ {name:"Bernstein / 維也納愛樂", year:"1980 年代", source:"Deutsche Grammophon",
+  note:"個性最強的一套，分句與重音的刻畫極為銳利。2018 年的樂評就是拿這套當作杜達美還沒做到的示範。想聽「瘋狂」的那一面就找它。", rec:5},
+ {name:"Szell / 克里夫蘭管弦樂團", year:"1950–60 年代", source:"Sony / Columbia",
+  note:"二十世紀「動手術」路線的代表：大幅修剪配器換取清晰度。演奏精準度驚人，但你聽到的不完全是舒曼寫的音符。歷史價值極高。", rec:4},
+ {name:"Sawallisch / 德勒斯登國立管弦樂團", year:"1970 年代", source:"EMI",
+  note:"長年被視為傳統派的基準版本。不修剪、不縮編，靠德式樂團的音色平衡自然解決問題。溫暖、厚實、正統。", rec:5},
+ {name:"Gardiner / 革命與浪漫管弦樂團", year:"1990 年代", source:"Archiv · 古樂器",
+  note:"用舒曼當時的樂器演奏，自然銅管與腸弦讓織體自動變薄。想理解「舒曼不會配器」這個罪名是不是冤枉的，這套是最直接的對照。", rec:4},
+ {name:"Ticciati / 蘇格蘭室內樂團等縮編路線", year:"2010 年代", source:"Linn 等",
+  note:"2013 年後那波全集的代表做法：用室內樂團從根本上稀釋織體。極透明，但交響的重量感也一併減少。", rec:4},
+ {name:"第四號 · 1841 年原版（各家錄音）", year:"—", source:"布拉姆斯 1891 年出版的版本",
+  note:"不是音質差異，是不同的曲子。同樣四樂章不間斷，但織體明顯更輕、更透明，速度術語為義大利文。Tovey 等人認為配器優於修訂版。聽過 1851 版之後一定要找來比較。", rec:5}
+],
+versionsNote:`音質方面：Qobuz 標示為 16-bit/44.1kHz 立體聲，目前沒有看到官方的 Hi-Res 或空間音訊版本標示。這是一套 2018 年的現場錄音，動態範圍相當大——尤其《第三號》第四樂章的極弱長號段落與《第四號》終樂章的全奏落差極明顯。建議不要用會做動態壓縮的播放模式，也不要用會自動拉平音量的「響度標準化」設定。
+
+至於「該聽哪一套舒曼」這個問題，實用的答案是：先用這套當日常版本（四首一次聽完最不吃力），想聽個性就轉伯恩斯坦，想聽正統就轉 Sawallisch，想搞清楚配器爭議就找 Gardiner 的古樂器版。第四號務必兩個版本都聽過。`,
+
+/* ── 9 聆聽路線圖 ── */
+roadmap:[
+ {title:"第一次聽 · 照唱片順序，一次一首", body:"四首交響曲不是一張專輯，是四件獨立的作品。不要一次聽完 2 小時 12 分。建議一次一首，中間隔開。第一次聽只需要感覺每一首的性格差異：第一號是外向的春天，第二號是掙扎，第三號是最陽光也最莊嚴的一首，第四號是最緊密、最一氣呵成的一首。"},
+ {title:"第二次聽 · 改用寫作順序", body:"真正的順序是：第一號（1841 春）→ 第四號（1841 秋，原始構想）→ 第二號（1845–46，崩潰之後）→ 第三號（1850，杜塞道夫）。按這個順序聽，你會聽到一條清楚的人生曲線：亢奮 → 野心 → 掙扎 → 短暫的陽光。三年後他投進了萊茵河。"},
+ {title:"第三次聽 · 只追動機", body:"舒曼四首交響曲都在做同一件事：用一個核心動機貫穿全曲。第一號是開頭的銅管召集令，第二號是那個極弱的銅管 motto，第四號是那個下行五音（被認為是「克拉拉主題」）。挑一首，全程只追那個動機在哪裡出現、變成了什麼樣子。這是理解舒曼交響思維最直接的方式。"},
+ {title:"進階 · 兩個第四號對照聽", body:"這張用的是 1851 年修訂版。去找一套 1841 年原版（布拉姆斯 1891 年出版的那個），同一首曲子聽兩遍。差別非常明顯：兩版都是四樂章不間斷，但 1851 版配器厚重、主題整合更完整，1841 版織體輕透得多。克拉拉堅持前者、布拉姆斯堅持後者，這場家族爭執到今天還沒有結論——聽完你會有自己的答案。"},
+ {title:"重點單曲 · 只有二十分鐘的話", body:"聽兩軌：《第二號》的詼諧曲（技術的極限）與《第三號》第四樂章「Feierlich」（音樂的重量）。前者告訴你這個樂團有多好，後者告訴你這套錄音的音響到底能不能撐住舒曼最難的地方。"},
+ {title:"情境 · 音量 · 訊源", body:"這是現場錄音，動態範圍大，適合安靜的環境與稍大一點的音量——但不要為了聽清楚極弱段落而把整體音量開太大，《第三號》第四樂章和《第四號》終樂章的全奏會把你嚇到。喇叭優於耳機，因為 Disney Hall 的空間感是這套錄音的一部分，耳機會把它壓扁。不適合通勤或當工作背景音樂：舒曼的內聲部太密，注意力一分散就只剩下一團好聽的聲音。"}
+],
+
+/* ── 10 視覺與實體 ── */
+physical:{
+ "封面":"杜達美的肖像照，坐在攤開的樂譜前，旁邊配上「Los Angeles Philharmonic · Schumann · Complete Symphonies」的字樣。沒有樂團合照、沒有音樂廳、沒有舒曼的畫像——把整套唱片的重心明確放在指揮個人身上，這在告別錄音的脈絡下是合理的選擇。",
+ "設計取向":"Platoon 的古典系列一貫走乾淨的攝影＋無襯線字體路線，與 DG 的黃標傳統或 ECM 的極簡風格都不同。這是一個以串流平台縮圖為前提設計的封面——在手機上縮到 200 像素依然辨識得出來。",
+ "發行形式":"以數位發行為主。Qobuz、Tidal、Apple Music、Spotify、Amazon Music、YouTube Music、Idagio 均已上架。目前未見廣泛流通的實體 CD 或黑膠版本資訊，若日後有實體發行可再補。",
+ "官方內頁":"Platoon 隨新聞稿提供了一份 PDF 內頁（Schumann Symphonies Nos 1–4），可從 LA Phil 的新聞稿頁面取得連結。技術 credits 是否收錄其中尚未確認。",
+ "影像資料":"LA Phil 官網列出四段連結，分別對應《第一號》終樂章、《第二號》詼諧曲、《第三號》第一樂章、《第四號》Romanze。實際查證後這四段是 YouTube 自動生成的 Topic 頻道音檔（靜態封面配樂章音訊），並不是介紹性質的影片——想試聽可以用，但別期待幕後花絮。",
+ "音樂廳":"Walt Disney Concert Hall，Frank Gehry 設計、Nagata Acoustics 的豐田泰久負責音響，2003 年 10 月啟用，2,265 席的葡萄園式廳堂。它的高解析音響是這套錄音能成立的前提——當年的樂評直言，是這個廳「盡其所能地把舒曼的配器澄清了」。"
+},
+
+/* ── 11 延伸聆聽 ── */
+further:[
+ {artist:"Robert Schumann", album:"Piano Concerto in A minor, Op. 54", why:"2018 年那場音樂節的另一半，內田光子擔任獨奏。舒曼最好的協奏曲"},
+ {artist:"Robert Schumann", album:"Das Paradies und die Peri", why:"「Schumann Focus」音樂節的壓軸，Peter Sellars 執導。極少演出的清唱劇"},
+ {artist:"Robert Schumann", album:"Cello Concerto in A minor, Op. 129", why:"1850 年杜塞道夫時期的作品，與《萊茵》同一批"},
+ {artist:"Robert Schumann", album:"Dichterliebe", why:"1840 年「歌曲年」的代表作。要理解交響曲的旋律感，先聽這個"},
+ {artist:"Leonard Bernstein Vienna Philharmonic", album:"Schumann: The Symphonies", why:"個性最強的對照組，2018 年樂評直接拿它當示範"},
+ {artist:"Wolfgang Sawallisch Staatskapelle Dresden", album:"Schumann: Symphonies", why:"傳統派的基準版本，溫暖厚實"},
+ {artist:"John Eliot Gardiner", album:"Schumann: Symphonies (Orchestre Révolutionnaire et Romantique)", why:"古樂器版，理解配器爭議最直接的對照"},
+ {artist:"Johannes Brahms", album:"Symphony No. 1", why:"舒曼發掘的那個二十歲年輕人，二十年後交出的答案"},
+ {artist:"Franz Schubert", album:"Symphony No. 9 \"Great\"", why:"舒曼親手發現的樂譜，直接催生了他的第一號"},
+ {artist:"Gustavo Dudamel Los Angeles Philharmonic", album:"Ives: Complete Symphonies", why:"杜達美與 LA Phil 的另一套全集，也是他任內最受好評的錄音之一"}
+],
+
+/* ── 影音延伸：介紹／紀錄片／訪談，不是聽音樂的連結 ── */
+videos:[
+ {kind:"官方影片", title:"Schumann Focus: Gustavo Dudamel on Mitsuko Uchida at Walt Disney Concert Hall", by:"LA Phil 官方頻道",
+  url:"https://www.youtube.com/watch?v=798XQOZ4F9Y",
+  note:"唯一一支與這套錄音現場直接相關的官方影片，拍攝於 2018 年 5 月「Schumann Focus」音樂節期間——專輯就是那三個週末音樂會的實況。"},
+ {kind:"紀錄片", title:"Now Hear This「Schumann: Genius and Madness」官方預告", by:"Great Performances | PBS",
+  url:"https://www.youtube.com/watch?v=eiE8GVOGHBw",
+  note:"主持人 Scott Yoo 走訪蘇格蘭、德國、法國追索舒曼創作與病症的關聯。全集可從 PBS 官網或 App 接續。"},
+ {kind:"紀錄片", title:"Did Schumann Have Bipolar Disorder?", by:"Great Performances | PBS",
+  url:"https://www.youtube.com/watch?v=egaNeMqfBts",
+  note:"同一集的正片片段，Scott Yoo 與精神科醫師 Richard Kogan 對談。理解第二號那種分裂感的最佳背景資料。"},
+ {kind:"訪談講座", title:"Richard Kogan: Schumann, Bipolar Disorder and Creative Genius", by:"Richard Kogan（茱莉亞出身的鋼琴家兼精神科醫師）",
+  url:"https://www.youtube.com/watch?v=Ng7sNvwPpVA",
+  note:"他邊彈邊講，用音樂本身示範躁期與鬱期如何寫進舒曼的樂句。2018 年那場音樂節的演前導聆就是他主講的。"},
+ {kind:"訪談講座", title:"Schumann, Bipolar Disorder, and the Creative Process", by:"Psychiatric News（美國精神醫學會官方媒體）",
+  url:"https://www.youtube.com/watch?v=68Z-QcnKUZI",
+  note:"同一主題的 APA 官方完整版，機構背書、內容較長。"},
+ {kind:"分析導讀", title:"Gerard Schwarz 分析《第三號「萊茵」》", by:"All-Star Orchestra / Khan Academy Partners",
+  url:"https://www.youtube.com/watch?v=yI7kDoB6YsI",
+  note:"指揮家逐段拆解這首曲子，含 1850 年萊茵河之旅與科隆大教堂的創作背景。系列共五集，其餘幾集在 Khan Academy 同一單元。"},
+ {kind:"分析導讀", title:"The Greatest Recordings EVER! Schumann: \"Rhenish\" Symphony", by:"Dave Hurwitz（The Ultimate Classical Music Guide）",
+  url:"https://www.youtube.com/watch?v=k4ChBvRExfc",
+  note:"資深樂評的版本大比較。聽完你會有一把尺，去衡量杜達美這一版站在詮釋光譜的哪個位置。"},
+ {kind:"分析導讀", title:"舒曼配器爭議與馬勒的重新配器", q:"Schumann orchestration problem Mahler reorchestration symphonies explained",
+  note:"「舒曼不會配器」這個罪名是理解所有現代舒曼錄音的前提，也是第四號 1851 版爭議的核心。這張用的正是 1851 版。"},
+ {kind:"訪談", title:"杜達美告別洛杉磯愛樂十七年", q:"Gustavo Dudamel LA Phil final season interview 2026",
+  note:"這套唱片的定位就是十七年任期的總結。看官方告別訪談，會比較理解為什麼 2018 年的錄音要壓到 2026 年才發行。"},
+ {kind:"提醒", title:"LA Phil 官網那四段「Video Preview」不是介紹影片", q:"Dudamel Schumann Complete Symphonies LA Phil official trailer",
+  note:"官網列出的四個連結經查證是 YouTube 自動生成的 Topic 頻道音檔（封面配音樂），不是導聆素材。目前確認沒有專為這張專輯拍的官方 trailer；日後若有，用這組關鍵字可以找到。"}
+],
+
+/* ── 12 資料來源 ── */
+sources:[
+ {title:"LA Phil 官方唱片頁 — Schumann: Complete Symphonies", url:"https://www.laphil.com/artists-and-media/recordings-and-media/recordings/schumann-complete-symphonies"},
+ {title:"LA Phil 新聞稿（2026-07-27）— 發行公告與杜達美談話", url:"https://www.hollywoodbowl.com/press/releases/2249"},
+ {title:"Qobuz — 曲目、時長、發行資料", url:"https://www.qobuz.com/gb-en/album/schumann-complete-symphonies-los-angeles-philharmonic-and-gustavo-dudamel/t0z8is48e0tzb"},
+ {title:"Apple Music — Schumann: The Complete Symphonies", url:"https://music.apple.com/us/album/schumann-the-complete-symphonies/6774131756"},
+ {title:"Classical Voice North America — Dudamel Begins Schumann Cycle On Promising Note（2018-05-21）", url:"https://classicalvoiceamerica.org/2018/05/21/dudamel-begins-schumann-cycle-on-promising-note/"},
+ {title:"San Francisco Classical Voice — Schumann Cycle Launches at LA Phil（2018-05-22）", url:"https://www.sfcv.org/articles/review/schumann-cycle-launches-la-phil"},
+ {title:"Wikipedia — Symphony No. 1 (Schumann)", url:"https://en.wikipedia.org/wiki/Symphony_No._1_(Schumann)"},
+ {title:"Wikipedia — Symphony No. 2 (Schumann)", url:"https://en.wikipedia.org/wiki/Symphony_No._2_(Schumann)"},
+ {title:"Wikipedia — Symphony No. 3 (Schumann)", url:"https://en.wikipedia.org/wiki/Symphony_No._3_(Schumann)"},
+ {title:"Wikipedia — Symphony No. 4 (Schumann)", url:"https://en.wikipedia.org/wiki/Symphony_No._4_(Schumann)"},
+ {title:"Wikipedia — Robert Schumann", url:"https://en.wikipedia.org/wiki/Robert_Schumann"},
+ {title:"Wikipedia — Gustavo Dudamel", url:"https://en.wikipedia.org/wiki/Gustavo_Dudamel"},
+ {title:"Wikipedia — Los Angeles Philharmonic", url:"https://en.wikipedia.org/wiki/Los_Angeles_Philharmonic"},
+ {title:"Kenneth Woods — Explore the Score: Schumann Symphony in D minor（1841 / 1851 版本逐處比對）", url:"https://kennethwoods.net/blog1/2013/01/19/explore-the-score-schumann-symphony-no-4/"},
+ {title:"USC Thornton — Joseph Pereira", url:"https://music.usc.edu/joseph-pereira/"}
+]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   渲染引擎 —— 以下不需要修改
+   ═══════════════════════════════════════════════════════════════ */
+const E = s => String(s==null?'':s);
+const has = x => Array.isArray(x) ? x.length>0 : (x && Object.keys(x).length>0);
+const amURL = t => 'https://music.apple.com/tw/search?term=' + encodeURIComponent(t);
+const ytURL = t => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(t);
+const P = txt => E(txt).split(/\n\s*\n/).map(x=>`<p>${x.trim()}</p>`).join('');
+
+document.title = `${D.album} · 深度導聆`;
+
+const SEC = [];
+function sec(id, zh, en, html){ if(html) SEC.push({id, zh, en, html}); }
+
+/* 1 · 錄音製作全紀錄 */
+sec('production','錄音製作全紀錄','Production', D.production ? `<div class="prose">${P(D.production)}</div>` : '');
+
+/* 2 · 深度樂評 */
+sec('review','深度樂評','Critique', D.review ? `<div class="prose">${P(D.review)}</div>` : '');
+
+/* 3 · 逐曲導聆 */
+sec('tracks','逐曲導聆','Track by Track', has(D.tracks) ? D.tracks.map((t,i)=>`
+  <div class="trk" data-i="${i}">
+    <div class="trkhead">
+      <span class="tn">${t.n||i+1}</span>
+      <span class="tt"><b>${E(t.title)}</b>${t.writer?`<span>${E(t.writer)}</span>`:''}</span>
+      <span class="tlen">${E(t.len)}</span>
+      <span class="tcar">▶</span>
+    </div>
+    <div class="trkbody">
+      ${t.note?P(t.note):''}
+      ${has(t.cues)?`<div class="cues">${t.cues.map(c=>`<div class="cue"><b>${E(c[0])}</b><span>${E(c[1])}</span></div>`).join('')}</div>`:''}
+      ${t.personnel?`<div class="tmeta"><b>編制：</b>${E(t.personnel)}</div>`:''}
+    </div>
+  </div>`).join('') : '');
+
+/* 4 · 人物誌 */
+sec('people','人物誌 · 作曲家／演奏家／主唱','People', has(D.people) ? `<div class="people">${
+  D.people.map(p=>`
+  <div class="pcard">
+    <div class="prole">${E(p.role)}</div>
+    <div class="pname">${E(p.name)}</div>
+    <div class="plife">${E(p.life)}</div>
+    ${p.bio?P(p.bio):''}
+    ${p.here?`<div class="phere"><b style="color:var(--accent)">在這張專輯裡 · </b>${E(p.here)}</div>`:''}
+    ${has(p.key)?`<div class="pkey">${p.key.map(k=>`<a href="${amURL(p.name+' '+k[0])}" target="_blank" rel="noopener">${E(k[0])}${k[1]?` · ${k[1]}`:''}</a>`).join('')}</div>`:''}
+  </div>`).join('')}</div>` : '');
+
+/* 5 · 完整 Credits */
+sec('credits','完整 Credits','Credits', has(D.credits) ?
+  `<dl class="kv">${D.credits.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl>` : '');
+
+/* 6 · 評價與歷史地位 */
+let recHTML = '';
+if(has(D.reception)){
+  const R = D.reception;
+  if(has(R.scores)) recHTML += `<div class="tblwrap"><table class="tbl"><thead><tr><th>來源</th><th>評價</th></tr></thead><tbody>${
+    R.scores.map(s=>`<tr><td>${E(s[0])}</td><td>${E(s[1])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(has(R.chart)) recHTML += `<div style="margin-top:16px"><dl class="kv">${
+    R.chart.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl></div>`;
+  if(has(R.awards)) recHTML += `<div style="margin-top:16px" class="cards">${
+    R.awards.map(a=>`<div class="nc"><b>${E(a[0])}</b><span>${E(a[1])}</span></div>`).join('')}</div>`;
+  if(R.legacy) recHTML += `<div class="prose" style="margin-top:20px">${P(R.legacy)}</div>`;
+}
+sec('reception','評價與歷史地位','Reception & Legacy', recHTML);
+
+/* 7 · 脈絡與影響網絡 */
+let ctxHTML = '';
+if(has(D.context)){
+  const C = D.context;
+  if(C.era) ctxHTML += `<div class="prose">${P(C.era)}</div>`;
+  if(has(C.timeline)) ctxHTML += `<div class="tl" style="margin-top:22px">${
+    C.timeline.map(t=>`<div class="tlitem"><div class="ty">${E(t[0])}</div><b>${E(t[1])}</b><span>${E(t[2])}</span></div>`).join('')}</div>`;
+  const grp = (title, arr) => has(arr) ? `<div style="margin-top:24px">
+    <div style="font-size:11px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase;margin-bottom:9px">${title}</div>
+    <div class="cards">${arr.map(x=>`<a href="${amURL(x[0]+' '+(x[1]||''))}" target="_blank" rel="noopener">
+      <b>${E(x[1]||x[0])}</b><span>${E(x[1]?x[0]:'')}${x[2]?` — ${E(x[2])}`:''}</span></a>`).join('')}</div></div>` : '';
+  ctxHTML += grp('影響了這張的作品', C.influencedBy);
+  ctxHTML += grp('被這張影響的作品', C.influenced);
+  ctxHTML += grp('翻唱 · 取樣 · 引用', C.covers);
+}
+sec('context','脈絡與影響網絡','Context & Influence', ctxHTML);
+
+/* 8 · 版本／音質指南 */
+sec('versions','版本／音質指南','Editions & Sound', has(D.versions) ? `<div class="tblwrap">
+  <table class="tbl"><thead><tr><th>版本</th><th>年份</th><th>母帶／載體</th><th>說明</th><th>推薦</th></tr></thead>
+  <tbody>${D.versions.map(v=>`<tr>
+    <td><b style="color:var(--txt)">${E(v.name)}</b></td><td>${E(v.year)}</td>
+    <td>${E(v.source)}</td><td>${E(v.note)}</td>
+    <td class="rec">${'★'.repeat(v.rec||0)}${'☆'.repeat(Math.max(0,5-(v.rec||0)))}</td></tr>`).join('')}
+  </tbody></table></div>${D.versionsNote?`<div class="prose" style="margin-top:18px">${P(D.versionsNote)}</div>`:''}` : '');
+
+/* 9 · 聆聽路線圖 */
+sec('roadmap','聆聽路線圖','How to Listen', has(D.roadmap) ? `<div class="road">${
+  D.roadmap.map((r,i)=>`<div class="rstep"><div class="rnum">${i+1}</div>
+    <div><b>${E(r.title)}</b><p>${E(r.body)}</p></div></div>`).join('')}</div>` : '');
+
+/* 10 · 視覺與實體 */
+sec('physical','視覺與實體','Artwork & Object', has(D.physical) ?
+  `<dl class="kv">${Object.entries(D.physical).map(([k,v])=>`<dt>${E(k)}</dt><dd>${E(v)}</dd>`).join('')}</dl>` : '');
+
+/* 11 · 影音延伸 —— 介紹、紀錄片、訪談；不是聽音樂的連結 */
+sec('videos','影音延伸','Watch', has(D.videos) ? `
+  <div class="vnote">以下都是「認識這張唱片」的影音資料——官方介紹、紀錄片、分析與訪談，不是拿來聽音樂的。
+  標示「搜尋」的項目會帶你到 YouTube 的搜尋結果頁（影片會下架、網址會失效，用搜尋比較耐放）。</div>
+  <div class="vids">${D.videos.map(v=>`
+    <a class="vid" href="${v.url ? E(v.url) : ytURL(v.q || (D.artist+' '+D.album))}" target="_blank" rel="noopener">
+      <div class="vtop">
+        <span class="vkind">${E(v.kind||'影片')}</span>
+        ${v.url ? '' : '<span class="vsearch">搜尋</span>'}
+        ${v.len ? `<span class="vlen">${E(v.len)}</span>` : ''}
+      </div>
+      <b>${E(v.title)}</b>
+      ${v.by ? `<span class="vby">${E(v.by)}</span>` : ''}
+      ${v.note ? `<span class="vnt">${E(v.note)}</span>` : ''}
+    </a>`).join('')}</div>` : '');
+
+/* 12 · 延伸聆聽 */
+sec('further','延伸聆聽','Go Deeper', has(D.further) ? `<div class="cards">${
+  D.further.map(f=>`<a href="${amURL(f.artist+' '+f.album)}" target="_blank" rel="noopener">
+    <b>${E(f.album)}</b><span>${E(f.artist)}${f.why?`<br>${E(f.why)}`:''}</span></a>`).join('')}</div>` : '');
+
+/* 13 · 資料來源 */
+sec('sources','資料來源','Sources', has(D.sources) ? `<div class="srcs">${
+  D.sources.map(s=>s.url?`<a href="${E(s.url)}" target="_blank" rel="noopener">${E(s.title)}</a>`:E(s.title)).join(' · ')}</div>` : '');
+
+/* ---------- HERO ---------- */
+const heroHTML = `
+  ${D.backLink!==false?`<a class="back" href="${E(D.backLink||'../index.html')}">← 回專輯推薦</a>`:''}
+  <div class="hero">
+    <div class="hart" id="hart"><div class="ph">${E(D.album).slice(0,2)}</div></div>
+    <div class="hmeta">
+      <div class="kicker">深度導聆 · Deep Listening</div>
+      <h1>${E(D.album)}</h1>
+      <div class="who">${E(D.artist)}</div>
+      <div class="yl">${E(D.year)}${D.label?` · ${E(D.label)}`:''}${D.catalog?` · ${E(D.catalog)}`:''}</div>
+      <div class="chips">
+        ${D.genre?`<span class="chip g">${E(D.genre)}</span>`:''}
+        ${(D.styles||[]).map(s=>`<span class="chip">${E(s)}</span>`).join('')}
+        ${(D.moods||[]).map(s=>`<span class="chip c">${E(s)}</span>`).join('')}
+      </div>
+      <div class="btns">
+        <a class="btn am" href="${amURL(D.itunesTerm || (D.artist+' '+D.album))}" target="_blank" rel="noopener">▶ 在 Apple Music 聽</a>
+        ${has(D.videos)?`<a class="btn yt" href="#videos">▶ 影音延伸 · ${D.videos.length}</a>`:''}
+        ${D.wiki?`<a class="btn" href="${E(D.wiki)}" target="_blank" rel="noopener">Wikipedia</a>`:''}
+      </div>
+    </div>
+  </div>
+  ${D.tagline?`<div class="tagline">${E(D.tagline)}</div>`:''}
+  ${has(D.facts)?`<dl class="facts">${D.facts.map(f=>`<div><dt>${E(f[0])}</dt><dd>${E(f[1])}</dd></div>`).join('')}</dl>`:''}`;
+
+document.getElementById('main').innerHTML = heroHTML + SEC.map((s,i)=>`
+  <section id="${s.id}">
+    <div class="shead"><span class="snum">${String(i+1).padStart(2,'0')}</span>
+      <h2>${s.zh}</h2><span class="sen">${s.en}</span></div>
+    ${s.html}
+  </section>`).join('') + `
+  <footer><span>${E(D.artist)} — ${E(D.album)}</span><span>由 Claude 整理 · ${E(D.compiled||'')}</span></footer>`;
+
+document.getElementById('toc').innerHTML = SEC.map(s=>`<a href="#${s.id}">${s.zh.split(' · ')[0]}</a>`).join('');
+
+/* 逐曲展開 */
+document.querySelectorAll('.trkhead').forEach(h=>{
+  h.onclick = ()=> h.parentElement.classList.toggle('open');
+});
+
+/* 目錄高亮 */
+const links = [...document.querySelectorAll('#toc a')];
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-10% 0px -75% 0px'});
+SEC.forEach(s=>{ const el=document.getElementById(s.id); if(el) obs.observe(el); });
+
+/* 封面：iTunes Search API（JSONP，可在 file:// 直接跑） */
+(function(){
+  if(D.cover){ document.getElementById('hart').innerHTML = `<img src="${D.cover}" alt="">`; return; }
+  const cb = '__amcb1';
+  const s = document.createElement('script');
+  window[cb] = j => {
+    const r = (j.results||[])[0];
+    if(r && r.artworkUrl100)
+      document.getElementById('hart').innerHTML =
+        `<img src="${r.artworkUrl100.replace('100x100bb','1000x1000bb')}" alt="">`;
+    s.remove(); delete window[cb];
+  };
+  s.src = `https://itunes.apple.com/search?term=${encodeURIComponent(D.itunesTerm||(D.artist+' '+D.album))}`
+        + `&entity=album&media=music&limit=1&country=tw&callback=${cb}`;
+  s.onerror = ()=>{ s.remove(); };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

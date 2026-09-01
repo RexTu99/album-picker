@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深度導聆</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#14131a; --card:#1a1922; --line:#2a2833; --line2:#3a3747;
+    --txt:#ece9f2; --dim:#9b95ab; --dim2:#6f6a7d;
+    --accent:#fa4b6e; --accent2:#ffb26b; --gold:#e8c27a; --cyan:#7ad3e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1000px 560px at 82% -12%, rgba(250,75,110,.13), transparent 62%),
+      radial-gradient(760px 520px at -5% 100%, rgba(120,110,255,.11), transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.8; min-height:100vh;
+  }
+  a{color:inherit}
+  .shell{max-width:1240px;margin:0 auto;padding:0 22px 110px;display:grid;
+    grid-template-columns:200px minmax(0,1fr);gap:38px;align-items:start}
+  @media(max-width:900px){ .shell{grid-template-columns:1fr;gap:0} }
+
+  /* ---------- 側邊目錄 ---------- */
+  nav.toc{position:sticky;top:22px;padding-top:34px}
+  @media(max-width:900px){
+    nav.toc{position:static;padding:16px 0 0;overflow-x:auto;white-space:nowrap;
+      border-bottom:1px solid var(--line);margin-bottom:18px}
+    nav.toc .tocTitle{display:none}
+    nav.toc a{display:inline-block;margin:0 6px 10px 0}
+  }
+  .tocTitle{font-size:11px;letter-spacing:.24em;color:var(--dim2);text-transform:uppercase;margin-bottom:12px}
+  nav.toc a{display:block;font-size:13px;color:var(--dim2);text-decoration:none;padding:6px 10px;
+    border-radius:8px;border-left:2px solid transparent;transition:.16s}
+  nav.toc a:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+  nav.toc a.on{color:var(--accent2);border-left-color:var(--accent);background:rgba(250,75,110,.07)}
+  @media(max-width:900px){ nav.toc a{border-left:0;border-bottom:2px solid transparent}
+    nav.toc a.on{border-left:0;border-bottom-color:var(--accent)} }
+
+  main{padding-top:34px;min-width:0}
+
+  /* ---------- HERO ---------- */
+  .back{display:inline-block;font-size:12.5px;color:var(--dim2);text-decoration:none;margin-bottom:20px}
+  .back:hover{color:var(--txt)}
+  .hero{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+  .hart{width:250px;height:250px;flex:none;border-radius:14px;overflow:hidden;background:#211f2b;
+    position:relative;box-shadow:0 22px 56px rgba(0,0,0,.6)}
+  .hart img{width:100%;height:100%;object-fit:cover;display:block}
+  .hart .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;color:rgba(255,255,255,.2)}
+  .hmeta{flex:1;min-width:280px}
+  .kicker{font-size:11px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+  .hmeta h1{font-size:38px;line-height:1.2;letter-spacing:-.02em;margin:9px 0 5px;font-weight:750}
+  .hmeta .who{font-size:18px;color:var(--dim);margin-bottom:4px}
+  .hmeta .yl{font-size:12.5px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{font-size:11.5px;background:#252331;border:1px solid var(--line);color:var(--dim);
+    padding:4px 11px;border-radius:999px}
+  .chip.g{border-color:rgba(232,194,122,.4);color:var(--gold)}
+  .chip.c{border-color:rgba(122,211,232,.34);color:var(--cyan)}
+  .btns{display:flex;gap:9px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:14px;
+    padding:10px 20px;border-radius:999px;transition:.18s;border:1px solid var(--line2);color:var(--txt);
+    background:var(--card)}
+  .btn:hover{transform:translateY(-1px);border-color:var(--dim2)}
+  .btn.am{background:#fff;color:#111;border-color:#fff}
+  .btn.yt{background:#2a1418;color:#ff8fa3;border-color:#4a2028}
+  .tagline{margin-top:26px;font-size:17.5px;line-height:1.75;color:#ded9ec;
+    border-left:3px solid var(--accent);padding-left:18px;font-weight:520}
+
+  /* ---------- 快速事實 ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px}
+  .facts div{background:var(--bg2);padding:13px 16px}
+  .facts dt{font-size:10.5px;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase;margin-bottom:3px}
+  .facts dd{font-size:14px;color:var(--txt);line-height:1.55}
+
+  /* ---------- 區塊 ---------- */
+  section{margin-top:56px;scroll-margin-top:24px}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;
+    padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .snum{font-size:11px;letter-spacing:.16em;color:var(--dim2);font-variant-numeric:tabular-nums}
+  .shead h2{font-size:19px;letter-spacing:.02em;font-weight:700;color:var(--accent2)}
+  .shead .sen{font-size:11px;letter-spacing:.2em;color:var(--dim2);text-transform:uppercase;margin-left:auto}
+  .prose p{font-size:15.5px;color:#d8d4e4;margin-bottom:14px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{color:var(--gold);font-style:normal;font-weight:600}
+
+  /* ---------- 逐曲導聆 ---------- */
+  .trk{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--bg2),#111017)}
+  .trkhead{display:flex;align-items:center;gap:14px;padding:14px 17px;cursor:pointer;transition:.16s}
+  .trkhead:hover{background:rgba(255,255,255,.03)}
+  .tn{font-size:12px;color:var(--dim2);font-variant-numeric:tabular-nums;width:22px;flex:none}
+  .tt{flex:1;min-width:0}
+  .tt b{display:block;font-size:15.5px;font-weight:640;line-height:1.4}
+  .tt span{font-size:12px;color:var(--dim2)}
+  .tlen{font-size:12.5px;color:var(--dim2);font-variant-numeric:tabular-nums;flex:none}
+  .tcar{font-size:11px;color:var(--dim2);flex:none;transition:.2s}
+  .trk.open .tcar{transform:rotate(90deg)}
+  .trkbody{display:none;padding:2px 17px 18px 53px;border-top:1px solid var(--line)}
+  .trk.open .trkbody{display:block}
+  .trkbody p{font-size:14.5px;color:#d3cfe0;margin:14px 0}
+  .cues{border-left:2px solid var(--line2);padding-left:14px;margin:14px 0}
+  .cue{display:flex;gap:12px;font-size:13.5px;margin-bottom:7px;align-items:baseline}
+  .cue b{color:var(--cyan);font-variant-numeric:tabular-nums;flex:none;font-weight:600;font-size:12.5px}
+  .cue span{color:var(--dim)}
+  .tmeta{font-size:12.5px;color:var(--dim2);margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}
+  .tmeta b{color:var(--dim)}
+  /* ---------- 影音延伸 ---------- */
+  .vnote{font-size:13px;color:var(--dim2);line-height:1.75;margin-bottom:16px;
+    border-left:2px solid var(--line2);padding-left:14px}
+  .vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:11px}
+  .vid{display:block;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:15px 17px;text-decoration:none;transition:.18s}
+  .vid:hover{border-color:#ff8fa3;transform:translateY(-2px);background:#1e1c27}
+  .vtop{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .vkind{font-size:10.5px;letter-spacing:.1em;background:#2a1418;border:1px solid #4a2028;
+    color:#ff8fa3;padding:3px 9px;border-radius:999px}
+  .vsearch{font-size:10.5px;letter-spacing:.1em;background:#1f1d29;border:1px solid var(--line);
+    color:var(--dim2);padding:3px 9px;border-radius:999px}
+  .vlen{font-size:11.5px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  .vid b{display:block;font-size:14.5px;color:var(--txt);font-weight:640;line-height:1.45;margin-bottom:4px}
+  .vby{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+  .vnt{display:block;font-size:12.5px;color:var(--dim2);line-height:1.6}
+
+  /* ---------- 人物誌 ---------- */
+  .people{display:grid;gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:15px;padding:19px 20px;background:var(--bg2)}
+  .prole{font-size:10.5px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .plife{font-size:12.5px;color:var(--dim2);margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .pcard p{font-size:14.5px;color:#d3cfe0;margin-bottom:11px}
+  .phere{background:rgba(250,75,110,.07);border-left:2px solid var(--accent);
+    padding:11px 14px;border-radius:0 9px 9px 0;font-size:14px;color:#e2dded;margin-bottom:12px}
+  .pkey{display:flex;gap:7px;flex-wrap:wrap}
+  .pkey a{font-size:12px;background:#232130;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;border-radius:8px;text-decoration:none;transition:.16s}
+  .pkey a:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- 表格 ---------- */
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .tbl th{background:#1f1d29;color:var(--dim);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-align:left;padding:11px 14px;font-weight:600;border-bottom:1px solid var(--line)}
+  .tbl td{padding:12px 14px;border-bottom:1px solid var(--line);color:#d3cfe0;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tr:hover td{background:rgba(255,255,255,.022)}
+  .tbl .rec{color:var(--gold);white-space:nowrap;font-size:12.5px}
+  .tblwrap{overflow-x:auto}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;font-size:14px}
+  .kv dt{color:var(--dim2);white-space:nowrap}
+  .kv dd{color:#d8d4e4}
+
+  /* ---------- 通用小卡 ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+  .cards a,.cards div.nc{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-decoration:none;transition:.18s}
+  .cards a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .cards b{display:block;font-size:14px;color:var(--txt);margin-bottom:3px;font-weight:640;line-height:1.4}
+  .cards span{font-size:12.5px;color:var(--dim2);line-height:1.5;display:block}
+
+  /* ---------- 時間軸 ---------- */
+  .tl{border-left:2px solid var(--line2);padding-left:20px;margin-left:6px}
+  .tlitem{position:relative;margin-bottom:20px}
+  .tlitem::before{content:'';position:absolute;left:-26px;top:8px;width:9px;height:9px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+  .tlitem .ty{font-size:11.5px;letter-spacing:.14em;color:var(--gold);font-variant-numeric:tabular-nums}
+  .tlitem b{display:block;font-size:15px;margin:2px 0 4px}
+  .tlitem span{font-size:14px;color:var(--dim);line-height:1.65;display:block}
+
+  /* ---------- 路線圖 ---------- */
+  .road{display:grid;gap:12px}
+  .rstep{border:1px solid var(--line);border-radius:14px;padding:17px 19px;background:var(--bg2);
+    display:flex;gap:16px;align-items:flex-start}
+  .rnum{width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0d12;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .rstep b{display:block;font-size:15.5px;margin-bottom:5px}
+  .rstep p{font-size:14.5px;color:#d3cfe0;margin:0}
+
+  .srcs{font-size:12.5px;color:var(--dim2);line-height:2}
+  .srcs a{color:var(--dim);text-decoration:none;border-bottom:1px dotted var(--line2)}
+  .srcs a:hover{color:var(--accent2)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--dim2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .none{color:var(--dim2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc"><div class="tocTitle">目錄</div><div id="toc"></div></nav>
+<main id="main"></main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   資料區 —— 每張專輯只需要換掉這個 D 物件，其餘引擎完全不動
+   ═══════════════════════════════════════════════════════════════ */
+const D = {
+
+/* ── 基本識別 ── */
+artist:"Sueye Park, Rundfunk-Sinfonieorchester Berlin & Valentin Egel",
+album:"Goldmark and Sibelius: Works for Violin and Orchestra",
+year:2026,
+label:"BIS Records",
+catalog:"BIS-2782",
+genre:"古典 · 小提琴與管弦樂",
+styles:["浪漫派協奏曲","北歐小品","Hybrid SACD","24-bit/96kHz"],
+moods:["專注","深夜","週末黑膠"],
+itunesTerm:"Sueye Park Goldmark and Sibelius Works for Violin and Orchestra",
+wiki:"https://en.wikipedia.org/wiki/Violin_Concerto_No._1_(Goldmark)",
+compiled:"2026-08-20",
+
+tagline:"一張把師徒兩人放在同一張唱片上的節目：1890 年冬天，二十四歲的西貝流士在維也納敲開高德馬克的門；老師說他的配器太薄，並要他去看看貝多芬如何把一個樂思改寫五十遍。這張唱片一邊是老師那首被遺忘的協奏曲，一邊是學生晚年最私密的小品。",
+
+facts:[
+  ["錄音一","2024 年 5 月 13–15 日（高德馬克協奏曲、西貝流士組曲）"],
+  ["錄音二","2025 年 7 月 8–9 日（兩首莊重的旋律、兩首幽默曲）"],
+  ["錄音地點","Haus des Rundfunks, Saal 1，柏林"],
+  ["製作人","Florian B. Schmidt"],
+  ["錄音師","Christoph Binner"],
+  ["發行日","2026 年 7 月 10 日"],
+  ["規格","Hybrid SACD · 24-bit/96kHz · 立體聲與 5.0 環繞"],
+  ["總長度","10 軌 · 串流版 65 分 13 秒（實體 SACD 內頁標 65'37，兩者切點略有不同）"],
+  ["使用樂器","Lorenzo Storioni 1774 與 François-Louis Pique 1800，弓為 Heinrich Knopf 1865"]
+],
+
+/* ── 1 錄音製作全紀錄 ── */
+production:`這張唱片的起點是一條師徒線。1890 年 10 月底，剛滿二十四歲的西貝流士抵達維也納（他 12 月才過二十五歲生日）；11 月 12 日他登門拜訪高德馬克，對方表示自己已經好幾年沒收學生了，但願意看他的作品。這段零星的指導持續到 1891 年 6 月。十三年前，高德馬克剛寫完他的 a 小調小提琴協奏曲。朴秀藝把這兩件事放進同一張唱片裡。
+
+她自己的說法很直接：「我想把兩位有著獨特連結的作曲家放在一起——西貝流士曾在維也納跟高德馬克學習。高德馬克的小提琴協奏曲是一顆真正的浪漫派寶石，在音樂與技術上都是實打實的挑戰。西貝流士這幾首小提琴與樂團的作品則揭示了他更私密、更個人的一面。放在一起，它們既相連又對比。」
+
+錄音分成兩批。2024 年 5 月 13 至 15 日錄下高德馬克協奏曲與西貝流士的組曲；隔了一年多，2025 年 7 月 8 至 9 日再補上《兩首莊重的旋律》與《兩首幽默曲》。地點都是柏林夏洛滕堡的 Haus des Rundfunks 第一廳——柏林廣播交響樂團的家——1929 年奠基、1931 年啟用的那棟廣播大樓。這裡不是 Nalepastraße 的老東德廣播中心，那是樂團 1956 年之後的舊址。
+
+製作人是 Florian B. Schmidt，錄音師 Christoph Binner；立體聲的剪輯與混音由 Schmidt 負責，5.0 環繞與 ADM 由 Binner 處理。監製是德國廣播電台的 Christine Anderson 與 BIS 的 Robert Suff。原始格式 24-bit/96kHz，出成 Hybrid SACD，可以聽立體聲也可以聽 5.0。
+
+有一個細節值得特別記下來：**朴秀藝在這張唱片裡沒有用她平常那把琴。** 她的常用琴是 1753 年的 Giovanni Battista Guadagnini「ex-Hamma」，由三星文化財團出借。但內頁的樂器欄寫得很清楚——高德馬克協奏曲與西貝流士組曲用的是 **Lorenzo Storioni 1774**，兩組小品用的是 **François-Louis Pique 1800**，弓則是 Heinrich Knopf 1865。換句話說，你在這張唱片上聽到的是兩把不同的琴，而且分界剛好落在「協奏曲／小品」這條線上。
+
+（內頁把 Storioni 標為「Guadagnini Foundation 出借」，但朴秀藝本人網站寫的是曼海姆的 Sinfonima Foundation，而且查不到「Guadagnini Foundation」這個機構。這一項存疑，此處照內頁原文記載。）
+
+另外一個時代註腳：BIS 的版權標示現在是「℗ 2026 BIS Records, a division of PLATOON Ltd.」——這家瑞典老牌發燒廠已經是 Apple 旗下 Platoon 的一部分了。`,
+
+/* ── 2 深度樂評 ── */
+review:`先講這張唱片真正的賣點：**高德馬克的協奏曲，朴秀藝彈的是完整版本，沒有任何刪節。** 內頁特別標明了這一點，而這件事本身就說明了這首曲子的處境——它長期以來被演的時候是要剪的。
+
+高德馬克這首寫於 1877 年，比布拉姆斯和柴可夫斯基的小提琴協奏曲還早一年。它當年不輸給那兩首。芝加哥交響樂團前二十五個樂季裡有二十二季演過高德馬克的作品；1900 年一場觀眾點播音樂會上，他的《莎昆妲蘿》序曲得票數超過貝多芬第七與舒伯特未完成。然後他就消失了。原因不是音樂變差，而是作品版權散在十幾家出版商手上、沒有人有動機持續推廣，加上他過世後維也納的思想氣候徹底變了——他是猶太人，《示巴女王》在維也納國家歌劇院一路演到 1938 年為止。
+
+所以聽這張唱片有一個很具體的樂趣：你會一直在想「這首為什麼會被忘掉」。第一樂章是十六分半的長篇，開頭有一段馬扎爾式的進行曲，然後獨奏小提琴唱出綿延不斷的抒情長句——那是華格納式的「無盡旋律」被搬進協奏曲裡。《衛報》的 Clive Paget 給了四顆星，那句評語抓得很準：「高德馬克或許慢，但它始終引人入勝，朴秀藝流動、銀質的音色對這些綿長的抒情線條再理想不過。」
+
+「銀質」（silvery）這個形容值得停一下。朴秀藝的聲音不厚、不濃、不靠揉音去撐分量，靠的是線條的連續性與音準的乾淨。這種聲音放在高德馬克那些長句上非常好用，因為那些句子最怕的就是中途斷掉。但同樣的特質在《兩首莊重的旋律》上就比較吃虧——Paget 的保留意見正是「溫暖是溫暖了，但少了一點吟遊詩人式的莊嚴」，而 D 大調的幽默曲「少了 Pekka Kuusisto 那種輕盈的幻想感」。這個批評我認為公允。
+
+樂團的部分反而是驚喜。柏林廣播交響樂團在 Valentin Egel 手上把高德馬克的配器處理得清楚而不單薄——這首曲子的樂團寫作其實相當厚，稍一放縱就會把獨奏埋掉。Haus des Rundfunks 第一廳的錄音也幫了大忙：中頻密實、堂音適中，獨奏與樂團的距離感很自然，不是那種把小提琴貼在你耳朵上的近場錄音。德國的 concerti.de 甚至用了「參考錄音」這個字眼，那可能講得太滿，但方向是對的。
+
+真正把這張唱片撐起來的是節目編排。如果只有高德馬克，這是一張「冷門曲目復興」的唱片；加上西貝流士那三組小品之後，它變成一個關於師承的論證。1929 年的組曲是西貝流士最後的管弦作品之一，被紐約的出版商退稿之後他在手稿上寫了「草稿。待改寫！」，然後終生沒有動它，直到 1990 年才首演。兩首幽默曲則來自 1917 年——西貝流士自己形容那組曲子是「存在的苦痛……被陽光斷續地照亮」。
+
+把這些放在高德馬克那首外向、華麗、渴望被喜愛的協奏曲旁邊，對比就出來了：老師寫的是要征服音樂廳的作品，學生晚年寫的是不打算給任何人的東西。這張唱片最好的地方，是它讓你聽見這兩種音樂觀之間的四十年。`,
+
+/* ── 3 逐曲導聆（全 10 軌） ── */
+tracks:[
+/* ══ Goldmark ══ */
+{n:1, title:"高德馬克：a 小調小提琴協奏曲 Op. 28 · I. Allegro moderato", len:"16:32",
+ writer:"Karl Goldmark（1830–1915）｜作於 1877 年",
+ personnel:"Sueye Park（Lorenzo Storioni 1774）· Rundfunk-Sinfonieorchester Berlin · Valentin Egel 指揮",
+ note:`全曲最長的一個樂章，十六分半。這首協奏曲 1877 年在不來梅首演（確切日期、獨奏者與指揮均查不到可靠記載），同年由漢堡的 Hugo Pohle 首度出版，小提琴與鋼琴縮譜及分譜則掛不來梅的 Schweers & Haake。
+
+結構上它是傳統的協奏曲式，但高德馬克在兩件事上做得不太一樣：一是開頭那段馬扎爾式的進行曲主題，把匈牙利元素放在第一樂章而不是慣例的終樂章；二是獨奏一進來就是「cantabile、dolce、espressivo」的超長抒情句——那是華格納「無盡旋律」的觀念被移植到協奏曲身上。
+
+再現部之前有一段以開場主題為素材的樂團賦格段，獨奏要等它跑完才回來。這是全樂章結構最緊的一處，也是最能聽出樂團素質的一段。
+
+朴秀藝這裡彈的是完整版本，沒有任何刪節——這在這首曲子的錄音史上並非常態。`,
+ cues:[["開頭","樂團的進行曲主題，帶著匈牙利的重音。這是全曲唯一的「硬」東西"],
+       ["獨奏進入","立刻是綿延不斷的長句。《衛報》說朴秀藝「銀質」的音色對這些線條再理想不過，就是指這裡"],
+       ["發展部","樂團的密度陡增，這首曲子最容易把獨奏埋掉的地方"],
+       ["賦格段","再現部之前，樂團用開場主題自己跑一段對位，獨奏暫時退場"],
+       ["尾聲","主題以全奏收束，注意 Egel 沒有讓它變成噪音"]]},
+
+{n:2, title:"高德馬克：協奏曲 · II. Andante（多數版本標作 Air）", len:"7:01",
+ writer:"a 小調協奏曲的抒情中心",
+ personnel:"同上",
+ note:`IMSLP 上的原始出版資料只寫「Andante」，但從 Ricci、Irnberger 到本片，絕大多數唱片都標成「Air. Andante」。這個標題是不是出現在 1877 年的初版總譜上，我查不到確證——姑且理解為「歌謠式的抒情曲」，air 就是 aria 的英法對應詞。
+
+芝加哥交響的曲目解說形容它是「孟德爾頌式的無言歌，帶一點華格納的和聲染色」。這個描述很準：旋律的呼吸方式是孟德爾頌的，但底下的和聲一直在往不預期的方向走。
+
+七分鐘，是全張最適合單獨拿出來聽的一軌。`,
+ cues:[["開頭","獨奏直接進入主題，沒有樂團前奏。注意音色的乾淨度"],
+       ["中段","和聲開始偏離，這是華格納留下的痕跡"],
+       ["再現","同樣的旋律，但配器加厚了"],
+       ["尾聲","極安靜地收，不要在這裡調大音量"]]},
+
+{n:3, title:"高德馬克：協奏曲 · III. Moderato – Allegretto", len:"17:37",
+ writer:"全張最長的一軌｜終樂章",
+ personnel:"同上",
+ note:`十七分半，比第一樂章還長。要說明的是，這個長度有一半來自「完整無刪節」——一般錄音的終樂章大約九到十分鐘，全曲三十一到三十六分鐘，而這張的協奏曲部分就跑了四十一分鐘。
+
+最值得注意的是它的節奏型。美國交響樂團的曲目解說指出，這個終樂章的舞蹈節奏一方面讓人想起貝多芬三重協奏曲末樂章的波蘭舞曲（polacca）風格，另一方面**預示了西貝流士小提琴協奏曲終樂章的波麗露節拍**。芝加哥交響的解說講得更直接：這個樂章「很可能就在高德馬克的學生西貝流士寫自己那首『波蘭舞曲』終樂章時浮現在他腦中」。
+
+要補充的是，本片內頁作者 Andrew Barnett 主張的其實是另一條線：他認為高德馬克**第一樂章**那個進行曲樂念，與西貝流士小提琴協奏曲**原始版本第一樂章**中極為相似的進行曲素材有關（那段素材在修訂版裡幾乎被刪光）；對終樂章他只說它「像舒曼與西貝流士的協奏曲終樂章一樣帶有波蘭舞曲性格」，沒有主張影響關係。兩種說法並存，都值得聽聽看。
+
+（常見的誤植：不少資料把這個樂章寫成「Moderato – Allegro」，正確是 Allegretto。）`,
+ cues:[["開頭 Moderato","慢速導入，和前兩個樂章的收尾接得很順"],
+       ["轉入 Allegretto","舞蹈節奏出現——這就是被認為預示了西貝流士協奏曲終樂章的那個律動"],
+       ["中段","技術密度最高的一段，完整版本在此不作刪節"],
+       ["尾聲","加速衝刺。十七分半的長度在這裡才顯出理由"]]},
+
+/* ══ Sibelius Suite ══ */
+{n:4, title:"西貝流士：小提琴與弦樂團組曲 Op. 117 (JS 185) · I. Country Scenery. Allegretto", len:"2:25",
+ writer:"Jean Sibelius（1865–1957）｜作於 1929 年",
+ personnel:"Sueye Park（Lorenzo Storioni 1774）· 弦樂團 · Valentin Egel 指揮",
+ note:`這套組曲的身世是全張最戲劇性的。
+
+1928 年 10 月，紐約的出版商 Carl Fischer 主動來信邀稿。西貝流士在 1929 年 2 月 15 日寄出了 Op. 114 到 117 四部作品。同年 9 月 7 日，Fischer 退稿，理由是「美國樂譜出版界情勢極為不利……市場對這類音樂非常不好」——那是華爾街崩盤前一個多月。
+
+西貝流士在手稿上用瑞典文寫下「Skizz. Omarbetas!」（草稿。待改寫！），然後終其一生沒有動它。這套組曲從未在他生前演出或出版。**直到 1990 年 12 月 8 日——他的生日當天——才在芬蘭拉赫蒂首演，Osmo Vänskä 指揮，獨奏是 John Storgårds。**
+
+這個名字值得記住：三十五年後，Storgårds 是 2025 年西貝流士小提琴大賽的評審團主席，朴秀藝就是那一屆的首獎；同年七月她的 BBC 逍遙音樂節首演也是由他指揮。這條線繞了一圈回來。
+
+三個樂章的標題是英文寫的，因為西貝流士本來就打算賣給美國出版商。第一樂章兩分半，最短最輕。`,
+ cues:[["開頭","弦樂的田園質地，速度輕快。這是西貝流士最不「西貝流士」的一面"],
+       ["獨奏線條","注意這裡的獨奏幾乎沒有炫技成分，是室內樂的寫法"],
+       ["收尾","兩分半就結束，不留餘韻"]]},
+
+{n:5, title:"西貝流士：組曲 · II. Serenade. Evening in Spring. Andantino", len:"4:37",
+ writer:"組曲三樂章中最長、最好的一段",
+ personnel:"同上",
+ note:`組曲的核心。《衛報》的評論特別點名這一軌：「中間的小夜曲有一些絕美的極弱奏」。
+
+這是全張最能聽出朴秀藝控制力的地方——四分半的極弱長句，音量壓得很低，但線條不能斷。Storioni 那把琴在低音量下的顆粒感在此非常明顯。
+
+順帶澄清一個常見錯誤：這套組曲**是 B 大調**，不是 d 小調。不少新聞稿與商品頁把它寫成「Suite in D Minor」，那其實是另一首作品——給小提琴與鋼琴的 d 小調組曲 JS 187。另外 Op. 117 這個編號也是「事實上的」而非西貝流士官方認定的，他 1952 年的最終作品編號表並沒有把 117 指派給任何作品。`,
+ cues:[["開頭","春夜的小夜曲，速度是 Andantino 而非慢板"],
+       ["極弱段落","《衛報》點名的「exquisite pianissimo」就在這一帶。把音量調到你聽得見呼吸的程度"],
+       ["中段","弦樂加入但仍極克制"],
+       ["尾聲","不解決，直接讓路給終樂章"]]},
+
+{n:6, title:"西貝流士：組曲 · III. In the Summer. Vivace", len:"2:03",
+ writer:"全張最短的一軌",
+ personnel:"同上",
+ note:`兩分鐘出頭（內頁標 1'55），全張最短。快速、輕巧、幾乎是嬉遊曲。
+
+出版商 Fennica Gehrman 把這套組曲定位為西貝流士「一系列小提琴與樂團作品的頂點」——這個系列從 Op. 69 的兩首小夜曲開始，經過 Op. 87 與 89 的六首幽默曲，到 1929 年的這套組曲結束。它寫在《塔皮奧拉》與《暴風雨》配樂完成之後不久，是他最後的作品之一。
+
+換句話說：這兩分鐘是西貝流士管弦樂寫作的終點附近。他之後還活了二十八年，幾乎沒再發表任何東西。`,
+ cues:[["開頭","Vivace，速度全張最快"],
+       ["中段","獨奏與弦樂的快速對答"],
+       ["尾聲","乾脆收束。這是西貝流士管弦樂寫作的終點附近"]]},
+
+/* ══ Two Serious Melodies ══ */
+{n:7, title:"西貝流士：兩首莊重的旋律 Op. 77 · No. 1 Cantique（Laetare anima mea）", len:"5:19",
+ writer:"作於 1914 年｜Moderato assai",
+ personnel:"Sueye Park（François-Louis Pique 1800）· Rundfunk-Sinfonieorchester Berlin · Valentin Egel 指揮",
+ note:`從這一軌開始換琴。內頁標明《兩首莊重的旋律》與《兩首幽默曲》用的是 1800 年的 François-Louis Pique，錄音時間也差了一年多（2025 年 7 月）。
+
+拉丁文副標「Laetare anima mea」意思是「我的靈魂，歡欣吧」。這首原名是瑞典文的《Lofsången》（讚歌），編制包含獨奏、兩支長笛、兩支單簧管、兩支法國號、定音鼓、弦樂與豎琴。
+
+兩首都題獻給芬蘭大提琴家 Ossian Fohström。這裡有一個容易搞混的地方：**首演用的是大提琴版，不是小提琴版。** 1916 年 3 月 30 日在赫爾辛基，西貝流士本人指揮赫爾辛基愛樂，Fohström 拉大提琴。小提琴版的首演資訊查不到。
+
+《衛報》對這兩首的評語是保留的：「溫暖是溫暖了，但少了一種吟遊詩人式的莊嚴。」`,
+ cues:[["開頭","換了琴——Pique 1800 的音色比 Storioni 更暗一點"],
+       ["豎琴進入","這是編制裡最容易被忽略的一件樂器"],
+       ["中段","旋律往上走，「歡欣」的部分在這裡"],
+       ["尾聲","極安靜收束"]]},
+
+{n:8, title:"西貝流士：兩首莊重的旋律 Op. 77 · No. 2 Devotion（Ab imo pectore）", len:"3:26",
+ writer:"作於 1915 年｜Tempo molto moderato",
+ personnel:"同上",
+ note:`拉丁文副標「Ab imo pectore」的字面意思是「從胸腔最深處」，通常譯作「發自我內心深處」。
+
+這兩首寫在 1914 到 1915 年之間，正是一次大戰爆發、芬蘭仍在俄羅斯帝國治下、西貝流士的國際版稅收入被戰爭切斷的時候。他當時同時在寫第五號交響曲。把這首三分半的小品放進那個時間點，你會理解「莊重」（serious）這個標題不只是速度指示。
+
+作品後來衍生出多個版本：原為小提琴（或大提琴）與樂團，1915 年出小提琴與鋼琴版，1916 年再出大提琴與樂團、大提琴與鋼琴版。`,
+ cues:[["開頭","比前一首更慢、更收",],
+       ["中段","和聲最暗的一段"],
+       ["尾聲","沒有真正的解決，直接停在那裡"]]},
+
+/* ══ Two Humoresques ══ */
+{n:9, title:"西貝流士：兩首幽默曲 Op. 87 · No. 1 in D minor（1917，1940 修訂）· Comodo", len:"3:52",
+ writer:"六首幽默曲 Op. 87 與 Op. 89 的第一首",
+ personnel:"同上",
+ note:`「幽默曲」這個名字容易誤導。西貝流士自己形容這組曲子展現的是「**存在的苦痛……被陽光斷續地照亮**」——那不是輕鬆的音樂。傳記作者 Tawaststjerna 則說它們捕捉到「小提琴那抒情的、舞蹈的靈魂」。
+
+六首本來是一整套，作曲家一度考慮叫它們 impromptus 或 lyrical dances，最後因為「出版技術性因素」被拆成 Op. 87（兩首）與 Op. 89（四首）兩個編號。至於為什麼要拆，除了這個籠統說法之外找不到更具體的解釋。
+
+全套六首在 1919 年 11 月 24 日於赫爾辛基首演，西貝流士本人指揮，獨奏是俄裔小提琴家 Paul Cherkassky——同一場音樂會還首演了第五號交響曲的定稿版。
+
+這第一首後來被改過：1940 年秋天西貝流士修訂了配器，最明顯的是刪掉豎琴聲部，修訂版由 Arvo Hannikainen 於 1940 年 12 月 15 日首演。本片用的是修訂版。`,
+ cues:[["開頭","d 小調。注意這不是輕快的音樂，速度標示是 Comodo（從容）"],
+       ["中段","舞蹈性的節奏出現，但底下的和聲是暗的"],
+       ["尾聲","陽光沒有真的照進來"]]},
+
+{n:10, title:"西貝流士：兩首幽默曲 Op. 87 · No. 2 in D major · Allegro assai", len:"2:17",
+ writer:"全張的終點",
+ personnel:"同上",
+ note:`兩分十七秒，全張最短也最外向的一軌。編制上有個特別之處：它和第一首用同樣的樂團，但**木管組完全被刪掉**，只剩銅管、定音鼓與弦樂。
+
+《衛報》對這一軌的保留意見值得一併記下：「雖然生氣勃勃，但 D 大調的幽默曲少了 Pekka Kuusisto 那種輕盈的幻想感。」這是一個很具體的比較點——Kuusisto 的版本走的是即興感很強的路子，朴秀藝這裡則是規矩而乾淨的。你可以自己判斷要哪一種。
+
+用這兩分鐘結束一張以十七分半的高德馬克終樂章為重心的唱片，是一個相當克制的收尾決定。`,
+ cues:[["開頭","D 大調，木管全數退場，聲音突然變薄變亮"],
+       ["中段","全張技術最外向的一段"],
+       ["結尾","兩分十七秒就結束了。專輯在此收束"]]}
+],
+
+/* ── 4 人物誌 ── */
+people:[
+{role:"小提琴", name:"Sueye Park 朴秀藝", life:"2000 年生 · 南韓大邱",
+ bio:`四歲學琴，九歲起師事 Ulf Wallin——先在柏林漢斯艾斯勒音樂院，2020 年起在維也納音樂暨表演藝術大學（mdw）繼續跟隨他，同時隨 Avo Kouyoumdjian 修室內樂、隨 Clive Brown 修古典與浪漫時期的演奏實踐。
+
+2025 年 5 月 19 至 29 日，她在赫爾辛基拿下第十三屆國際西貝流士小提琴大賽首獎（獎金三萬歐元），評審團主席是指揮 John Storgårds。2026 年 3 月起，她獲聘為 mdw 的小提琴教授——二十六歲。同年 7 月 21 日在皇家亞伯特廳完成 BBC 逍遙音樂節首演，曲目正是西貝流士小提琴協奏曲，由 Storgårds 指揮 BBC 愛樂。
+
+在 BIS 已經出過六張以上專輯，包括十七歲時錄的帕格尼尼二十四首隨想曲、2021 年獲《留聲機》月選唱片的《Journey through a Century》，以及 2025 年同時拿下《留聲機》編輯精選與《BBC 音樂雜誌》器樂類推薦的《Echoes of Exile》。2026 年 7 月簽入經紀公司 HarrisonParrott。`,
+ here:`她的聲音特質是「銀質」——《衛報》用的字。不厚、不濃、不靠揉音撐分量，靠線條的連續性與音準的乾淨度取勝。這種聲音對高德馬克那些綿長的抒情句是理想的，因為那些句子最怕中途斷掉；但在《兩首莊重的旋律》這種需要重量感的曲子上就比較吃虧。
+
+更值得記的是她的節目編排能力：把高德馬克與西貝流士放在一起，靠的是 1890 年那段師徒關係，而這個連結在音樂上真的成立——高德馬克協奏曲終樂章的舞蹈節奏，被普遍認為預示了西貝流士小提琴協奏曲的終樂章。這不是唱片公司的行銷話術，是一個站得住的論證。
+
+另外她在這張唱片裡沒有用自己那把 1753 Guadagnini「ex-Hamma」（三星文化財團出借），而是換了 Storioni 1774 與 Pique 1800 兩把琴，分別對應協奏曲與小品。順帶一提，2025 年西貝流士大賽首獎附帶的出借樂器是另一把 Guadagnini——1777 年的「ex Sasson」，借期一年，兩把很容易混淆。`,
+ key:[["Echoes of Exile","2025"],["Journey through a Century","2021"],["Paganini: 24 Caprices","2017"],["Isang Yun: Three Late Works","2022"],["Szymanowski: Music for Violin and Piano","2023"]]},
+
+{role:"作曲（協奏曲）", name:"Karl Goldmark 卡爾・高德馬克", life:"1830 年 5 月 18 日–1915 年 1 月 2 日 · 生於匈牙利 Keszthely，卒於維也納",
+ bio:`猶太會眾領唱者之子，出身極貧的多子女家庭。十二歲進 Sopron 的音樂學校學小提琴，十四歲赴維也納投靠兄長，跟 Leopold Jansa 私下學了約十八個月，直到錢用完。1847 年考進維也納音樂之友協會音樂院，隔年三月革命爆發、音樂院關閉，學業就此中斷——作曲基本上是自學的。
+
+1849 年他隨劇團工作期間，在匈牙利 Győr（德文名 Raab）被控通敵、一度面臨處決，最後獲救——獲救的經過各家記載不一，有說是他當面說服了負責的少校，也有說是舊識及時趕到。（常見的混淆：被缺席判處死刑、流亡美國的是他哥哥 Joseph，兩件事不同。）
+
+1875 年歌劇《示巴女王》在維也納宮廷歌劇院首演，一夕成名，首演夜謝幕四十次；這齣戲在維也納一路上演到 1938 年。他與布拉姆斯是相當要好的朋友，1875 年兩人與樂評家 Hanslick 同任奧地利國家藝術獎助評審委員會的三人小組，1878 年還一起去義大利。同時他在 1871/72 年維也納華格納協會的創立中扮演要角——他刻意走在兩派之間，這在當時的維也納相當罕見。
+
+布魯克納（1896）、布拉姆斯（1897）、小約翰史特勞斯（1899）相繼過世之後，他被視為維也納的首席作曲家，地位還在馬勒與荀白克之上。`,
+ here:`他是這張唱片的主角，也是被遺忘的那一半。這首 1877 年的協奏曲比布拉姆斯與柴可夫斯基的小提琴協奏曲還早一年，當年三者的受歡迎程度不相上下。
+
+他消失的原因不是音樂變差。維也納市的歷史檔案給了一個很實際的解釋：他的作品散在十幾家出版商手上，每家只握有一小部分，沒有人有動機持續推廣他；加上他過世後維也納的思想氣候轉變。芝加哥交響樂團上一次把這首協奏曲排進訂閱音樂會是 1984 年。
+
+順帶一提，他在維也納並不以教學著稱——1852 年起靠教鋼琴維生，《示巴女王》成功後就不再收學生。1890 年西貝流士登門時，他說自己已經好幾年沒教過人了。`,
+ key:[["Die Königin von Saba（示巴女王）","1875"],["Ländliche Hochzeit（鄉村婚禮交響曲）","1876"],["Sakuntala Overture（莎昆妲蘿序曲）","1860 年代中期"]]},
+
+{role:"作曲（其餘七軌）", name:"Jean Sibelius 尚・西貝流士", life:"1865 年 12 月 8 日–1957 年 9 月 20 日 · 芬蘭",
+ bio:`他十四歲才開始學小提琴，起步太晚，但用他自己的話說：「小提琴以風暴之姿攫住了我，接下來十年，成為偉大的演奏家是我最深的願望、最壓倒一切的野心。」
+
+1890 年 10 月底他到維也納，住在四區 Waaggasse 1 號二樓，據記載房租連兩餐與鋼琴每月約二十八古爾登。**他並沒有註冊維也納音樂院**——學期已經開始了，所以是私人授課：主要跟 Robert Fuchs（由指揮家 Hans Richter 引薦），零星跟高德馬克。他本來想跟布拉姆斯或布魯克納學，沒能如願。
+
+那段日子並不順。據記載，高德馬克嫌他的管弦樂配器「薄弱」，Fuchs 則說他的作品「野蠻而生硬」。1891 年 1 月他去應徵維也納愛樂的一個替補職位，失敗；傳記記載他回到房間後崩潰痛哭，然後坐到鋼琴前開始練音階。同年二月，據記載他在住處燒掉了一批自己寫的德奧風格作品。
+
+但也就是在維也納，他開始讀《卡勒瓦拉》、開始構思《Kullervo》，並且第一次真正轉向管弦樂寫作。1891 年 6 月 8 日離開時，他已經是另一個作曲家了。`,
+ here:`這張唱片收的三組作品都來自他的晚期：1914–15 年的《兩首莊重的旋律》、1917 年的《兩首幽默曲》、1929 年的組曲。全部都是小提琴與樂團，全部都是小品，全部都不是為了征服音樂廳而寫的。
+
+高德馬克當年給他的建議留下了文字紀錄：「把你的樂思再打磨得更有內在性格。貝多芬會把他的樂思重寫上五十次。」老師還勸他多看海頓、莫札特、貝多芬，少受白遼士與華格納影響。從這張唱片上那些極度精簡的小品聽回去，這個建議似乎真的起了作用——只是要等四十年。
+
+最直接的音樂連結在高德馬克協奏曲的終樂章：那個舞蹈節奏被廣泛認為預示了西貝流士自己小提琴協奏曲的波蘭舞曲終樂章。`,
+ key:[["Violin Concerto in D minor, Op. 47","1904/1905"],["Symphony No. 5","1915/1919"],["Tapiola","1926"],["Kullervo","1892"],["Six Humoresques, Op. 87 & 89","1917–18"]]},
+
+{role:"指揮", name:"Valentin Egel", life:"1994 年生 · 德國",
+ bio:`出身音樂家庭，幼時隨父習鋼琴，後學小提琴，曾在弗萊堡主教座堂少年合唱團唱歌。就讀威瑪李斯特音樂院，師從 Nicolás Pasquet、Gunter Kahlert 與 Ekhart Wycik，2019 年赴印第安納大學 Jacobs School of Music 交換。
+
+2019 年拿下薩格勒布 Lovro von Matačić 青年指揮大賽首獎，另有德國音樂院「Campus Dirigieren」與萊比錫／MDR 交響樂團指揮比賽的首獎。2020 年 9 月起任克羅埃西亞里耶卡國家劇院首席指揮兼副總監，2021 年、二十六歲時升任音樂總監，在那裡指揮過華格納、威爾第、普契尼、莫札特、比才與荀白克的《期待》。`,
+ here:"他在這張唱片裡處理的是一個具體的技術問題：高德馬克協奏曲的樂團寫作相當厚，稍一放縱就會把獨奏埋掉。從結果聽，他選擇的是清楚而不單薄的路線——《衛報》稱讚樂團的演奏「有精神」，德國的 concerti.de 則說這次的相遇「真是一件幸事」。對一位三十出頭的指揮來說，能把一首幾乎沒有演出傳統可依循的協奏曲帶出這種平衡，是相當扎實的成績。",
+ key:[]},
+
+{role:"樂團", name:"Rundfunk-Sinfonieorchester Berlin 柏林廣播交響樂團", life:"1923 年創立 · 駐地 Haus des Rundfunks，柏林",
+ bio:`歷史可回溯到 1923 年 10 月 29 日德國公共廣播誕生那一天，是歐洲最古老的廣播交響樂團之一。1949 年德國分裂後歸東德廣播管轄，1994 年起隸屬 ROC（Rundfunk-Orchester und Chöre GmbH）。
+
+歷任首席指揮包括 Bruno Seidler-Winkler、Eugen Jochum、Sergiu Celibidache、Artur Rother、Hermann Abendroth、Rolf Kleinert、Heinz Rögner、Rafael Frühbeck de Burgos、Marek Janowski，2017 年起由 Vladimir Jurowski 出任首席指揮兼藝術總監，合約已延長至 2029 年。
+
+（常見的混淆：Fricsay、Maazel、Chailly、Ashkenazy 是柏林德意志交響樂團 DSO 的首席指揮，不是這個團的。兩團的舊名都叫過「Radio-Symphonie-Orchester Berlin」，中文資料經常張冠李戴。）`,
+ here:"這張唱片錄於他們自己的家——夏洛滕堡的 Haus des Rundfunks 第一廳。這是理解這張錄音音響性格的關鍵：中頻密實、堂音適中，獨奏與樂團的距離感自然，不是那種把小提琴貼在耳朵上的近場錄音。廣播樂團的另一個特質是視奏能力與適應力，這對高德馬克這種幾乎沒有演出傳統可依循的曲目特別重要。",
+ key:[]}
+],
+
+/* ── 5 完整 Credits ── */
+credits:[
+ ["小提琴","Sueye Park"],
+ ["樂團","Rundfunk-Sinfonieorchester Berlin"],
+ ["指揮","Valentin Egel"],
+ ["製作人 / Producer","Florian B. Schmidt"],
+ ["錄音師 / Recording engineer","Christoph Binner"],
+ ["剪輯與立體聲混音","Florian B. Schmidt"],
+ ["5.0 環繞混音與 ADM","Christoph Binner"],
+ ["監製 / Executive producers","Dr. Christine Anderson（Deutschlandradio）· Robert Suff（BIS Records）"],
+ ["錄音日期","2024 年 5 月 13–15 日 · 2025 年 7 月 8–9 日"],
+ ["錄音地點","Haus des Rundfunks, Saal 1, Berlin"],
+ ["原始格式","24-bit / 96 kHz"],
+ ["內頁文字","Andrew Barnett（德譯 Anna Lamberti、法譯 Jean-Pascal Vachon）"],
+ ["樂器","Lorenzo Storioni 1774（高德馬克協奏曲、西貝流士組曲）· François-Louis Pique 1800（Op. 77、Op. 87）· 弓 Heinrich Knopf 1865"],
+ ["封面攝影","© Frank Jerke｜設計 Wandala Rowe / Platoon"],
+ ["版權","℗ 2026 BIS Records, a division of PLATOON Ltd.｜© 2026 Deutschlandradio/ROC-GmbH & BIS Records"],
+ ["樂譜版本","Sibelius 組曲：Fennica Gehrman Oy Ab｜Op. 77 與 Op. 87：Wilhelm Hansen"]
+],
+
+/* ── 6 評價與歷史地位 ── */
+reception:{
+ scores:[
+  ["The Guardian（2026-07-09）","★★★★｜「高德馬克或許慢，但它始終引人入勝，朴秀藝流動、銀質的音色對這些綿長的抒情線條再理想不過。」（本頁引用的其餘評語出自二手轉述，未能核對原文）"],
+  ["Gramophone（2026 年 8 月號）","「這裡既沒有無心的技術展示，也沒有黏膩的感傷：朴秀藝在所有這些樂譜裡都找到了一條屬於個人的抒情脈絡，無論作品多麼樸素。」"],
+  ["concerti.de（2026-07-10，Ecki Ramón Weber）","標題〈Sternstunde〉（星光時刻）：「無疑地，這裡誕生了一份新的參考錄音。」"],
+  ["Classical CD Choice（2026-08-03）","「朴秀藝與這個樂團在 Valentin Egel 手下的新演繹值得列入上乘之作，對作曲家獨特而不尋常的配器展現了極大的敏感度。」"],
+  ["Pizzicato（盧森堡，2026-07-10，Uwe Krusch）","已確認有評論，全文與星等未能取得"]
+ ],
+ chart:[
+  ["發行形式","Hybrid SACD（立體聲＋5.0 環繞）／Hi-Res 下載與串流（96 kHz / 24 bit）"],
+  ["目錄編號","BIS-2782｜EAN 7318599927824"],
+  ["曲目版本","高德馬克協奏曲為完整版本，未作任何刪節（內頁特別註明）"]
+ ],
+ awards:[
+  ["本片獎項","本頁整理於 2026 年 8 月，距發行一個多月，尚未見任何獎項或月選紀錄"],
+  ["對照：上一張專輯","《Echoes of Exile》(BIS-2332) 為 2025 年 10 月《留聲機》編輯精選與《BBC 音樂雜誌》器樂類推薦"],
+  ["演奏家獎項","2025 年第十三屆國際西貝流士小提琴大賽首獎（赫爾辛基，5 月 29 日公布，獎金三萬歐元）"]
+ ],
+ legacy:`這張唱片的歷史位置目前還無法判斷——它才發行一個多月。但它想做的事很清楚：把高德馬克的小提琴協奏曲從「冷門曲目」推回常規曲目。
+
+這件事有前人做過。Nathan Milstein 1950 年代末在 Capitol 的錄音長期被視為標竿，之後有 Perlman／Previn（EMI）、Ruggiero Ricci、Sarah Chang／Conlon，以及 1999 年 Joshua Bell 與沙隆年、洛杉磯愛樂的版本——後者也是把高德馬克與西貝流士配在同一張唱片上，不過配的是西貝流士的小提琴協奏曲。朴秀藝這張的差別在於：她配的是西貝流士的小品，而且演的是完整無刪節的版本。
+
+比較能站得住的一句判斷是：如果你想聽這首協奏曲全貌、又想要當代錄音的解析度，這是目前最直接的選擇。至於它會不會成為 concerti.de 所說的「參考錄音」，還需要時間與更多樂評的檢驗。
+
+另一個值得注意的角度是這張唱片的產業背景。BIS 這家 1973 年創立的瑞典發燒廠，現在的版權標示是「a division of PLATOON Ltd.」——也就是 Apple 旗下的 Platoon。獨立古典廠牌被科技公司收編之後還能不能維持這種「錄冷門曲目、做 5.0 環繞、附完整學術內頁」的作法，這張唱片本身就是一個觀察樣本。`
+},
+
+/* ── 7 脈絡與影響網絡 ── */
+context:{
+ era:`1877 年是小提琴協奏曲的豐年。高德馬克這首寫成的同一時期，布拉姆斯與柴可夫斯基各自在 1878 年交出了自己的小提琴協奏曲。三首曲子在當年的受歡迎程度相去不遠，一百五十年後只剩兩首還在演。
+
+高德馬克在維也納的位置很特別。他是猶太人、自學出身、走在布拉姆斯派與華格納派之間——1875 年與布拉姆斯、Hanslick 同任國家藝術獎助評審，1871/72 年又在維也納華格納協會的創立中扮演要角。奧地利音樂辭典的說法是他「大體上避開了關於音樂『進步』的黨派之爭，走出一條介於兩派之間的路」。這種立場讓他在世時左右逢源，卻也讓他在後世的音樂史敘事裡沒有位置——寫音樂史的人習慣沿著派系的線走。
+
+十三年後，二十四歲的西貝流士來到這座城市。他遇到的是一個處在事業頂峰、已經不收學生的作曲家。這段師徒關係只持續了七個月，內容也只是「寫完了拿來給我看」，但留下了具體的紀錄：高德馬克嫌他配器薄弱，並要他去看貝多芬如何把一個樂思重寫五十遍。
+
+四十年後，西貝流士寫下這張唱片上那幾組小品。它們短、精簡、幾乎沒有多餘的音——不能說是高德馬克的功勞，但也不能說完全無關。`,
+ timeline:[
+  ["1830-05-18","高德馬克生於匈牙利 Keszthely","猶太會眾領唱者之子，出身極貧的多子女家庭"],
+  ["1849","在 Győr（Raab）一度面臨處決","隨劇團工作期間被控通敵，最後獲救；獲救經過各家記載不一"],
+  ["1875-03-10","《示巴女王》維也納首演","一夕成名，首演夜謝幕四十次；此劇在維也納一路演到 1938 年"],
+  ["1877","小提琴協奏曲 Op. 28 完成並於不來梅首演","比布拉姆斯與柴可夫斯基的小提琴協奏曲早一年"],
+  ["1890-11-12","西貝流士登門拜訪高德馬克","高德馬克表示已多年不收學生，但願意看他的作品"],
+  ["1891-01","西貝流士應徵維也納愛樂失敗","傳記記載他回房後崩潰痛哭，然後坐到鋼琴前開始練音階"],
+  ["1891-02","燒掉自己的德奧風格作品","在維也納的住處。此事見於傳記記載"],
+  ["1891-06-08","離開維也納","此時他已開始構思《Kullervo》"],
+  ["1914–15","《兩首莊重的旋律》Op. 77","題獻給大提琴家 Ossian Fohström，1916 年由他以大提琴首演"],
+  ["1917–18","《六首幽默曲》Op. 87 & 89","1919-11-24 赫爾辛基首演，西貝流士指揮，同場首演第五號交響曲定稿版"],
+  ["1929","小提琴與弦樂團組曲","寄給紐約 Carl Fischer 遭退稿，手稿上寫下「草稿。待改寫！」，終生未動"],
+  ["1984-11","芝加哥交響最後一次把高德馬克協奏曲排進訂閱音樂會","Christian Altenburger 獨奏、Slatkin 指揮"],
+  ["1990-12-08","組曲 Op. 117 世界首演","西貝流士生日當天，拉赫蒂，Vänskä 指揮，獨奏 John Storgårds"],
+  ["2025-05-29","朴秀藝獲西貝流士大賽首獎","評審團主席正是 John Storgårds"],
+  ["2026-07-10","本片發行","BIS-2782"],
+  ["2026-07-21","朴秀藝 BBC 逍遙音樂節首演","曲目為西貝流士小提琴協奏曲，Storgårds 指揮 BBC 愛樂"]
+ ],
+ influencedBy:[
+  ["Ludwig van Beethoven","Triple Concerto","高德馬克協奏曲終樂章的 polacca 節奏被指與此曲末樂章同源"],
+  ["Richard Wagner","Lohengrin","高德馬克第一樂章那種「無盡旋律」式的抒情長句"],
+  ["Felix Mendelssohn","Songs Without Words","協奏曲第二樂章被形容為「孟德爾頌式的無言歌」"]
+ ],
+ influenced:[
+  ["Jean Sibelius","Violin Concerto in D minor, Op. 47","終樂章的舞蹈節奏被普遍認為源自高德馬克協奏曲的終樂章"],
+  ["Jean Sibelius","Kullervo","維也納那七個月的直接產物之一"],
+  ["Jean Sibelius","Six Humoresques, Op. 87 & 89","高德馬克「把樂思打磨得更有內在性格」的建議，四十年後的迴響"]
+ ],
+ covers:[
+  ["Nathan Milstein","Goldmark: Violin Concerto（Capitol）","長期被視為這首協奏曲的標竿版本"],
+  ["Joshua Bell / Salonen / LA Phil","Sibelius & Goldmark: Violin Concertos（1999）","同樣把兩人配在一起，不過配的是西貝流士的協奏曲"],
+  ["Dong-Suk Kang / Vänskä / Lahti SO","Sibelius: Suite Op. 117（BIS, 1992）","組曲的世界首錄"]
+ ]
+},
+
+/* ── 8 版本／音質指南 ── */
+versions:[
+ {name:"本片：Park / Egel / RSB", year:"2026", source:"BIS-2782 · Hybrid SACD · 24-bit/96kHz",
+  note:"高德馬克協奏曲的完整無刪節版本，配上西貝流士三組罕見小品。當代錄音、解析度高、有 5.0 環繞。想一次聽到協奏曲全貌就是這張。", rec:5},
+ {name:"Milstein / Blech / Philharmonia", year:"1957（Capitol）", source:"1957 年 7 月 2–4 日錄音",
+  note:"這首協奏曲長期以來的標竿。技術與線條的說服力至今沒有人超過，代價是錄音年代久遠。", rec:5},
+ {name:"Perlman / Previn / Pittsburgh SO", year:"1977（EMI）", source:"類比立體聲",
+  note:"最容易入手的主流版本，音色濃厚、揉音飽滿，和朴秀藝「銀質」的路線正好相反。想聽另一種美學就找它。", rec:4},
+ {name:"Joshua Bell / Salonen / LA Phil", year:"1999（Sony Classical）", source:"錄於 Dorothy Chandler Pavilion",
+  note:"與西貝流士小提琴協奏曲同碟——同樣的配對邏輯，但配的是大曲目而非小品。想比較「兩種師徒配對」的做法，這張是直接對照組。", rec:4},
+ {name:"Sarah Chang / Conlon / Gürzenich-Orchester Köln", year:"1999（EMI）", source:"錄於科隆愛樂廳",
+  note:"樂團部分厚實，獨奏外向，是 1990 年代末最主流的數位版本。", rec:4},
+ {name:"Ricci / de Froment / Luxembourg Radio Orchestra", year:"1977（Vox）", source:"類比",
+  note:"歷史價值高於音質，Vox 的錄音一向偏乾。給想聽演奏史的人。", rec:3},
+ {name:"Kang / Vänskä / Lahti SO（西貝流士組曲）", year:"1992（BIS）", source:"數位",
+  note:"Op. 117 組曲的世界首錄，同一個廠牌。想比較這套罕見組曲的兩種讀法，這是唯一的對照組。", rec:4}
+],
+versionsNote:`實務建議很單純：想聽高德馬克協奏曲的完整全貌、又要當代錄音的解析度，就是這張。想理解這首曲子為什麼曾經是名曲，去找 Milstein；想聽另一種完全相反的音色美學，去找 Perlman。
+
+至於格式：串流的 96kHz/24bit 已經非常夠用。實體 Hybrid SACD 多的是 5.0 環繞，Haus des Rundfunks 的堂音在多聲道下確實更完整，但立體聲版本的平衡本來就做得好，不是非升級不可。
+
+一個聽感上的提醒：這張唱片的動態範圍不小，高德馬克第一樂章的全奏與西貝流士組曲第二樂章的極弱奏落差很大。不要用會自動拉平音量的「響度標準化」設定，那會把《衛報》稱讚的那些極弱段落壓掉。`,
+
+/* ── 9 聆聽路線圖 ── */
+roadmap:[
+ {title:"第一次聽 · 照順序聽完", body:"六十五分鐘，結構是「一大三小」：先是十七分半的協奏曲終樂章壓陣的高德馬克，然後是三組愈來愈短的西貝流士小品，最後兩分十七秒收尾。這個由大到小的安排是設計過的，第一次聽不要跳軌，感覺那個逐漸收束的過程。"},
+ {title:"第二次聽 · 只聽協奏曲，並且問一個問題", body:"單獨聽第 1 到第 3 軌，四十一分鐘。全程只想一件事：這首曲子為什麼會被忘掉。它比布拉姆斯的小提琴協奏曲早一年，旋律不輸、技術不輸、配器也不差。想完之後你對「經典是怎麼形成的」會有不太一樣的看法。"},
+ {title:"第三次聽 · 驗證師徒這條線", body:"先聽第 3 軌高德馬克的終樂章，注意那個舞蹈節奏；接著去找西貝流士小提琴協奏曲的第三樂章（那個著名的「波蘭舞曲」終樂章）。芝加哥交響與美國交響兩份曲目解說都指出前者很可能就在後者寫作時浮現在西貝流士腦中；本片內頁則把連結指向兩人協奏曲的第一樂章。無論採哪一說，這個節目編排都不是行銷話術。"},
+ {title:"進階 · 兩把琴的差別", body:"第 1 到第 6 軌用的是 Lorenzo Storioni 1774，第 7 到第 10 軌換成 François-Louis Pique 1800。連著聽第 6 軌與第 7 軌，注意音色的轉折——Pique 偏暗、偏內斂，剛好配上那兩組更私密的小品。這種「一張唱片換兩把琴」的做法並不常見。"},
+ {title:"重點單曲 · 只有十分鐘的話", body:"第 2 軌（協奏曲的 Andante，七分鐘）加第 5 軌（組曲的春夜小夜曲，四分半）。前者是高德馬克最好的旋律，後者是《衛報》點名的「絕美極弱奏」。這兩軌決定你要不要聽完整張。"},
+ {title:"情境 · 音量 · 訊源", body:"動態範圍大，適合安靜環境。耳機能聽清楚 Pique 那把琴的細節與極弱段落，喇叭則比較能還原 Haus des Rundfunks 的堂音——如果房間夠安靜，喇叭是更好的選擇。務必關掉播放器的音量標準化。不適合當通勤或工作背景音樂：西貝流士那幾首小品短到你一分心就過去了。"}
+],
+
+/* ── 10 視覺與實體 ── */
+physical:{
+ "封面":"朴秀藝的全身肖像，黑底、白色上衣與黑褲，右手垂握小提琴與弓，站姿放鬆。左下角是「SUEYE PARK」，右側直排列出 Karl Goldmark / Violin Concerto 與 Jean Sibelius / Works for violin and orchestra，最下方是樂團與指揮。攝影 Frank Jerke，設計出自 Platoon 的 Wandala Rowe。",
+ "設計取向":"BIS 近年的封面路線：大量留白、人物置中、字級克制。這一張把演奏家而非曲目放在視覺重心，但曲目資訊仍完整列出——對一張以冷門曲目為賣點的唱片來說，這個平衡是刻意的。",
+ "載體":"Hybrid SACD 單片，可在一般 CD 機播立體聲，在 SACD 機播立體聲或 5.0 環繞。BIS 的 ecopak 紙質包裝。另有 Hi-Res 下載（96kHz/24bit）與串流。",
+ "內頁":"Andrew Barnett 撰文（他是西貝流士研究的權威之一），附德文與法文翻譯。BIS 的內頁一貫收錄完整的錄音資料、樂器清單與樂譜版本——這張也不例外，本頁的多數技術資料都來自它。",
+ "樂器":"高德馬克協奏曲與西貝流士組曲用 Lorenzo Storioni 1774，兩組小品用 François-Louis Pique 1800，弓為 Heinrich Knopf 1865。內頁把 Storioni 標為「Guadagnini Foundation 出借」，但朴秀藝本人網站寫的是曼海姆 Sinfonima Foundation，且查不到前者這個機構——此點存疑。",
+ "廠牌背景":"BIS 由 Robert von Bahr 於 1973 年在瑞典創立，長年以冷門北歐曲目、完整全集與高規格錄音著稱（西貝流士全集、巴哈清唱劇全集）。現版權標示為「a division of PLATOON Ltd.」，已隸屬 Apple 旗下的 Platoon。"
+},
+
+/* ── 影音延伸 ── */
+videos:[
+ {kind:"官方影片", title:"Sueye Park — Sibelius Violin Competition 2025, First Round", by:"Jean Sibelius Violin Competition 官方頻道",
+  url:"https://www.youtube.com/watch?v=kXm_Gno6Ld4",
+  note:"2025 年那屆大賽的第一輪。想知道她奪冠前的狀態，從這裡開始。"},
+ {kind:"官方影片", title:"Sueye Park — Sibelius Violin Competition 2025, Second Round", by:"Jean Sibelius Violin Competition 官方頻道",
+  url:"https://www.youtube.com/watch?v=zkJhhmTiwts",
+  note:"第二輪。大賽官方完整放送，是目前網路上最完整的一手演奏紀錄。"},
+ {kind:"演出紀錄", title:"Sueye Park — 西貝流士小提琴協奏曲（2025 大賽決賽）", by:"Cellliszt",
+  url:"https://www.youtube.com/watch?v=ZQFIVALHp1A",
+  note:"讓她拿下首獎的那場決賽演出。評審團主席是 John Storgårds——正是 1990 年組曲 Op. 117 世界首演的獨奏者，也是她 2026 年 BBC 逍遙音樂節首演的指揮。"},
+ {kind:"曲目對照", title:"Goldmark: Violin Concerto — Itzhak Perlman", by:"Addiobelpassato",
+  url:"https://www.youtube.com/watch?v=x5X4Nas96zo",
+  note:"主打曲目的經典參照版。Perlman 濃厚飽滿的音色和朴秀藝的「銀質」路線正好相反，是最直接的美學對照。"},
+ {kind:"曲目對照", title:"Sibelius: Suite for violin and string orchestra JS 185 (1929)", by:"Rodders",
+  url:"https://www.youtube.com/watch?v=eMzGGxqyhUk",
+  note:"這套組曲 1990 年才首演，錄音本來就少。聽另一個版本可以確認朴秀藝在第二樂章的極弱處理有多克制。"},
+ {kind:"曲目對照", title:"Augustin Hadelich plays Sibelius Humoresque No. 2 (Op. 87/2)", by:"Augustin Hadelich 官方頻道",
+  url:"https://www.youtube.com/watch?v=nYxV-M30l5w",
+  note:"專輯最後一軌的另一種讀法。《衛報》拿 Pekka Kuusisto 當對照批評朴秀藝這一軌少了輕盈的幻想感，Hadelich 這個版本可以當第三個參考點。"},
+ {kind:"官方影片", title:"BIS 這張專輯的官方預告", q:"BIS Records Sueye Park Goldmark trailer",
+  note:"查證時在 BIS 官網、eClassical 與官方發行連結頁都找不到本片的 YouTube 預告，目前應該不存在。若日後推出，用這組關鍵字可以找到。"},
+ {kind:"訪談", title:"朴秀藝的訪談", q:"Sueye Park violinist interview",
+  note:"找不到可驗證網址的訪談影片。她 2026 年 7 月才簽進 HarrisonParrott，經紀公司的影音內容可能陸續出現。"},
+ {kind:"分析導讀", title:"高德馬克為什麼被遺忘", q:"Karl Goldmark forgotten composer Vienna Queen of Sheba documentary",
+  note:"理解這張唱片的核心問題。維也納市的歷史檔案給的解釋是出版商分散與他過世後的思想氣候轉變，不是音樂本身的問題。"}
+],
+
+/* ── 11 延伸聆聽 ── */
+further:[
+ {artist:"Sueye Park", album:"Echoes of Exile", why:"她 2025 年的前一張，《留聲機》編輯精選＋《BBC 音樂雜誌》器樂類推薦"},
+ {artist:"Sueye Park", album:"Journey through a Century", why:"2021 年《留聲機》月選唱片，同樣是 BIS"},
+ {artist:"Jean Sibelius", album:"Violin Concerto in D minor, Op. 47", why:"聽完高德馬克的終樂章一定要接這首的第三樂章，師徒那條線就在那裡"},
+ {artist:"Joshua Bell", album:"Sibelius & Goldmark: Violin Concertos", why:"1999 年沙隆年／洛杉磯愛樂，同樣的配對邏輯但配的是大曲目"},
+ {artist:"Nathan Milstein", album:"Goldmark: Violin Concerto", why:"這首協奏曲長期以來的標竿版本"},
+ {artist:"Karl Goldmark", album:"Ländliche Hochzeit (Rustic Wedding Symphony)", why:"他最好的管弦作品之一，連布拉姆斯都讚賞"},
+ {artist:"Jean Sibelius", album:"Six Humoresques, Op. 87 & 89", why:"本片只收了前兩首，另外四首在 Op. 89"},
+ {artist:"Jean Sibelius", album:"Tapiola", why:"1926 年，比組曲早三年，是他管弦樂寫作真正的終點"}
+],
+
+/* ── 12 資料來源 ── */
+sources:[
+ {title:"BIS-2782 官方內頁 PDF（錄音資料、樂器、Credits）", url:"https://eclassical.textalk.se/shop/17115/art61/5201361-f1f86c-BIS-2782_Booklet.pdf"},
+ {title:"Presto Music — 曲目、時長、樂評摘錄", url:"https://www.prestomusic.com/classical/products/9870293--goldmark-and-sibelius-works-for-violin-and-orchestra"},
+ {title:"The Guardian — Clive Paget 樂評（2026-07-09）", url:"https://www.theguardian.com/music/2026/jul/09/sueye-park-goldmark-and-sibelius-album-review-korean-violinists-silvery-tone-is-ideal-for-goldmark-rarity"},
+ {title:"concerti.de — Ecki Ramón Weber 樂評", url:"https://www.concerti.de/rezensionen/sueye-park-goldmark-violinkonzert/"},
+ {title:"The Violin Channel — 專輯發行報導與朴秀藝談話", url:"https://theviolinchannel.com/sueye-parks-new-album-sibelius-and-goldmark-violin-concertos/"},
+ {title:"國際西貝流士小提琴大賽官方 — 2025 年首獎公告", url:"https://sibeliuscompetition.fi/en/sueye-park-wins-the-xiii-international-jean-sibelius-violin-competition/"},
+ {title:"Chicago Symphony — Goldmark 小提琴協奏曲曲目解說（Phillip Huscher）", url:"https://cso.org/uploadedFiles/1_Tickets_and_Events/Program_Notes/ProgramNotes_Goldmark_ViolinConcerto.pdf"},
+ {title:"American Symphony Orchestra — Goldmark 協奏曲解說", url:"https://americansymphony.org/concert-notes/goldmark-violin-concerto/"},
+ {title:"Wien Geschichte Wiki — Carl Goldmark", url:"https://www.geschichtewiki.wien.gv.at/Carl_Goldmark"},
+ {title:"奧地利科學院音樂辭典 — Sibelius（維也納時期）", url:"https://musiklexikon.ac.at/ml/musik_S/Sibelius_Jean.xml"},
+ {title:"Wikipedia — Suite for Violin and String Orchestra (Sibelius)", url:"https://en.wikipedia.org/wiki/Suite_for_Violin_and_String_Orchestra"},
+ {title:"Wikipedia — Two Serious Melodies", url:"https://en.wikipedia.org/wiki/Two_Serious_Melodies"},
+ {title:"Wikipedia — Six Humoresques", url:"https://en.wikipedia.org/wiki/Six_Humoresques"},
+ {title:"IMSLP — Goldmark Violin Concerto, Op. 28", url:"https://imslp.org/wiki/Violin_Concerto,_Op.28_(Goldmark,_Carl)"},
+ {title:"ROC Berlin — Rundfunk-Sinfonieorchester Berlin", url:"https://www.roc-berlin.de/rundfunk-sinfonieorchester-berlin/"},
+ {title:"Valentin Egel 官方網站", url:"https://www.valentinegel.com/biography/"}
+]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   渲染引擎 —— 以下不需要修改
+   ═══════════════════════════════════════════════════════════════ */
+const E = s => String(s==null?'':s);
+const has = x => Array.isArray(x) ? x.length>0 : (x && Object.keys(x).length>0);
+const amURL = t => 'https://music.apple.com/tw/search?term=' + encodeURIComponent(t);
+const ytURL = t => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(t);
+const P = txt => E(txt).split(/\n\s*\n/).map(x=>`<p>${x.trim()}</p>`).join('');
+
+document.title = `${D.album} · 深度導聆`;
+
+const SEC = [];
+function sec(id, zh, en, html){ if(html) SEC.push({id, zh, en, html}); }
+
+/* 1 · 錄音製作全紀錄 */
+sec('production','錄音製作全紀錄','Production', D.production ? `<div class="prose">${P(D.production)}</div>` : '');
+
+/* 2 · 深度樂評 */
+sec('review','深度樂評','Critique', D.review ? `<div class="prose">${P(D.review)}</div>` : '');
+
+/* 3 · 逐曲導聆 */
+sec('tracks','逐曲導聆','Track by Track', has(D.tracks) ? D.tracks.map((t,i)=>`
+  <div class="trk" data-i="${i}">
+    <div class="trkhead">
+      <span class="tn">${t.n||i+1}</span>
+      <span class="tt"><b>${E(t.title)}</b>${t.writer?`<span>${E(t.writer)}</span>`:''}</span>
+      <span class="tlen">${E(t.len)}</span>
+      <span class="tcar">▶</span>
+    </div>
+    <div class="trkbody">
+      ${t.note?P(t.note):''}
+      ${has(t.cues)?`<div class="cues">${t.cues.map(c=>`<div class="cue"><b>${E(c[0])}</b><span>${E(c[1])}</span></div>`).join('')}</div>`:''}
+      ${t.personnel?`<div class="tmeta"><b>編制：</b>${E(t.personnel)}</div>`:''}
+    </div>
+  </div>`).join('') : '');
+
+/* 4 · 人物誌 */
+sec('people','人物誌 · 作曲家／演奏家／主唱','People', has(D.people) ? `<div class="people">${
+  D.people.map(p=>`
+  <div class="pcard">
+    <div class="prole">${E(p.role)}</div>
+    <div class="pname">${E(p.name)}</div>
+    <div class="plife">${E(p.life)}</div>
+    ${p.bio?P(p.bio):''}
+    ${p.here?`<div class="phere"><b style="color:var(--accent)">在這張專輯裡 · </b>${E(p.here)}</div>`:''}
+    ${has(p.key)?`<div class="pkey">${p.key.map(k=>`<a href="${amURL(p.name+' '+k[0])}" target="_blank" rel="noopener">${E(k[0])}${k[1]?` · ${k[1]}`:''}</a>`).join('')}</div>`:''}
+  </div>`).join('')}</div>` : '');
+
+/* 5 · 完整 Credits */
+sec('credits','完整 Credits','Credits', has(D.credits) ?
+  `<dl class="kv">${D.credits.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl>` : '');
+
+/* 6 · 評價與歷史地位 */
+let recHTML = '';
+if(has(D.reception)){
+  const R = D.reception;
+  if(has(R.scores)) recHTML += `<div class="tblwrap"><table class="tbl"><thead><tr><th>來源</th><th>評價</th></tr></thead><tbody>${
+    R.scores.map(s=>`<tr><td>${E(s[0])}</td><td>${E(s[1])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(has(R.chart)) recHTML += `<div style="margin-top:16px"><dl class="kv">${
+    R.chart.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl></div>`;
+  if(has(R.awards)) recHTML += `<div style="margin-top:16px" class="cards">${
+    R.awards.map(a=>`<div class="nc"><b>${E(a[0])}</b><span>${E(a[1])}</span></div>`).join('')}</div>`;
+  if(R.legacy) recHTML += `<div class="prose" style="margin-top:20px">${P(R.legacy)}</div>`;
+}
+sec('reception','評價與歷史地位','Reception & Legacy', recHTML);
+
+/* 7 · 脈絡與影響網絡 */
+let ctxHTML = '';
+if(has(D.context)){
+  const C = D.context;
+  if(C.era) ctxHTML += `<div class="prose">${P(C.era)}</div>`;
+  if(has(C.timeline)) ctxHTML += `<div class="tl" style="margin-top:22px">${
+    C.timeline.map(t=>`<div class="tlitem"><div class="ty">${E(t[0])}</div><b>${E(t[1])}</b><span>${E(t[2])}</span></div>`).join('')}</div>`;
+  const grp = (title, arr) => has(arr) ? `<div style="margin-top:24px">
+    <div style="font-size:11px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase;margin-bottom:9px">${title}</div>
+    <div class="cards">${arr.map(x=>`<a href="${amURL(x[0]+' '+(x[1]||''))}" target="_blank" rel="noopener">
+      <b>${E(x[1]||x[0])}</b><span>${E(x[1]?x[0]:'')}${x[2]?` — ${E(x[2])}`:''}</span></a>`).join('')}</div></div>` : '';
+  ctxHTML += grp('影響了這張的作品', C.influencedBy);
+  ctxHTML += grp('被這張影響的作品', C.influenced);
+  ctxHTML += grp('翻唱 · 取樣 · 引用', C.covers);
+}
+sec('context','脈絡與影響網絡','Context & Influence', ctxHTML);
+
+/* 8 · 版本／音質指南 */
+sec('versions','版本／音質指南','Editions & Sound', has(D.versions) ? `<div class="tblwrap">
+  <table class="tbl"><thead><tr><th>版本</th><th>年份</th><th>母帶／載體</th><th>說明</th><th>推薦</th></tr></thead>
+  <tbody>${D.versions.map(v=>`<tr>
+    <td><b style="color:var(--txt)">${E(v.name)}</b></td><td>${E(v.year)}</td>
+    <td>${E(v.source)}</td><td>${E(v.note)}</td>
+    <td class="rec">${'★'.repeat(v.rec||0)}${'☆'.repeat(Math.max(0,5-(v.rec||0)))}</td></tr>`).join('')}
+  </tbody></table></div>${D.versionsNote?`<div class="prose" style="margin-top:18px">${P(D.versionsNote)}</div>`:''}` : '');
+
+/* 9 · 聆聽路線圖 */
+sec('roadmap','聆聽路線圖','How to Listen', has(D.roadmap) ? `<div class="road">${
+  D.roadmap.map((r,i)=>`<div class="rstep"><div class="rnum">${i+1}</div>
+    <div><b>${E(r.title)}</b><p>${E(r.body)}</p></div></div>`).join('')}</div>` : '');
+
+/* 10 · 視覺與實體 */
+sec('physical','視覺與實體','Artwork & Object', has(D.physical) ?
+  `<dl class="kv">${Object.entries(D.physical).map(([k,v])=>`<dt>${E(k)}</dt><dd>${E(v)}</dd>`).join('')}</dl>` : '');
+
+/* 11 · 影音延伸 —— 介紹、紀錄片、訪談；不是聽音樂的連結 */
+sec('videos','影音延伸','Watch', has(D.videos) ? `
+  <div class="vnote">以下都是「認識這張唱片」的影音資料——官方介紹、紀錄片、分析與訪談，不是拿來聽音樂的。
+  標示「搜尋」的項目會帶你到 YouTube 的搜尋結果頁（影片會下架、網址會失效，用搜尋比較耐放）。</div>
+  <div class="vids">${D.videos.map(v=>`
+    <a class="vid" href="${v.url ? E(v.url) : ytURL(v.q || (D.artist+' '+D.album))}" target="_blank" rel="noopener">
+      <div class="vtop">
+        <span class="vkind">${E(v.kind||'影片')}</span>
+        ${v.url ? '' : '<span class="vsearch">搜尋</span>'}
+        ${v.len ? `<span class="vlen">${E(v.len)}</span>` : ''}
+      </div>
+      <b>${E(v.title)}</b>
+      ${v.by ? `<span class="vby">${E(v.by)}</span>` : ''}
+      ${v.note ? `<span class="vnt">${E(v.note)}</span>` : ''}
+    </a>`).join('')}</div>` : '');
+
+/* 12 · 延伸聆聽 */
+sec('further','延伸聆聽','Go Deeper', has(D.further) ? `<div class="cards">${
+  D.further.map(f=>`<a href="${amURL(f.artist+' '+f.album)}" target="_blank" rel="noopener">
+    <b>${E(f.album)}</b><span>${E(f.artist)}${f.why?`<br>${E(f.why)}`:''}</span></a>`).join('')}</div>` : '');
+
+/* 13 · 資料來源 */
+sec('sources','資料來源','Sources', has(D.sources) ? `<div class="srcs">${
+  D.sources.map(s=>s.url?`<a href="${E(s.url)}" target="_blank" rel="noopener">${E(s.title)}</a>`:E(s.title)).join(' · ')}</div>` : '');
+
+/* ---------- HERO ---------- */
+const heroHTML = `
+  ${D.backLink!==false?`<a class="back" href="${E(D.backLink||'../index.html')}">← 回專輯推薦</a>`:''}
+  <div class="hero">
+    <div class="hart" id="hart"><div class="ph">${E(D.album).slice(0,2)}</div></div>
+    <div class="hmeta">
+      <div class="kicker">深度導聆 · Deep Listening</div>
+      <h1>${E(D.album)}</h1>
+      <div class="who">${E(D.artist)}</div>
+      <div class="yl">${E(D.year)}${D.label?` · ${E(D.label)}`:''}${D.catalog?` · ${E(D.catalog)}`:''}</div>
+      <div class="chips">
+        ${D.genre?`<span class="chip g">${E(D.genre)}</span>`:''}
+        ${(D.styles||[]).map(s=>`<span class="chip">${E(s)}</span>`).join('')}
+        ${(D.moods||[]).map(s=>`<span class="chip c">${E(s)}</span>`).join('')}
+      </div>
+      <div class="btns">
+        <a class="btn am" href="${amURL(D.itunesTerm || (D.artist+' '+D.album))}" target="_blank" rel="noopener">▶ 在 Apple Music 聽</a>
+        ${has(D.videos)?`<a class="btn yt" href="#videos">▶ 影音延伸 · ${D.videos.length}</a>`:''}
+        ${D.wiki?`<a class="btn" href="${E(D.wiki)}" target="_blank" rel="noopener">Wikipedia</a>`:''}
+      </div>
+    </div>
+  </div>
+  ${D.tagline?`<div class="tagline">${E(D.tagline)}</div>`:''}
+  ${has(D.facts)?`<dl class="facts">${D.facts.map(f=>`<div><dt>${E(f[0])}</dt><dd>${E(f[1])}</dd></div>`).join('')}</dl>`:''}`;
+
+document.getElementById('main').innerHTML = heroHTML + SEC.map((s,i)=>`
+  <section id="${s.id}">
+    <div class="shead"><span class="snum">${String(i+1).padStart(2,'0')}</span>
+      <h2>${s.zh}</h2><span class="sen">${s.en}</span></div>
+    ${s.html}
+  </section>`).join('') + `
+  <footer><span>${E(D.artist)} — ${E(D.album)}</span><span>由 Claude 整理 · ${E(D.compiled||'')}</span></footer>`;
+
+document.getElementById('toc').innerHTML = SEC.map(s=>`<a href="#${s.id}">${s.zh.split(' · ')[0]}</a>`).join('');
+
+/* 逐曲展開 */
+document.querySelectorAll('.trkhead').forEach(h=>{
+  h.onclick = ()=> h.parentElement.classList.toggle('open');
+});
+
+/* 目錄高亮 */
+const links = [...document.querySelectorAll('#toc a')];
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-10% 0px -75% 0px'});
+SEC.forEach(s=>{ const el=document.getElementById(s.id); if(el) obs.observe(el); });
+
+/* 封面：iTunes Search API（JSONP，可在 file:// 直接跑） */
+(function(){
+  if(D.cover){ document.getElementById('hart').innerHTML = `<img src="${D.cover}" alt="">`; return; }
+  const cb = '__amcb1';
+  const s = document.createElement('script');
+  window[cb] = j => {
+    const r = (j.results||[])[0];
+    if(r && r.artworkUrl100)
+      document.getElementById('hart').innerHTML =
+        `<img src="${r.artworkUrl100.replace('100x100bb','1000x1000bb')}" alt="">`;
+    s.remove(); delete window[cb];
+  };
+  s.src = `https://itunes.apple.com/search?term=${encodeURIComponent(D.itunesTerm||(D.artist+' '+D.album))}`
+        + `&entity=album&media=music&limit=1&country=tw&callback=${cb}`;
+  s.onerror = ()=>{ s.remove(); };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

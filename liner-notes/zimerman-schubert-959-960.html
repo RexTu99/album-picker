@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深度導聆</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#14131a; --card:#1a1922; --line:#2a2833; --line2:#3a3747;
+    --txt:#ece9f2; --dim:#9b95ab; --dim2:#6f6a7d;
+    --accent:#fa4b6e; --accent2:#ffb26b; --gold:#e8c27a; --cyan:#7ad3e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1000px 560px at 82% -12%, rgba(250,75,110,.13), transparent 62%),
+      radial-gradient(760px 520px at -5% 100%, rgba(120,110,255,.11), transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.8; min-height:100vh;
+  }
+  a{color:inherit}
+  .shell{max-width:1240px;margin:0 auto;padding:0 22px 110px;display:grid;
+    grid-template-columns:200px minmax(0,1fr);gap:38px;align-items:start}
+  @media(max-width:900px){ .shell{grid-template-columns:1fr;gap:0} }
+
+  /* ---------- 側邊目錄 ---------- */
+  nav.toc{position:sticky;top:22px;padding-top:34px}
+  @media(max-width:900px){
+    nav.toc{position:static;padding:16px 0 0;overflow-x:auto;white-space:nowrap;
+      border-bottom:1px solid var(--line);margin-bottom:18px}
+    nav.toc .tocTitle{display:none}
+    nav.toc a{display:inline-block;margin:0 6px 10px 0}
+  }
+  .tocTitle{font-size:11px;letter-spacing:.24em;color:var(--dim2);text-transform:uppercase;margin-bottom:12px}
+  nav.toc a{display:block;font-size:13px;color:var(--dim2);text-decoration:none;padding:6px 10px;
+    border-radius:8px;border-left:2px solid transparent;transition:.16s}
+  nav.toc a:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+  nav.toc a.on{color:var(--accent2);border-left-color:var(--accent);background:rgba(250,75,110,.07)}
+  @media(max-width:900px){ nav.toc a{border-left:0;border-bottom:2px solid transparent}
+    nav.toc a.on{border-left:0;border-bottom-color:var(--accent)} }
+
+  main{padding-top:34px;min-width:0}
+
+  /* ---------- HERO ---------- */
+  .back{display:inline-block;font-size:12.5px;color:var(--dim2);text-decoration:none;margin-bottom:20px}
+  .back:hover{color:var(--txt)}
+  .hero{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+  .hart{width:250px;height:250px;flex:none;border-radius:14px;overflow:hidden;background:#211f2b;
+    position:relative;box-shadow:0 22px 56px rgba(0,0,0,.6)}
+  .hart img{width:100%;height:100%;object-fit:cover;display:block}
+  .hart .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;color:rgba(255,255,255,.2)}
+  .hmeta{flex:1;min-width:280px}
+  .kicker{font-size:11px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+  .hmeta h1{font-size:38px;line-height:1.2;letter-spacing:-.02em;margin:9px 0 5px;font-weight:750}
+  .hmeta .who{font-size:18px;color:var(--dim);margin-bottom:4px}
+  .hmeta .yl{font-size:12.5px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{font-size:11.5px;background:#252331;border:1px solid var(--line);color:var(--dim);
+    padding:4px 11px;border-radius:999px}
+  .chip.g{border-color:rgba(232,194,122,.4);color:var(--gold)}
+  .chip.c{border-color:rgba(122,211,232,.34);color:var(--cyan)}
+  .btns{display:flex;gap:9px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:14px;
+    padding:10px 20px;border-radius:999px;transition:.18s;border:1px solid var(--line2);color:var(--txt);
+    background:var(--card)}
+  .btn:hover{transform:translateY(-1px);border-color:var(--dim2)}
+  .btn.am{background:#fff;color:#111;border-color:#fff}
+  .btn.yt{background:#2a1418;color:#ff8fa3;border-color:#4a2028}
+  .tagline{margin-top:26px;font-size:17.5px;line-height:1.75;color:#ded9ec;
+    border-left:3px solid var(--accent);padding-left:18px;font-weight:520}
+
+  /* ---------- 快速事實 ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px}
+  .facts div{background:var(--bg2);padding:13px 16px}
+  .facts dt{font-size:10.5px;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase;margin-bottom:3px}
+  .facts dd{font-size:14px;color:var(--txt);line-height:1.55}
+
+  /* ---------- 區塊 ---------- */
+  section{margin-top:56px;scroll-margin-top:24px}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;
+    padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .snum{font-size:11px;letter-spacing:.16em;color:var(--dim2);font-variant-numeric:tabular-nums}
+  .shead h2{font-size:19px;letter-spacing:.02em;font-weight:700;color:var(--accent2)}
+  .shead .sen{font-size:11px;letter-spacing:.2em;color:var(--dim2);text-transform:uppercase;margin-left:auto}
+  .prose p{font-size:15.5px;color:#d8d4e4;margin-bottom:14px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{color:var(--gold);font-style:normal;font-weight:600}
+
+  /* ---------- 逐曲導聆 ---------- */
+  .trk{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--bg2),#111017)}
+  .trkhead{display:flex;align-items:center;gap:14px;padding:14px 17px;cursor:pointer;transition:.16s}
+  .trkhead:hover{background:rgba(255,255,255,.03)}
+  .tn{font-size:12px;color:var(--dim2);font-variant-numeric:tabular-nums;width:22px;flex:none}
+  .tt{flex:1;min-width:0}
+  .tt b{display:block;font-size:15.5px;font-weight:640;line-height:1.4}
+  .tt span{font-size:12px;color:var(--dim2)}
+  .tlen{font-size:12.5px;color:var(--dim2);font-variant-numeric:tabular-nums;flex:none}
+  .tcar{font-size:11px;color:var(--dim2);flex:none;transition:.2s}
+  .trk.open .tcar{transform:rotate(90deg)}
+  .trkbody{display:none;padding:2px 17px 18px 53px;border-top:1px solid var(--line)}
+  .trk.open .trkbody{display:block}
+  .trkbody p{font-size:14.5px;color:#d3cfe0;margin:14px 0}
+  .cues{border-left:2px solid var(--line2);padding-left:14px;margin:14px 0}
+  .cue{display:flex;gap:12px;font-size:13.5px;margin-bottom:7px;align-items:baseline}
+  .cue b{color:var(--cyan);font-variant-numeric:tabular-nums;flex:none;font-weight:600;font-size:12.5px}
+  .cue span{color:var(--dim)}
+  .tmeta{font-size:12.5px;color:var(--dim2);margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}
+  .tmeta b{color:var(--dim)}
+  /* ---------- 影音延伸 ---------- */
+  .vnote{font-size:13px;color:var(--dim2);line-height:1.75;margin-bottom:16px;
+    border-left:2px solid var(--line2);padding-left:14px}
+  .vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:11px}
+  .vid{display:block;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:15px 17px;text-decoration:none;transition:.18s}
+  .vid:hover{border-color:#ff8fa3;transform:translateY(-2px);background:#1e1c27}
+  .vtop{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .vkind{font-size:10.5px;letter-spacing:.1em;background:#2a1418;border:1px solid #4a2028;
+    color:#ff8fa3;padding:3px 9px;border-radius:999px}
+  .vsearch{font-size:10.5px;letter-spacing:.1em;background:#1f1d29;border:1px solid var(--line);
+    color:var(--dim2);padding:3px 9px;border-radius:999px}
+  .vlen{font-size:11.5px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  .vid b{display:block;font-size:14.5px;color:var(--txt);font-weight:640;line-height:1.45;margin-bottom:4px}
+  .vby{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+  .vnt{display:block;font-size:12.5px;color:var(--dim2);line-height:1.6}
+
+  /* ---------- 人物誌 ---------- */
+  .people{display:grid;gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:15px;padding:19px 20px;background:var(--bg2)}
+  .prole{font-size:10.5px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .plife{font-size:12.5px;color:var(--dim2);margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .pcard p{font-size:14.5px;color:#d3cfe0;margin-bottom:11px}
+  .phere{background:rgba(250,75,110,.07);border-left:2px solid var(--accent);
+    padding:11px 14px;border-radius:0 9px 9px 0;font-size:14px;color:#e2dded;margin-bottom:12px}
+  .pkey{display:flex;gap:7px;flex-wrap:wrap}
+  .pkey a{font-size:12px;background:#232130;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;border-radius:8px;text-decoration:none;transition:.16s}
+  .pkey a:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- 表格 ---------- */
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .tbl th{background:#1f1d29;color:var(--dim);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-align:left;padding:11px 14px;font-weight:600;border-bottom:1px solid var(--line)}
+  .tbl td{padding:12px 14px;border-bottom:1px solid var(--line);color:#d3cfe0;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tr:hover td{background:rgba(255,255,255,.022)}
+  .tbl .rec{color:var(--gold);white-space:nowrap;font-size:12.5px}
+  .tblwrap{overflow-x:auto}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;font-size:14px}
+  .kv dt{color:var(--dim2);white-space:nowrap}
+  .kv dd{color:#d8d4e4}
+
+  /* ---------- 通用小卡 ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+  .cards a,.cards div.nc{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-decoration:none;transition:.18s}
+  .cards a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .cards b{display:block;font-size:14px;color:var(--txt);margin-bottom:3px;font-weight:640;line-height:1.4}
+  .cards span{font-size:12.5px;color:var(--dim2);line-height:1.5;display:block}
+
+  /* ---------- 時間軸 ---------- */
+  .tl{border-left:2px solid var(--line2);padding-left:20px;margin-left:6px}
+  .tlitem{position:relative;margin-bottom:20px}
+  .tlitem::before{content:'';position:absolute;left:-26px;top:8px;width:9px;height:9px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+  .tlitem .ty{font-size:11.5px;letter-spacing:.14em;color:var(--gold);font-variant-numeric:tabular-nums}
+  .tlitem b{display:block;font-size:15px;margin:2px 0 4px}
+  .tlitem span{font-size:14px;color:var(--dim);line-height:1.65;display:block}
+
+  /* ---------- 路線圖 ---------- */
+  .road{display:grid;gap:12px}
+  .rstep{border:1px solid var(--line);border-radius:14px;padding:17px 19px;background:var(--bg2);
+    display:flex;gap:16px;align-items:flex-start}
+  .rnum{width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0d12;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .rstep b{display:block;font-size:15.5px;margin-bottom:5px}
+  .rstep p{font-size:14.5px;color:#d3cfe0;margin:0}
+
+  .srcs{font-size:12.5px;color:var(--dim2);line-height:2}
+  .srcs a{color:var(--dim);text-decoration:none;border-bottom:1px dotted var(--line2)}
+  .srcs a:hover{color:var(--accent2)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--dim2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .none{color:var(--dim2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc"><div class="tocTitle">目錄</div><div id="toc"></div></nav>
+<main id="main"></main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   資料區 —— 每張專輯只需要換掉這個 D 物件，其餘引擎完全不動
+   ═══════════════════════════════════════════════════════════════ */
+const D = {
+
+/* ── 基本識別 ── */
+artist:"Krystian Zimerman",
+album:"Schubert: Piano Sonatas, D. 959 & 960",
+year:2017,
+label:"Deutsche Grammophon",
+catalog:"DG 4797588",
+genre:"古典 · 鋼琴獨奏",
+styles:["舒伯特遺作","32-bit 錄音","自製鍵盤機構","96kHz/24bit"],
+moods:["深夜","專注","週末黑膠"],
+itunesTerm:"Zimerman Schubert Piano Sonatas D 959 960",
+wiki:"https://en.wikipedia.org/wiki/Schubert%27s_last_sonatas",
+compiled:"2026-08-21",
+
+tagline:"睽違二十三年的獨奏錄音。他把自己親手做的鍵盤裝進 Steinway，飛到日本一座小城的音樂廳，用五天錄下舒伯特生前最後五十四天寫成的兩首奏鳴曲。而且兩首的第一樂章呈示部，他都照譜反覆了。",
+
+facts:[
+  ["錄音","2016 年 1 月，日本新潟縣柏崎市文化會館 Art-Forêt"],
+  ["發行","2017 年 9 月 8 日"],
+  ["目錄編號","DG 4797588（另有 2LP 479 8204、日本 SHM-CD UCCG-1775）"],
+  ["製作人／錄音師","Rainer Maillard（Tonmeister 兼錄音製作人）"],
+  ["錄音格式","32-bit 錄製（齊瑪曼稱可能是 DG 首次）；發行為 96kHz／24bit"],
+  ["內容","8 軌 · 約 82 分鐘（D.959 38:52 · D.960 43:09）"],
+  ["呈示部反覆","兩首的第一樂章都完整反覆——這是本片最重要的詮釋決定"],
+  ["樂器","Steinway，但裝的是齊瑪曼自己設計製作的鍵盤機構"],
+  ["內頁","Jessica Duchen 撰寫，形式是訪談而非傳統樂曲解說"]
+],
+
+/* ── 1 錄音製作全紀錄 ── */
+production:`齊瑪曼上一張純鋼琴獨奏專輯是 1994 年的德布西《前奏曲》全集。中間隔了二十三年。（DG 的行銷文案寫「超過二十五年」，但 1994 到 2017 是二十三年。）
+
+他自己給的理由很直接。接受 Limelight 訪談時他說：「我不太相信我們所謂『只給聽覺媒介的音樂』是對的事……十九世紀你總是看得見演奏者。因為我們發展出了錄音的機器，我們就開始把音樂當成聲音來錄。**而我不相信音樂是聲音。音樂其實是時間。**」第二個理由更簡單：市面上已經有太多唱片，他不覺得自己能再加上什麼。
+
+那為什麼是這兩首、為什麼是現在？他說自己接近六十歲，開始盤點；這兩首他已經彈了三十年，「我擔心再拖下去就太晚了」。
+
+**錄音地點是一個很個人的選擇。** 2007 年新潟中越沖地震後，他曾到柏崎市義演。重建後的市文化會館 Art-Forêt 落成，市長回過頭來把整座音樂廳提供給他錄音一週。他在那裡「沉浸於舒伯特五天」。他特別提到那個廳的音響——「每一個音都清楚，卻又都被包在溫暖的環境裡」，設計者是豐田泰久的學生。（豐田泰久正是華特迪士尼音樂廳的音響設計者。）
+
+**樂器是本片最關鍵的技術點。** 齊瑪曼本人就是專業鋼琴技師，巡演一律自備鋼琴並親自調校。這次他把**自己設計、自己製作的一整副鍵盤機構裝進 Steinway**。他在內頁裡說明了原理：琴槌擊弦的落點被改變了，「強化了它維持歌唱聲音的能力——不過這也會產生不同的泛音，鋼琴可能會聽起來調得有點奇怪。」《留聲機》那句評語就是衝著這個來的：「齊瑪曼，簡單說，聽起來不像任何其他人。這有一部分要歸功於那件樂器。」
+
+有意思的是，唱片內頁從頭到尾沒有提到鋼琴的廠牌，只揭露鍵盤是他自製的。
+
+錄音由 Rainer Maillard 擔任 Tonmeister 兼錄音製作人，Emil Berliner Studios 負責錄音與母帶，Ute Fesquet 監製。齊瑪曼堅持用 32-bit 技術錄製，並說「可能是 Deutsche Grammophon 史上第一次」。工作常做到凌晨兩點，他在訪談裡特別感謝 Maillard 願意陪他到那麼晚。`,
+
+/* ── 2 深度樂評 ── */
+review:`先講最重要的那個決定：**兩首奏鳴曲的第一樂章呈示部，他都完整反覆了。**
+
+這在 D.960 上不是小事。那個反覆意味著第一樂章要跑二十分鐘（不反覆的版本通常十三到十五分鐘），也意味著你會聽到九個小節的「第一結束句」——那九小節寫了全曲別處完全不出現的素材，跳過反覆就永遠聽不到。齊瑪曼在內頁裡把理由講得很具體：「我覺得這些反覆絕對必要。在 D.960 裡，左手那個低音顫音**只有在呈示部結尾、在第一結束句裡才以 fortissimo 出現**，而且它和我們聽到的另外三次完全不同。」
+
+這場爭論有一段很有名的歷史。布蘭德爾在 1989 年《紐約書評》上公開表態：「在任何情況下、任何節目組合中，我都不能同意演奏這些有爭議的反覆。」他的理由之一正好與齊瑪曼相反——他認為那個顫音在全曲別處都是遙遠而神祕的，在這裡卻要吹成 fortissimo，這讓他「最為痛苦」。席夫則說省略它等於「截肢」。齊瑪曼站在席夫這一邊，而且站得很明白。
+
+**聲音本身是這張唱片第二個爭論點。** 那副自製鍵盤讓琴槌的擊弦落點改變，結果是歌唱性變強、泛音結構變得不太一樣。多數樂評把這當成優點——《BBC 音樂雜誌》說「這台鋼琴甜美地歌唱，讓齊瑪曼能做出所有情緒的爆發，卻不會突破到我們這個更吵的現代」。但 The Classical Source 的 Colin Anderson 給了保留意見：他覺得 D.960 第一樂章「或許會讓人覺得少了一份寧靜」，斷奏有時「太鈍」，而且「鋼琴在偏乾的音場裡被放得太前面，大概是 fortissimo 時高音特別亮的原因」。他的結論是「D.959 極佳，D.960 雖然很有意思，但沒那麼一面倒」。
+
+我認為這個保留是有道理的，而且它指向這張唱片真正的性格：**這不是一張「安詳告別」的舒伯特。** AllMusic 的 James Manheim 說得很準——D.959 的開頭「不是宏偉，而是一個相當現代的、帶刺的神經質與恐懼的陳述」。齊瑪曼自己也刻意打破了「臨終之作」的迷思：他認為舒伯特寫這些曲子時身體狀況相對還好，還舉了舒伯特曾步行三十英里到海頓墓前獻花為證，主張這音樂是**向前看**的。
+
+但他對慢樂章的看法又完全相反：「D.959 和 D.960 的慢樂章大概是我所知最悲傷的音樂：大調比小調更悲傷，因為這是徹底的認命、徹底的接受，也許是想著要離開這顆星球、結束生命。A 大調慢樂章的中段是革命性的。那是音樂史上的一座里程碑：一場天翻地覆的暴風雨。你會覺得它幾乎預示了華格納。」
+
+把這兩段話放在一起，就是這張唱片的核心矛盾——一個不肯把它當遺書來彈的人，卻認為它的慢樂章是他所知最悲傷的音樂。整張唱片的張力就在這裡。
+
+最後說個實務判斷：如果你只想要一個版本，這張的問題在於它太有主張。想聽最平衡、最沒有稜角的舒伯特，肯普夫或魯普更合適；想聽極端，李希特的慢還在更前面。齊瑪曼給的是第三種東西——一個把每一個細節都想過一遍的舒伯特。《留聲機》那句話值得完整引用：「這兩首奏鳴曲的每一個元素都被想過、被考慮過；換成次一等的藝術家，結果可能會變得吹毛求疵，但在這裡它們趨向超越。」`,
+
+/* ── 3 逐曲導聆（8 軌） ── */
+tracks:[
+{n:1, title:"D.959 · I. Allegro", len:"14:13",
+ writer:"A 大調第二十號鋼琴奏鳴曲｜1828 年春草稿、9 月完成謄清稿",
+ personnel:"呈示部反覆完整演奏",
+ note:`開頭是 forte 的厚重和弦號角——Hyperion 的解說形容為「準管絃樂式的召喚」，低音是 marcato 的八度跳進，內聲部像聖詠。這和 D.960 開頭那個 pianissimo 的綿長歌唱是兩個極端；一個是斷言，一個是低語。
+
+號角之後緊接安靜下行的三連音琶音。記住這兩個東西——四十分鐘後，全曲最後一頁會把開頭的號角以**逆行**（cancrizans，整段倒著走）再唱一次，而下行琶音會被翻成上行。這種首尾框架在奏鳴曲文獻裡大概前所未有，而且手稿顯示這是舒伯特**最後才加上去的**：草稿裡沒有。
+
+還有一個細節值得知道：這個樂章的過渡段原本寫在高四度，改寫之後成了舒伯特晚期首樂章裡絕無僅有的一次古典式 V of V 過渡。
+
+十四分十三秒，代表齊瑪曼把呈示部反覆彈了。`,
+ cues:[["開頭","forte 的和弦號角。這是全曲的第一句，也會是最後一句"],
+       ["號角之後","安靜下行的三連音琶音。與號角形成的落差是整個樂章的張力來源"],
+       ["呈示部反覆","注意他第二遍的重量分配和第一遍不同"],
+       ["發展部","齊瑪曼那副自製鍵盤在密集織體下的分離度，這裡最聽得出來"],
+       ["尾聲","安靜收束，不預告下一樂章會發生什麼"]]},
+
+{n:2, title:"D.959 · II. Andantino", len:"7:36",
+ writer:"升 f 小調｜草稿原標 Andante，後改為 Andantino",
+ note:`全套三首遺作裡最極端的一個樂章，也是這張唱片最該從這裡聽起的一軌。
+
+A 段是一支「遙遠、憂鬱的船歌」，充滿嘆息式的下行二度。然後中段來了：調性與節拍被一段看似任性的**宣敘調兼裝飾奏**瓦解，從升 F 一路走到無限遙遠的 c 小調；接著舒伯特把鍵盤變成一座怪誕的管絃樂團，展開一場把節奏與和聲推到瀕臨崩解邊緣的地震式幻想曲，在**升 c 小調**以 fortissimo 和弦達到高潮。
+
+**布蘭德爾把這一段形容為一場「精神崩潰」（nervous breakdown）**，Hyperion 的解說直接引用了這個說法，並斷言「這種破壞性的暴力在舒伯特所有晚期慢樂章中沒有第二例」。維基的技術描述則說它的和聲大膽處「預示了李斯特甚至荀白克」。
+
+齊瑪曼自己的話：「A 大調慢樂章的中段是革命性的。那是音樂史上的一座里程碑：一場天翻地覆的暴風雨。你會覺得它幾乎預示了華格納。」
+
+風暴退去之後船歌回來了，但節奏已經變形，最後沉入 ppp。Hyperion 的結語值得記住：**「中段爆發的創傷從未被真正驅除。」**
+
+（另外，升 c 小調在這三首奏鳴曲裡有特殊地位。學者 Charles Fisk 稱它為「流浪者的調」，源自舒伯特的歌曲《流浪者》。它稍後會是 D.960 慢樂章的主調。）`,
+ cues:[["開頭","船歌。左手的搖擺、右手的嘆息式下行二度"],
+       ["轉入 A 大調","第一次的「魔法般」轉調，之後才知道那是暴風雨前的平靜"],
+       ["宣敘調段落","調性與節拍開始崩解。這裡是入口"],
+       ["幻想曲式的爆發","布蘭德爾說的「精神崩潰」。fortissimo 的衝擊、升 c 小調的高潮"],
+       ["船歌回歸","節奏已經和第一次不一樣了"],
+       ["尾聲 ppp","沉下去。創傷沒有被解決"]]},
+
+{n:3, title:"D.959 · III. Scherzo. Allegro vivace", len:"4:51",
+ writer:"A 大調｜Trio: Un poco più lento（D 大調）",
+ note:`表面上是全曲最輕的樂章——跳躍的琶音和弦音型，Hyperion 說主題「輕盈、飄浮，帶有弦樂撥奏的暗示」。
+
+但 B 段藏著全曲最外顯的循環指涉：從歡快的 C 大調主題開始，突然被一道**毫無轉調準備、向下奔瀉的升 c 小調音階**打斷——那直接回指上一個樂章中段的高潮。爆發之後在升 c 小調靜靜結束，用一個裝飾音旋律，而那條旋律的輪廓（2–1–7–1–3–1）**與 Andantino 主題的音型完全相同**。
+
+換句話說：詼諧曲沒有讓你忘掉剛才發生的事。
+
+Trio 是 D 大調三段體，用交叉手法，Hyperion 說它把奏鳴曲開頭的主題翻轉過來，把下行八度顛倒，做出法國號的音響。`,
+ cues:[["開頭","跳躍的琶音，撥弦質地"],
+       ["B 段的 C 大調","歡快，短暫"],
+       ["升 c 小調音階奔瀉","沒有任何轉調準備。上一樂章的鬼魂回來了"],
+       ["B 段收尾","那條裝飾音旋律的輪廓與 Andantino 主題完全相同"],
+       ["Trio","D 大調，交叉手法，法國號式的音響"]]},
+
+{n:4, title:"D.959 · IV. Rondo. Allegretto – Presto", len:"12:12",
+ writer:"A 大調｜主題取自 1817 年 a 小調第四號奏鳴曲 D.537 的第二樂章",
+ note:`主題是舊的。舒伯特把 1817 年 D.537（第四號奏鳴曲）第二樂章的旋律拿來重寫，調整成符合本曲的循環設計——十一年後的自我回收。
+
+形式是奏鳴迴旋曲。Charles Rosen 指出它的結構模仿貝多芬 Op.31 No.1 的終樂章，但認為「舒伯特這首終樂章無疑優於它的範本」。發展部以一長段升 c 小調收尾（又是這個調），接著是升 F 大調的假再現部——Hyperion 稱這是「貝多芬絕不會有的大膽手筆」。
+
+**真正的重點在最後一頁。** 尾聲裡主題碎片化，整小節的休止導向意外轉調，然後是激動的 Presto；最後全曲大膽召喚它自己最開頭的幾小節——上行琶音（第一樂章第二句下行音型的倒影），加上 fortissimo 完整陳述開頭號角主題的**逆行**。
+
+回去聽第 1 軌的開頭，你會聽出那是同一段音樂倒著走。而手稿證明這個結尾是舒伯特最後才加的。`,
+ cues:[["開頭","主題來自 1817 年的 D.537。舒伯特十一年後回收自己的旋律"],
+       ["發展部","以一長段升 c 小調收尾"],
+       ["假再現部","升 F 大調。Hyperion 說貝多芬不會這樣做"],
+       ["尾聲的 Presto","主題碎片化之後突然加速"],
+       ["最後一頁","開頭號角的逆行。四十分鐘的框架在此閉合——回去聽第 1 軌"]]},
+
+{n:5, title:"D.960 · I. Molto moderato", len:"20:14",
+ writer:"降 B 大調第二十一號鋼琴奏鳴曲｜手稿末頁註記 1828 年 9 月 26 日",
+ personnel:"呈示部反覆完整演奏——本片最重要的決定",
+ note:`二十分十四秒。這個數字本身就是一個宣告：他把呈示部反覆彈了。不反覆的版本通常十三到十五分鐘。
+
+主題是 pianissimo 的綿長歌唱，Hyperion 稱為「崇高的靜謐」。然後**第 8 小節**，低音區來了一個極弱的顫音——G♭ 與 A♭ 之間顫動，收在帶 staccatissimo 的 F。席夫稱它是「音樂史上最不凡的顫音」。
+
+它為什麼重要？G♭ 是降 B 大調的降六級。這一個音預告了後面所有的和聲事件：主題中段轉入 G♭ 大調、回到主調後第二主題開頭等音轉換到升 f 小調、發展部起始的升 c 小調、第二樂章的主調升 c 小調、詼諧曲裡的 G♭／升 F 等音戲法。Hyperion 點出一個關鍵差異：「貝多芬會把顫音整合進音樂論證裡，**對舒伯特它始終是『他者』：遙遠、神祕，與周遭一切在音響與音域上構成極端對比**。」
+
+**而這正是反覆之所以必要的原因。** 呈示部結尾有九個小節的第一結束句，裡面藏著全樂章**唯一一次以 fortissimo 演奏的那個低音顫音**——一個令人恐懼的「認出」的瞥視。不反覆就跳過那九小節，直接進入第二結束句（幾個飄忽的和弦，突兀地把音樂推進升 c 小調的發展部），那個 ff 顫音你就永遠聽不到。
+
+齊瑪曼的話：「我覺得這些反覆絕對必要。」席夫說省略它等於「截肢」。而布蘭德爾的反對意見也很有力：他認為那些過渡小節「破壞了這個樂章宏偉的凝聚力」，而且最讓他痛苦的是那個顫音竟要以 fortissimo 演奏——他還搬出草稿證據：在舒伯特較短的初稿裡，顫音在那裡仍是 pianissimo。
+
+聽這一軌時，那九小節是重點。`,
+ cues:[["開頭","pianissimo 的長歌唱主題。Hyperion 說是「崇高的靜謐」"],
+       ["第 8 小節","低音顫音第一次出現。G♭–A♭，收在 F。席夫說這是史上最不凡的顫音"],
+       ["主題中段","轉入 G♭ 大調——第 8 小節那個音預告的第一件事"],
+       ["第二主題","等音轉換到升 f 小調"],
+       ["呈示部結尾的九小節","本片的關鍵。那個低音顫音在此以 fortissimo 爆發，全樂章唯一一次。不反覆就聽不到"],
+       ["反覆之後","進入升 c 小調的發展部。這裡才是第二結束句"]]},
+
+{n:6, title:"D.960 · II. Andante sostenuto", len:"10:32",
+ writer:"升 c 小調｜舒伯特成熟期奏鳴曲式器樂作品中調性最遙遠的內樂章",
+ note:`升 c 小調對降 B 大調有多遠？它的同名大調升 C 就是降 D，也就是主調的降二級（拿坡里關係），在五度圈上兩者相隔極遠。維基引述的說法是：這是舒伯特成熟期奏鳴曲式器樂作品中，**調性上最遙遠的內樂章**。
+
+但它同時是第一樂章那個 G♭ 顫音所開啟的調性層的屬調——所以它遠，卻不是任意的遠。
+
+Hyperion 形容這是一支「夜的船歌」，織體暗示弦樂室內樂，尤其是 C 大調弦樂五重奏著名的慢板：不難想像第二小提琴與中提琴吟唱那條飄浮、幾近靜止的旋律，其他聲部以纖細的撥奏襯托。中段是 A 大調的聖詠式旋律，再現時尾聲前還有一次「深不可測地遙遠的 C 大調」偏折，最後解入升 C 大調。
+
+齊瑪曼談這兩首的慢樂章：「大概是我所知最悲傷的音樂：大調比小調更悲傷，因為這是徹底的認命、徹底的接受。」這個樂章最後那個從小調轉進大調的瞬間，就是他說的那件事。`,
+ cues:[["開頭","夜的船歌。左手的撥奏式伴奏，右手幾乎靜止的旋律"],
+       ["中段","A 大調的聖詠式旋律，是全曲唯一的慰藉"],
+       ["再現","主題回來，但織體已經改變"],
+       ["尾聲前","那次「深不可測地遙遠的 C 大調」偏折"],
+       ["結束","解入升 C 大調。齊瑪曼說大調比小調更悲傷，指的就是這種地方"]]},
+
+{n:7, title:"D.960 · III. Scherzo. Allegro vivace con delicatezza", len:"4:09",
+ writer:"降 B 大調｜Trio 為降 b 小調",
+ note:`速度術語裡那個 con delicatezza（帶著細膩）很少見，而且是必要的——這個詼諧曲如果彈得太用力就會毀掉。
+
+結構上有兩個怪處：第一部分不終止在主調或屬調，而是下屬調；B 段持續以上行四度轉調，一路走到降 D 大調，再到 G♭，然後等音轉為升 f 小調——又是第一樂章那個顫音的家族。
+
+Trio 是降 b 小調，全曲第一次出現主調的小調。Hyperion 形容它是「帶著笨重離拍低音的、扭曲彆扭的蘭德勒」。四分鐘出頭，是全張最短的一軌，也是唯一一次讓耳朵休息的地方。`,
+ cues:[["開頭","con delicatezza。注意齊瑪曼的音量上限壓得多低"],
+       ["B 段的轉調","一路往上走到降 D、G♭，然後等音變成升 f 小調"],
+       ["Trio","降 b 小調。第一次聽到主調的小調，笨重的離拍低音"],
+       ["回到 Scherzo","對比因此更明顯"]]},
+
+{n:8, title:"D.960 · IV. Allegro ma non troppo", len:"8:14",
+ writer:"降 B 大調｜整張專輯的終點",
+ note:`開場是一個孤立的、空的 G 八度，解決到 c 小調，然後被重新詮釋為降 B 大調的二級。Hyperion 形容主題是「帶匈牙利風味的舞曲，先佯攻 c 小調，才解決到『正確的』降 B」。
+
+那個孤立的 G 有來歷。布蘭德爾主張它正是第一樂章那個 G♭ 顫音的解決——而全曲的結尾證明了這個看法：尾聲裡主題碎片化，在高度半音化的進行中，**G 上的八度經 G♭ 下行到 F**，完成 G–G♭–F 的閉環，然後才是那段極其肯定的 Presto 告別。（要說明的是，布蘭德爾這個說法在維基上被標了「需要來源」。）
+
+八分十四秒。這也是齊瑪曼二十三年來第一張獨奏專輯的最後八分鐘。`,
+ cues:[["開頭","孤立的空 G 八度。它先假裝自己是 c 小調"],
+       ["主題確立","解決到降 B。匈牙利風味的舞曲"],
+       ["尾聲","主題碎片化，半音化的進行"],
+       ["最後幾小節","G 經 G♭ 下行到 F。第一樂章第 8 小節那個顫音，在這裡終於解決"],
+       ["Presto","肯定的告別。全曲、整張唱片、以及舒伯特的鋼琴奏鳴曲寫作，都在這裡結束"]]}
+],
+
+/* ── 4 人物誌 ── */
+people:[
+{role:"鋼琴", name:"Krystian Zimerman 克里斯提安・齊瑪曼", life:"1956 年 12 月 5 日生 · 波蘭扎布熱（Zabrze）",
+ bio:`卡托維茲附近的礦業小鎮出身，父親是工程師兼業餘鋼琴家，五歲起在父親鼓勵下學琴。少年時搭清晨的火車通勤到卡托維茲，跟隨 **Andrzej Jasiński** 學習——那是他唯一的老師。
+
+1975 年，十八歲的他拿下第九屆華沙蕭邦國際鋼琴大賽首獎，是當時史上最年輕的蕭邦大賽冠軍。賽後魯賓斯坦邀他到巴黎，兩人成為忘年之交，直到 1982 年魯賓斯坦過世；齊瑪曼說自己「幾乎每天都還在受惠於那段時光」。
+
+他錄音極少，而且理由不是懶。他對 Limelight 說：「我不相信音樂是聲音。音樂其實是時間。」他早年的幾張 LP（莫札特奏鳴曲、蕭邦圓舞曲、布拉姆斯奏鳴曲）從未授權轉成 CD；蕭邦奏鳴曲他等了四十年還沒錄。
+
+他也是專業鋼琴技師，巡演一律自備鋼琴、自己調校，甚至自行設計了一輛專門運琴的廂型車（他抱怨「每半小時就拋錨一次」）。他的說法：「它是一個裝了弦的木盒，但它像個人：你會想照顧它。」2001 年與 2006 年，他有一架 Steinway 在紐約甘迺迪機場被安檢人員徹底銷毀、另一架受損。（網路上流傳的「因膠合劑氣味被誤判為炸藥」這個細節查不到一手來源，姑且當成傳聞。）2009 年 4 月他在洛杉磯演出中宣布，為抗議美國在波蘭部署飛彈防禦系統，那將是他最後一次在美國演出。
+
+他是唯一同時與卡拉揚和伯恩斯坦這兩位死對頭都錄過音的鋼琴家。`,
+ here:`這張唱片有三件事只有他做得到。
+
+**第一是那副鍵盤。** 他把自己設計製作的整副鍵盤機構裝進 Steinway，改變琴槌的擊弦落點以強化歌唱性。《留聲機》的評語「齊瑪曼聽起來不像任何其他人」直接把原因指向這件樂器。這不是玄學——他自己就是技師，這是他的手藝。
+
+**第二是那個反覆。** 兩首的第一樂章呈示部他都完整演奏，而且理由講得比多數演奏家都具體：D.960 那個低音顫音只有在第一結束句裡才以 fortissimo 出現，跳過反覆就永遠聽不到。這是把詮釋建立在樂譜細節上，不是建立在傳統或時間長度上。
+
+**第三是他對這批曲子的定位。** 他刻意打破「臨終之作」的迷思，主張舒伯特寫這些時身體狀況相對還好，這音樂是向前看的；但同時又說這兩首的慢樂章「大概是我所知最悲傷的音樂」。這個矛盾就是這張唱片的性格。`,
+ key:[["Debussy: Préludes","1994"],["Chopin: Piano Concertos（自彈自指）","1999"],["Brahms: Piano Concertos（Bernstein）","1980s"],["Rachmaninoff: Piano Concertos 1 & 2（小澤征爾）","2003"],["Szymanowski: Piano Works","2022"]]},
+
+{role:"作曲", name:"Franz Schubert 法蘭茲・舒伯特", life:"1797 年 1 月 31 日–1828 年 11 月 19 日 · 維也納",
+ bio:`維也納郊區出身，父母的第十二個孩子，十四個孩子中只有五個活到成年。三十一歲去世，死因至今沒有定論——官方死亡登記寫的是傷寒，那是唯一有同時代文件依據的說法；主流傳記則傾向梅毒（1822–23 年起纏身）。汞中毒之說證據最弱。
+
+**1828 年 3 月 26 日**是他一生唯一一場全場自己作品的公開音樂會，地點在維也納「紅刺蝟之屋」，日期選在貝多芬逝世一週年當天。場地客滿、掌聲熱烈，淨賺八百弗羅林——然後三天後帕格尼尼來了維也納，整座城市的注意力被吸得一乾二淨，各報幾乎沒有評論。
+
+那一年他還寫了《天鵝之歌》、C 大調弦樂五重奏、降 E 大調彌撒、f 小調四手聯彈幻想曲、《岩上牧人》，以及這三首鋼琴奏鳴曲。
+
+1827 年 3 月 29 日貝多芬的葬禮上，舒伯特是**火炬手**——不是抬棺者，中文資料常常搞混這一點。`,
+ here:`D.958、D.959、D.960 三首是一套。草稿約始於 1828 年春，謄清稿集中寫於 9 月；D.960 最後一頁下方寫著 **9 月 26 日**。五十四天後他就過世了。
+
+他原本打算把這三首題獻給胡麥爾。但等到 1838 至 1839 年出版時，胡麥爾已經過世，出版商 Diabelli 改題獻給舒曼——第一版的標題頁直接寫明那是「出版商的」決定。首版沒有作品編號，只編 No. 1–3，標題是《舒伯特的最末期作品》。諷刺的是，舒曼收到題獻後寫的是負評：他嫌這些奏鳴曲創意「遠為單純得多」，說它們「一頁頁地涓涓流淌，彷彿沒有盡頭」。
+
+整個十九世紀這三首基本上被忽視，被嫌太長、缺乏形式凝聚力。布拉姆斯是少數例外——克拉拉的日記記載了他彈 D.960 並讚揚它。要等到 1928 年逝世百年前後，透過 Tovey 的著作與 **Schnabel、Eduard Erdmann** 的公開演出，它們才開始被認真對待。
+
+還有一件事：**舒伯特所有的鋼琴奏鳴曲，在他生前都沒有公開演出過。** 唯一有記載的是完成後不久一次私人晚間聚會上的演奏，日期與場合各家說法不一。`,
+ key:[["String Quintet in C major, D.956","1828"],["Winterreise, D.911","1827"],["Schwanengesang, D.957","1828"],["Impromptus, D.899 & D.935","1827"],["Symphony No. 9 \"Great\", D.944","1825–26"]]},
+
+{role:"錄音", name:"Rainer Maillard", life:"Tonmeister · Emil Berliner Studios",
+ bio:"Emil Berliner Studios 的資深錄音師，DG 體系裡最常出現的名字之一。Tonmeister 這個德國職稱同時涵蓋錄音技術與音樂判斷——他既是工程師也是製作人。",
+ here:"《BBC 音樂雜誌》給這張五顆星時特別點名了他：「Rainer Maillard 的錄音掌握得極好，把柔和與絕對的清晰結合在一起。」值得注意的是他配合齊瑪曼做到凌晨兩點，也配合他堅持的 32-bit 錄製。唯一的保留意見來自 The Classical Source：認為鋼琴在偏乾的音場裡被放得太前面，導致 fortissimo 時高音特別亮。這個判斷見仁見智，但值得你自己聽的時候留意。",
+ key:[]}
+],
+
+/* ── 5 完整 Credits ── */
+credits:[
+ ["鋼琴","Krystian Zimerman"],
+ ["樂器","Steinway，裝載齊瑪曼自行設計製作的鍵盤機構（內頁未載明鋼琴廠牌）"],
+ ["Tonmeister / 錄音製作人","Rainer Maillard"],
+ ["監製 / Executive Producer","Ute Fesquet"],
+ ["錄音與母帶","Emil Berliner Studios"],
+ ["錄音地點","柏崎市文化会館アルフォーレ（Art-Forêt），日本新潟縣柏崎市"],
+ ["錄音日期","2016 年 1 月（Presto 標示 1 月 23 日；齊瑪曼稱在該廳沉浸五天）"],
+ ["錄音格式","32-bit 錄製；發行為 96 kHz / 24 bit"],
+ ["內頁文字","Jessica Duchen（受 DG 委託採訪齊瑪曼並撰寫，形式為訪談）"],
+ ["封面攝影","Mat Hennek｜另有 Felix Broede 攝影｜設計 Julia Becker"],
+ ["發行日","2017 年 9 月 8 日"],
+ ["版本","CD 4797588（Digipak）· 2LP 180g gatefold 479 8204 · 日本 SHM-CD UCCG-1775 · Hi-Res 下載"],
+ ["未見版本","SACD（各來源均無紀錄）"]
+],
+
+/* ── 6 評價與歷史地位 ── */
+reception:{
+ scores:[
+  ["Gramophone（2017 年 10 月 · Disc of the Month）","「齊瑪曼，簡單說，聽起來不像任何其他人。這有一部分要歸功於那件樂器——他把自己親手做的鍵盤裝進了 Steinway……這兩首奏鳴曲的每一個元素都被想過、被考慮過；換成次一等的藝術家，結果可能會變得吹毛求疵，但在這裡它們趨向超越。這是一張美妙地令人振奮的發行。去親耳聽聽看。」"],
+  ["The Guardian（2017-10-12 · ★★★★★ · Andrew Clements）","「一如既往，這些演奏是以巨大的用心準備出來的……而齊瑪曼對分句最細微處的注意，從未淪為目的本身……這兩首奏鳴曲確實有更引人注目、更個人化的錄音，有好有壞，但少有像這樣始終如一地深思熟慮、富於音樂性，同時技術上無懈可擊的。」"],
+  ["BBC Music Magazine（2017 聖誕號 · ★★★★★）","「齊瑪曼帶我們進入一處深沉的內省之地，在其中找到廣袤的宇宙。Rainer Maillard 的錄音掌握得極好，把柔和與絕對的清晰結合在一起……這台鋼琴甜美地歌唱，讓齊瑪曼能做出所有情緒的爆發，卻不會突破到我們這個更吵的現代。」"],
+  ["International Piano（2018 年 1 月 · ★★★★★）","「齊瑪曼的技術掌控驚人而不曾動搖，卻完全服務於他灼熱的視野……我永遠不會捨棄長久珍愛的肯普夫、克爾榮、魯普與內田光子的錄音，但這些毫不妥協的演繹像一道熾烈的光柱般突出。」"],
+  ["The Classical Source（★★★★☆ · Colin Anderson）","唯一明顯保留的樂評：「D.960 第一樂章的處理或許會讓人覺得少了一份寧靜……斷奏有時太鈍；鋼琴在偏乾的音場裡被放得太前面，大概是 fortissimo 時高音特別亮的原因。總結：D.959 極佳，而 D.960 雖然很有意思，卻沒那麼一面倒。」"],
+  ["AllMusic（James Manheim）","「D.959 的開頭出來的不是宏偉，而是一個相當現代的、帶刺的神經質與恐懼的陳述……D.960 則出奇地安靜而透明，慢樂章帶著悲劇感。」"]
+ ],
+ chart:[
+  ["英國官方古典藝人專輯榜","齊瑪曼的最高名次為第 3 名（此數據取自官方榜頁面摘要，未能直接核實原始表格）"],
+  ["發行形式","CD、2LP 黑膠、日本 SHM-CD、Hi-Res 下載與串流"]
+ ],
+ awards:[
+  ["Gramophone 2017 年 10 月","Disc of the Month（當月最佳，位階高於 Editor's Choice）"],
+  ["ICMA 2018","國際古典音樂大獎 · 器樂獨奏類得獎"],
+  ["Presto Recordings of the Year 2017","年度錄音得獎；並獲 2017-09-08 當週 Recording of the Week"],
+  ["The Times Records of the Year 2017","入選"],
+  ["MusicWeb International","2017 年 11 月 Recording of the Month"],
+  ["BBC Music Magazine Awards 2018","器樂類決選入圍（未得獎）"]
+ ],
+ legacy:`這張唱片在發行當下就拿到了幾乎所有能拿的東西——《留聲機》月度最佳、ICMA 器樂獨奏獎、Presto 年度錄音、《泰晤士報》年度唱片。九年後回頭看，它的位置大概可以這樣描述：
+
+**它不是「最好的舒伯特」，而是「最被想過的舒伯特」。** 這兩首曲子的錄音史從 1937 年的 Schnabel 開始就已經很擁擠：肯普夫的自然、布蘭德爾的結構、李希特的極慢、內田光子的透明、魯普的溫暖。齊瑪曼加進來的不是另一種氣質，而是一種方法——把每一個細節（包括那副鍵盤、包括那九小節的反覆）都當成需要解決的問題。
+
+它也讓「呈示部反覆」這個一百多年的爭論多了一個當代的重量級表態。布蘭德爾與席夫在 1980 年代末的公開筆戰之後，這件事一直沒有定論；齊瑪曼站在席夫這邊，而且把理由建立在一個具體的樂譜事實上——那個只在第一結束句出現的 fortissimo 顫音。這個論證比「舒伯特寫了就要照做」有力得多。
+
+至於它有沒有改變什麼：目前看起來沒有。省略反覆的演奏依然存在，這件事大概永遠不會有共識。但這張唱片讓「為什麼要反覆」這個問題變得比較難迴避。
+
+順帶一提，齊瑪曼在訪談裡暗示下一步可能是貝多芬最後三首奏鳴曲。到本頁整理時（2026 年 8 月）還沒有出現。`
+},
+
+/* ── 7 脈絡與影響網絡 ── */
+context:{
+ era:`1828 年 3 月 26 日，舒伯特辦了他一生唯一一場全場自己作品的公開音樂會，日期選在貝多芬逝世一週年當天。場地客滿、淨賺八百弗羅林——然後三天後帕格尼尼抵達維也納，整座城市的注意力被吸乾，各報幾乎沒有評論。
+
+那就是他的處境：在貝多芬的陰影裡，在一個更迷戀炫技的市場旁邊。他去世時三十一歲，鋼琴奏鳴曲一首也沒有公開演出過。
+
+這三首遺作出版時已是 1838 到 1839 年，距他去世十年。出版商 Diabelli 把原本要獻給胡麥爾的題獻改成舒曼，而舒曼回報的是一篇失望的評論：他嫌這些曲子創意「遠為單純得多」，說它們「一頁頁地涓涓流淌，彷彿沒有盡頭」。整個十九世紀，舒伯特的鋼琴奏鳴曲都被嫌太長、缺乏形式凝聚力、不合鋼琴語法——因為大家拿貝多芬的標準去量它們。
+
+轉折點在 1928 年逝世百年前後：Tovey 的著作把它們放進嚴肅的分析框架，Schnabel 與 Eduard Erdmann 則開始公開演出，而且以「一場音樂會演完整套三首」聞名。這個做法後來被布蘭德爾、波里尼、內田光子、Paul Lewis 繼承下來。
+
+所以齊瑪曼 2017 年這張唱片站在一個已經成熟的傳統上。他要處理的不再是「這些曲子值不值得演」，而是「在這麼多版本之後還能說什麼」。他的答案是：把樂器改掉，把反覆彈完。`,
+ timeline:[
+  ["1797-01-31","舒伯特生於維也納","父母的第十二個孩子"],
+  ["1827-03-29","貝多芬葬禮","舒伯特擔任火炬手（不是抬棺者）"],
+  ["1828-03-26","唯一一場全場自作品音樂會","貝多芬逝世一週年當天。三天後帕格尼尼來到維也納"],
+  ["1828 春","三首奏鳴曲開始草擬","D.958、D.959、D.960 部分並行創作"],
+  ["1828-09-26","D.960 謄清稿完成","手稿末頁的日期"],
+  ["1828-09 底","私人聚會上演奏","唯一有記載的一次，日期與場合各家說法不一"],
+  ["1828-11-19","舒伯特去世","三十一歲。距 D.960 完成五十四天"],
+  ["1838–39","首度出版","Diabelli 出版，無作品編號，題獻由出版商改為舒曼"],
+  ["1838","舒曼發表評論","失望。嫌創意「遠為單純得多」"],
+  ["1928 前後","逝世百年，開始被認真對待","透過 Tovey 的著作與 Schnabel、Erdmann 的演出"],
+  ["1937 / 1939","Schnabel 錄下 D.959 與 D.960","現代錄音史的起點"],
+  ["1975","齊瑪曼十八歲奪得蕭邦大賽首獎","當時史上最年輕"],
+  ["1989","布蘭德爾與 Frisch 在《紐約書評》公開筆戰","關於呈示部反覆該不該演"],
+  ["1994","齊瑪曼錄德布西《前奏曲》","此後二十三年沒有純獨奏專輯"],
+  ["2007","新潟中越沖地震","齊瑪曼到柏崎義演，種下這張唱片的因"],
+  ["2009-04","宣布不再赴美演出","抗議美國在波蘭部署飛彈防禦系統"],
+  ["2016-01","錄音","柏崎市文化會館 Art-Forêt，五天"],
+  ["2017-09-08","發行","DG 4797588。當月即獲《留聲機》Disc of the Month"],
+  ["2018","ICMA 器樂獨奏獎","另獲 Presto 年度錄音、《泰晤士報》年度唱片"]
+ ],
+ influencedBy:[
+  ["Ludwig van Beethoven","Piano Sonata Op. 31 No. 1","D.959 終樂章的結構模仿它，但 Charles Rosen 認為舒伯特這首更好"],
+  ["Franz Schubert","Piano Sonata No. 4 in A minor, D.537","D.959 終樂章主題直接取自它的第二樂章，相隔十一年"],
+  ["Artur Schnabel","Schubert: Piano Sonatas","1937/1939 的錄音，這兩首現代演奏史的起點"],
+  ["Wilhelm Kempff","Schubert: The Piano Sonatas","1965–69 的 DG 全集，長年的基準"]
+ ],
+ influenced:[
+  ["András Schiff","Schubert: Piano Sonatas (ECM)","反覆爭議的另一位堅定支持者，2014–16 用 1820 年古鋼琴重錄"],
+  ["Stephen Hough","Schubert: Piano Sonata D.960 (Hyperion)","他自撰的內頁是反覆爭議最重要的文獻之一"],
+  ["Marc-André Hamelin","Schubert: Piano Sonatas (Hyperion)","同樣完整演奏反覆的當代版本"],
+  ["Krystian Zimerman","Beethoven: Piano Sonatas","他暗示下一步可能是貝多芬最後三首。到 2026 年 8 月尚未出現"]
+ ],
+ covers:[
+  ["Sviatoslav Richter","Schubert D.960（布拉格 1972）","第一樂章 25:41、全曲 46:51，取反覆。極慢速度的極端案例"],
+  ["Alfred Brendel","Schubert: Piano Sonatas（Philips）","反覆爭議的反方代表，錄過至少三到四次"],
+  ["Mitsuko Uchida","Schubert: Piano Sonatas（Philips）","1997 年維也納金色大廳錄音，透明路線的代表"]
+ ]
+},
+
+/* ── 8 版本／音質指南 ── */
+versions:[
+ {name:"本片：Zimerman（DG 4797588）", year:"2016 錄音 / 2017 發行", source:"32-bit 錄製 · 96/24 發行 · 自製鍵盤機構",
+  note:"兩首都完整演奏第一樂章反覆。聲音獨特（那副鍵盤），詮釋極度細緻。當代首選之一，但主張很強，不是「中庸版本」。", rec:5},
+ {name:"Wilhelm Kempff（DG）", year:"1967–68", source:"漢諾威 Beethovensaal · 18 首全集",
+  note:"最自然、最沒有稜角的版本，長年的基準。想聽「不被詮釋打擾的舒伯特」就找它。國際鋼琴雜誌評齊瑪曼時把它列為不會捨棄的四張之一。", rec:5},
+ {name:"Radu Lupu（Decca）", year:"1975–76 / 1991", source:"類比與數位",
+  note:"溫暖、內斂、音色極美。與齊瑪曼那種「每個細節都想過」的路線正好相反，是另一種完成度。", rec:5},
+ {name:"Mitsuko Uchida（Philips）", year:"1997", source:"維也納金色大廳",
+  note:"透明、線條清楚、結構感強。與齊瑪曼最接近的一種美學，但音色比較不那麼特殊。", rec:5},
+ {name:"Alfred Brendel（Philips）", year:"1970s–1990s 多次", source:"類比與數位",
+  note:"反覆爭議的反方代表——他公開表明「在任何情況下」都不同意演奏那些反覆。要理解這場爭論的兩面，這是必聽的對照組。", rec:4},
+ {name:"Sviatoslav Richter（Praga，布拉格現場）", year:"1972", source:"現場錄音",
+  note:"D.960 第一樂章 25:41、全曲 46:51，取反覆。極慢速度的極端案例，樂評兩極——有人說「好東西實在太多了」，也有人說沒有人比他更徹底顛覆了「舒伯特是無憂無慮的自然之子」這個看法。他沒有錄過 D.959。", rec:4},
+ {name:"András Schiff（ECM，古鋼琴）", year:"2014 / 2016", source:"1820 年 Brodmann 古鋼琴",
+  note:"用舒伯特時代的樂器。齊瑪曼改造鍵盤想接近的東西，這裡是直接用原物。兩張連著聽最能理解齊瑪曼在做什麼。", rec:5},
+ {name:"Artur Schnabel（HMV／EMI）", year:"1937 / 1939", source:"78 轉時代",
+  note:"這兩首現代演奏史的起點。音質是那個年代的水準，但歷史地位無可取代——沒有他，這些曲子可能還在被當成太長的失敗品。", rec:4}
+],
+versionsNote:`實務建議：如果這是你的第一張，先聽肯普夫或魯普——它們比較不會替你做決定。想聽「有觀點的舒伯特」再來聽這張齊瑪曼。
+
+**選版本時真正要問的問題是：有沒有演反覆。** 這決定了 D.960 第一樂章是十三分鐘還是二十分鐘，也決定了你聽不聽得到那九小節的獨有素材。取反覆的：齊瑪曼、席夫、Hough、Hamelin、波里尼、內田光子、肯普夫、李希特。省略的：克爾榮、布蘭德爾、巴倫波因、Paul Lewis。兩派都有一流的演奏，但它們給你的是不同長度的曲子。
+
+格式方面：這張的 Hi-Res（96/24）與 CD 差異不大，串流已經很夠。黑膠版是 2017 年的 180g 對開版，如果你在意那副鍵盤做出來的泛音結構，黑膠值得一試——但這是喜好問題，不是升級。
+
+最後：想理解齊瑪曼為什麼要改造鍵盤，去聽席夫在 ECM 用 1820 年古鋼琴錄的版本。那是他想接近的方向的原物。`,
+
+/* ── 9 聆聽路線圖 ── */
+roadmap:[
+ {title:"第一次聽 · 從第 2 軌開始", body:"不要照順序。先聽 D.959 的 Andantino（第 2 軌，七分半）。前半是一支憂鬱的船歌，中段突然爆發成布蘭德爾所說的「精神崩潰」，然後船歌回來但節奏已經變形。這七分半是整張唱片的鑰匙——聽完你就知道要不要把八十二分鐘聽完。"},
+ {title:"第二次聽 · D.960 第一樂章，只追一個音", body:"第 5 軌，二十分鐘。全程只注意那個低音顫音：它在第 8 小節第一次出現（極弱，G♭–A♭ 收在 F），之後會再出現幾次，而在呈示部結尾的九小節裡它會以 fortissimo 爆發一次——全樂章唯一一次。那九小節就是齊瑪曼堅持演反覆的理由。聽到它，你會理解這整場爭論在吵什麼。"},
+ {title:"第三次聽 · D.959 的首尾框架", body:"聽第 1 軌的開頭三十秒（forte 的和弦號角），記住它。然後直接跳到第 4 軌的最後兩分鐘——舒伯特把那個號角整段倒著寫了一遍。手稿證明這個結尾是他最後才加上去的。這種首尾框架在奏鳴曲文獻裡大概前所未有。"},
+ {title:"進階 · 兩種鍵盤的對照", body:"齊瑪曼把自製鍵盤裝進 Steinway，目的是接近舒伯特時代樂器的特質。想知道他離目標多遠，去聽席夫在 ECM 用 1820 年 Brodmann 古鋼琴錄的同兩首。一個是改造過的現代琴，一個是原物。兩者的差別會告訴你「歌唱性」在鋼琴上到底是什麼意思。"},
+ {title:"進階 · 反覆的兩面", body:"聽完齊瑪曼的 D.960 第一樂章（20:14，取反覆），再去找布蘭德爾的版本（約 14 分鐘，省略）。布蘭德爾的理由是那九小節「破壞了這個樂章宏偉的凝聚力」，而且那個顫音在別處都是神祕的、不該吹成 fortissimo。他還搬出草稿：舒伯特較短的初稿裡，顫音在那裡仍是 pianissimo。兩邊都有道理，這場架吵了快四十年。"},
+ {title:"情境 · 音量 · 訊源", body:"這張的動態範圍很大——D.959 Andantino 的 ppp 收尾和中段的 fortissimo 爆發相差極遠。務必關掉播放器的音量標準化。耳機比喇叭適合，因為那副自製鍵盤做出來的泛音結構與極弱音的細節在耳機上才聽得清楚。八十二分鐘不必一次聽完；比較合理的做法是一次一首奏鳴曲，中間隔開。不適合當背景音樂。"}
+],
+
+/* ── 10 視覺與實體 ── */
+physical:{
+ "封面":"DG 的黃色卡杜什（Kartusche）標準框，框內是齊瑪曼的黑白半身照，上方橫排 FRANZ SCHUBERT，中央手寫體 Krystian Zimerman，下方是曲目。這是 DG 近年復刻經典版式的做法——把 1950–60 年代的黃標框搬回來。封面攝影 Mat Hennek，設計 Julia Becker。",
+ "內頁":"由 Jessica Duchen 撰寫，但形式是**訪談**而不是傳統的樂曲解說。這在 DG 的獨奏專輯裡不常見，而且很合理——這張唱片的重點有一半在演奏者的決定上（鍵盤、反覆、對「臨終之作」的看法），那些只有他自己說得清楚。本頁引用的齊瑪曼談話大多出自這份內頁。",
+ "版本":"CD 為 Digipak（4797588，歐洲 Sony DADC 壓片，條碼 028947975885）；另有 2LP 180g 對開黑膠（479 8204）與日本 SHM-CD（UCCG-1775）。查不到 SACD 版本。",
+ "樂器的秘密":"內頁揭露了鍵盤是齊瑪曼自製的，也說明了琴槌擊弦落點的改變，但**從頭到尾沒有提到鋼琴的廠牌**。這件事本身值得注意——他要你聽的是那副鍵盤，不是那個牌子。",
+ "錄音場地":"柏崎市文化会館アルフォーレ（Art-Forêt），日本新潟縣柏崎市。2007 年新潟中越沖地震後重建，齊瑪曼曾到當地義演，市長事後把整座音樂廳提供給他錄音一週。音響設計者是豐田泰久的學生。"
+},
+
+/* ── 影音延伸 ── */
+videos:[
+ {kind:"樂評導讀", title:"Krystian Zimerman's Schubert", by:"Jed Distler（ClassicsToday 樂評人）",
+  url:"https://www.youtube.com/watch?v=AjLLeCJxb5A",
+  note:"直接針對這張唱片的樂評影片。他的書面評論標題是「大師與微觀管理者」，可以想見他的角度。"},
+ {kind:"分析導讀", title:"Jonathan Biss 大師班：舒伯特 D.960", by:"Carnegie Hall 官方頻道",
+  url:"https://www.youtube.com/watch?v=F6Yiul5GVos",
+  note:"卡內基音樂廳的官方大師班。想搞懂那個低音顫音與呈示部反覆到底在吵什麼，這是最好的免費教材。"},
+ {kind:"訪談", title:"Krystian Zimerman on Szymanowski, conducting and retirement", by:"Gramophone 古典音樂 Podcast",
+  url:"https://www.youtube.com/watch?v=TVgwDcVQ4uQ",
+  note:"深度訪談。曲目談的是 Szymanowski，但他對錄音、對退休、對自己為什麼這麼少錄音的看法都在裡面——那正是理解這張唱片的背景。"},
+ {kind:"官方訪談", title:"Krystian Zimerman: About his recording „Szymanowski: Piano Works\"", by:"Deutsche Grammophon — DG I Stories",
+  url:"https://www.youtube.com/watch?v=38hYAHSUSD8",
+  note:"DG 官方訪談。他極少接受錄影訪問，這是少數能看到他本人談錄音理念的官方影片。"},
+ {kind:"官方訪談", title:"齊瑪曼生日訪談（談 Szymanowski 專輯）", by:"Deutsche Grammophon — DG I Stories",
+  url:"https://www.youtube.com/watch?v=gjacKqNoaMg",
+  note:"較短的一支，同一系列。"},
+ {kind:"提醒", title:"這張舒伯特沒有 DG 官方預告片", q:"Zimerman Schubert D959 D960 Deutsche Grammophon trailer",
+  note:"查證時在 DG 官方頻道與 DG I Stories 都找不到本片的 trailer 或錄音花絮。齊瑪曼極度排斥被錄影（2013 年曾因觀眾手機側錄而中斷演出），這大概不是偶然。日後若有，用這組關鍵字可以找到。"},
+ {kind:"分析導讀", title:"D.960 呈示部反覆的爭論", q:"Schubert D960 exposition repeat debate Brendel Schiff",
+  note:"布蘭德爾與席夫的立場之爭。書面文獻最完整的是 1989 年《紐約書評》上布蘭德爾與 Walter Frisch 的公開筆戰，以及 Stephen Hough 為 Hyperion 寫的內頁。"},
+ {kind:"分析導讀", title:"齊瑪曼的自製鍵盤", q:"Zimerman piano keyboard action self-built Steinway",
+  note:"他自己是鋼琴技師這件事在鋼琴圈是有名的，但關於這副鍵盤的技術細節公開資料不多。有興趣可以用這組關鍵字追。"}
+],
+
+/* ── 11 延伸聆聽 ── */
+further:[
+ {artist:"Krystian Zimerman", album:"Debussy: Préludes", why:"1994 年，本片之前他最後一張純獨奏專輯，獲留聲機大獎"},
+ {artist:"Krystian Zimerman", album:"Szymanowski: Piano Works", why:"2022 年，為他拿下 2023 年留聲機大獎鋼琴類"},
+ {artist:"András Schiff", album:"Schubert: Piano Sonatas (ECM, fortepiano)", why:"用 1820 年古鋼琴錄的同兩首。齊瑪曼改造鍵盤想接近的方向的原物"},
+ {artist:"Wilhelm Kempff", album:"Schubert: The Piano Sonatas", why:"1965–69 的 DG 全集，最自然的基準版本"},
+ {artist:"Radu Lupu", album:"Radu Lupu plays Schubert", why:"溫暖內斂的另一極"},
+ {artist:"Franz Schubert", album:"String Quintet in C major, D.956", why:"同樣寫於 1828 年最後幾個月。D.960 慢樂章的織體直接讓人想到它的 Adagio"},
+ {artist:"Franz Schubert", album:"Schwanengesang, D.957", why:"1828 年 8 月到 10 月的歌曲，與這兩首奏鳴曲同時期"},
+ {artist:"Alfred Brendel", album:"Schubert: Piano Sonatas", why:"反覆爭議的反方。要理解這場架，必須聽對面的版本"}
+],
+
+/* ── 12 資料來源 ── */
+sources:[
+ {title:"Presto Music — 本片產品頁（曲目、時長、樂評摘錄、獎項）", url:"https://www.prestomusic.com/classical/products/8357532--schubert-piano-sonatas-d959-and-d960"},
+ {title:"Deutsche Grammophon — 本片官方頁", url:"https://www.deutschegrammophon.com/en/catalogue/products/schubert-sonatas-20-21-zimerman-88"},
+ {title:"Discogs — 版本、credits 與錄音資料", url:"https://www.discogs.com/release/10839334-Schubert-Krystian-Zimerman-Piano-Sonatas-D-959-D-960"},
+ {title:"JDCMB — Jessica Duchen 公開的內頁訪談節錄", url:"https://jessicamusic.blogspot.com/2017/09/out-now-zimermans-first-solo-album.html"},
+ {title:"JDCMB — 2016 年齊瑪曼專訪（自帶鋼琴、師承、錄音觀）", url:"https://jessicamusic.blogspot.com/2016/12/an-interview-with-krystian-zimerman.html"},
+ {title:"Limelight — 齊瑪曼談他為何很少錄音", url:"https://limelight-arts.com.au/features/krystian-zimerman-cds-schubert-youtube/"},
+ {title:"MusicWeb International — Recording of the Month 樂評", url:"http://www.musicweb-international.com/classrev/2017/Nov/Schubert_sonatas_4797588.htm"},
+ {title:"The Classical Source — 保留意見的樂評", url:"https://www.classicalsource.com/cd/krystian-zimerman-plays-schubert-piano-sonatas-d959-d960-deutsche-grammophon/"},
+ {title:"AllMusic — 本片專頁與樂評", url:"https://www.allmusic.com/album/franz-schubert-piano-sonatas-d959-d960-mw0003090222"},
+ {title:"Wikipedia — Schubert's last sonatas", url:"https://en.wikipedia.org/wiki/Schubert%27s_last_sonatas"},
+ {title:"Hyperion — D.959 / D.960 樂曲解說（Richard Wigmore）", url:"https://www.hyperion-records.co.uk/dc.asp?dc=D_CDA68398"},
+ {title:"Hyperion — Stephen Hough 為 D.960 撰寫的內頁（反覆爭議的重要文獻）", url:"https://www.hyperion-records.co.uk/dc.asp?dc=D_CDA67027"},
+ {title:"The New York Review of Books — 布蘭德爾與 Walter Frisch 論反覆（1989）", url:"https://www.nybooks.com/articles/1989/03/16/schuberts-last-sonatas-an-exchange/"},
+ {title:"Henle Blog — 席夫論 D.960 的「命運顫音」", url:"https://blog.henle.de/en/2016/04/04/the-trill-of-doom-%E2%80%93-the-pianist-andras-schiff%E2%80%99s-revelatory-study-of-schubert%E2%80%99s-final-sonata/"},
+ {title:"Morgan Library — 首版標題頁與題獻的原始資料", url:"https://www.themorgan.org/music-manuscripts-and-printed-music/85355"},
+ {title:"Wikipedia — Krystian Zimerman", url:"https://en.wikipedia.org/wiki/Krystian_Zimerman"}
+]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   渲染引擎 —— 以下不需要修改
+   ═══════════════════════════════════════════════════════════════ */
+const E = s => String(s==null?'':s);
+const has = x => Array.isArray(x) ? x.length>0 : (x && Object.keys(x).length>0);
+const amURL = t => 'https://music.apple.com/tw/search?term=' + encodeURIComponent(t);
+const ytURL = t => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(t);
+const P = txt => E(txt).split(/\n\s*\n/).map(x=>`<p>${x.trim()}</p>`).join('');
+
+document.title = `${D.album} · 深度導聆`;
+
+const SEC = [];
+function sec(id, zh, en, html){ if(html) SEC.push({id, zh, en, html}); }
+
+/* 1 · 錄音製作全紀錄 */
+sec('production','錄音製作全紀錄','Production', D.production ? `<div class="prose">${P(D.production)}</div>` : '');
+
+/* 2 · 深度樂評 */
+sec('review','深度樂評','Critique', D.review ? `<div class="prose">${P(D.review)}</div>` : '');
+
+/* 3 · 逐曲導聆 */
+sec('tracks','逐曲導聆','Track by Track', has(D.tracks) ? D.tracks.map((t,i)=>`
+  <div class="trk" data-i="${i}">
+    <div class="trkhead">
+      <span class="tn">${t.n||i+1}</span>
+      <span class="tt"><b>${E(t.title)}</b>${t.writer?`<span>${E(t.writer)}</span>`:''}</span>
+      <span class="tlen">${E(t.len)}</span>
+      <span class="tcar">▶</span>
+    </div>
+    <div class="trkbody">
+      ${t.note?P(t.note):''}
+      ${has(t.cues)?`<div class="cues">${t.cues.map(c=>`<div class="cue"><b>${E(c[0])}</b><span>${E(c[1])}</span></div>`).join('')}</div>`:''}
+      ${t.personnel?`<div class="tmeta"><b>編制：</b>${E(t.personnel)}</div>`:''}
+    </div>
+  </div>`).join('') : '');
+
+/* 4 · 人物誌 */
+sec('people','人物誌 · 作曲家／演奏家／主唱','People', has(D.people) ? `<div class="people">${
+  D.people.map(p=>`
+  <div class="pcard">
+    <div class="prole">${E(p.role)}</div>
+    <div class="pname">${E(p.name)}</div>
+    <div class="plife">${E(p.life)}</div>
+    ${p.bio?P(p.bio):''}
+    ${p.here?`<div class="phere"><b style="color:var(--accent)">在這張專輯裡 · </b>${E(p.here)}</div>`:''}
+    ${has(p.key)?`<div class="pkey">${p.key.map(k=>`<a href="${amURL(p.name+' '+k[0])}" target="_blank" rel="noopener">${E(k[0])}${k[1]?` · ${k[1]}`:''}</a>`).join('')}</div>`:''}
+  </div>`).join('')}</div>` : '');
+
+/* 5 · 完整 Credits */
+sec('credits','完整 Credits','Credits', has(D.credits) ?
+  `<dl class="kv">${D.credits.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl>` : '');
+
+/* 6 · 評價與歷史地位 */
+let recHTML = '';
+if(has(D.reception)){
+  const R = D.reception;
+  if(has(R.scores)) recHTML += `<div class="tblwrap"><table class="tbl"><thead><tr><th>來源</th><th>評價</th></tr></thead><tbody>${
+    R.scores.map(s=>`<tr><td>${E(s[0])}</td><td>${E(s[1])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(has(R.chart)) recHTML += `<div style="margin-top:16px"><dl class="kv">${
+    R.chart.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl></div>`;
+  if(has(R.awards)) recHTML += `<div style="margin-top:16px" class="cards">${
+    R.awards.map(a=>`<div class="nc"><b>${E(a[0])}</b><span>${E(a[1])}</span></div>`).join('')}</div>`;
+  if(R.legacy) recHTML += `<div class="prose" style="margin-top:20px">${P(R.legacy)}</div>`;
+}
+sec('reception','評價與歷史地位','Reception & Legacy', recHTML);
+
+/* 7 · 脈絡與影響網絡 */
+let ctxHTML = '';
+if(has(D.context)){
+  const C = D.context;
+  if(C.era) ctxHTML += `<div class="prose">${P(C.era)}</div>`;
+  if(has(C.timeline)) ctxHTML += `<div class="tl" style="margin-top:22px">${
+    C.timeline.map(t=>`<div class="tlitem"><div class="ty">${E(t[0])}</div><b>${E(t[1])}</b><span>${E(t[2])}</span></div>`).join('')}</div>`;
+  const grp = (title, arr) => has(arr) ? `<div style="margin-top:24px">
+    <div style="font-size:11px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase;margin-bottom:9px">${title}</div>
+    <div class="cards">${arr.map(x=>`<a href="${amURL(x[0]+' '+(x[1]||''))}" target="_blank" rel="noopener">
+      <b>${E(x[1]||x[0])}</b><span>${E(x[1]?x[0]:'')}${x[2]?` — ${E(x[2])}`:''}</span></a>`).join('')}</div></div>` : '';
+  ctxHTML += grp('影響了這張的作品', C.influencedBy);
+  ctxHTML += grp('被這張影響的作品', C.influenced);
+  ctxHTML += grp('翻唱 · 取樣 · 引用', C.covers);
+}
+sec('context','脈絡與影響網絡','Context & Influence', ctxHTML);
+
+/* 8 · 版本／音質指南 */
+sec('versions','版本／音質指南','Editions & Sound', has(D.versions) ? `<div class="tblwrap">
+  <table class="tbl"><thead><tr><th>版本</th><th>年份</th><th>母帶／載體</th><th>說明</th><th>推薦</th></tr></thead>
+  <tbody>${D.versions.map(v=>`<tr>
+    <td><b style="color:var(--txt)">${E(v.name)}</b></td><td>${E(v.year)}</td>
+    <td>${E(v.source)}</td><td>${E(v.note)}</td>
+    <td class="rec">${'★'.repeat(v.rec||0)}${'☆'.repeat(Math.max(0,5-(v.rec||0)))}</td></tr>`).join('')}
+  </tbody></table></div>${D.versionsNote?`<div class="prose" style="margin-top:18px">${P(D.versionsNote)}</div>`:''}` : '');
+
+/* 9 · 聆聽路線圖 */
+sec('roadmap','聆聽路線圖','How to Listen', has(D.roadmap) ? `<div class="road">${
+  D.roadmap.map((r,i)=>`<div class="rstep"><div class="rnum">${i+1}</div>
+    <div><b>${E(r.title)}</b><p>${E(r.body)}</p></div></div>`).join('')}</div>` : '');
+
+/* 10 · 視覺與實體 */
+sec('physical','視覺與實體','Artwork & Object', has(D.physical) ?
+  `<dl class="kv">${Object.entries(D.physical).map(([k,v])=>`<dt>${E(k)}</dt><dd>${E(v)}</dd>`).join('')}</dl>` : '');
+
+/* 11 · 影音延伸 —— 介紹、紀錄片、訪談；不是聽音樂的連結 */
+sec('videos','影音延伸','Watch', has(D.videos) ? `
+  <div class="vnote">以下都是「認識這張唱片」的影音資料——官方介紹、紀錄片、分析與訪談，不是拿來聽音樂的。
+  標示「搜尋」的項目會帶你到 YouTube 的搜尋結果頁（影片會下架、網址會失效，用搜尋比較耐放）。</div>
+  <div class="vids">${D.videos.map(v=>`
+    <a class="vid" href="${v.url ? E(v.url) : ytURL(v.q || (D.artist+' '+D.album))}" target="_blank" rel="noopener">
+      <div class="vtop">
+        <span class="vkind">${E(v.kind||'影片')}</span>
+        ${v.url ? '' : '<span class="vsearch">搜尋</span>'}
+        ${v.len ? `<span class="vlen">${E(v.len)}</span>` : ''}
+      </div>
+      <b>${E(v.title)}</b>
+      ${v.by ? `<span class="vby">${E(v.by)}</span>` : ''}
+      ${v.note ? `<span class="vnt">${E(v.note)}</span>` : ''}
+    </a>`).join('')}</div>` : '');
+
+/* 12 · 延伸聆聽 */
+sec('further','延伸聆聽','Go Deeper', has(D.further) ? `<div class="cards">${
+  D.further.map(f=>`<a href="${amURL(f.artist+' '+f.album)}" target="_blank" rel="noopener">
+    <b>${E(f.album)}</b><span>${E(f.artist)}${f.why?`<br>${E(f.why)}`:''}</span></a>`).join('')}</div>` : '');
+
+/* 13 · 資料來源 */
+sec('sources','資料來源','Sources', has(D.sources) ? `<div class="srcs">${
+  D.sources.map(s=>s.url?`<a href="${E(s.url)}" target="_blank" rel="noopener">${E(s.title)}</a>`:E(s.title)).join(' · ')}</div>` : '');
+
+/* ---------- HERO ---------- */
+const heroHTML = `
+  ${D.backLink!==false?`<a class="back" href="${E(D.backLink||'../index.html')}">← 回專輯推薦</a>`:''}
+  <div class="hero">
+    <div class="hart" id="hart"><div class="ph">${E(D.album).slice(0,2)}</div></div>
+    <div class="hmeta">
+      <div class="kicker">深度導聆 · Deep Listening</div>
+      <h1>${E(D.album)}</h1>
+      <div class="who">${E(D.artist)}</div>
+      <div class="yl">${E(D.year)}${D.label?` · ${E(D.label)}`:''}${D.catalog?` · ${E(D.catalog)}`:''}</div>
+      <div class="chips">
+        ${D.genre?`<span class="chip g">${E(D.genre)}</span>`:''}
+        ${(D.styles||[]).map(s=>`<span class="chip">${E(s)}</span>`).join('')}
+        ${(D.moods||[]).map(s=>`<span class="chip c">${E(s)}</span>`).join('')}
+      </div>
+      <div class="btns">
+        <a class="btn am" href="${amURL(D.itunesTerm || (D.artist+' '+D.album))}" target="_blank" rel="noopener">▶ 在 Apple Music 聽</a>
+        ${has(D.videos)?`<a class="btn yt" href="#videos">▶ 影音延伸 · ${D.videos.length}</a>`:''}
+        ${D.wiki?`<a class="btn" href="${E(D.wiki)}" target="_blank" rel="noopener">Wikipedia</a>`:''}
+      </div>
+    </div>
+  </div>
+  ${D.tagline?`<div class="tagline">${E(D.tagline)}</div>`:''}
+  ${has(D.facts)?`<dl class="facts">${D.facts.map(f=>`<div><dt>${E(f[0])}</dt><dd>${E(f[1])}</dd></div>`).join('')}</dl>`:''}`;
+
+document.getElementById('main').innerHTML = heroHTML + SEC.map((s,i)=>`
+  <section id="${s.id}">
+    <div class="shead"><span class="snum">${String(i+1).padStart(2,'0')}</span>
+      <h2>${s.zh}</h2><span class="sen">${s.en}</span></div>
+    ${s.html}
+  </section>`).join('') + `
+  <footer><span>${E(D.artist)} — ${E(D.album)}</span><span>由 Claude 整理 · ${E(D.compiled||'')}</span></footer>`;
+
+document.getElementById('toc').innerHTML = SEC.map(s=>`<a href="#${s.id}">${s.zh.split(' · ')[0]}</a>`).join('');
+
+/* 逐曲展開 */
+document.querySelectorAll('.trkhead').forEach(h=>{
+  h.onclick = ()=> h.parentElement.classList.toggle('open');
+});
+
+/* 目錄高亮 */
+const links = [...document.querySelectorAll('#toc a')];
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-10% 0px -75% 0px'});
+SEC.forEach(s=>{ const el=document.getElementById(s.id); if(el) obs.observe(el); });
+
+/* 封面：iTunes Search API（JSONP，可在 file:// 直接跑） */
+(function(){
+  if(D.cover){ document.getElementById('hart').innerHTML = `<img src="${D.cover}" alt="">`; return; }
+  const cb = '__amcb1';
+  const s = document.createElement('script');
+  window[cb] = j => {
+    const r = (j.results||[])[0];
+    if(r && r.artworkUrl100)
+      document.getElementById('hart').innerHTML =
+        `<img src="${r.artworkUrl100.replace('100x100bb','1000x1000bb')}" alt="">`;
+    s.remove(); delete window[cb];
+  };
+  s.src = `https://itunes.apple.com/search?term=${encodeURIComponent(D.itunesTerm||(D.artist+' '+D.album))}`
+        + `&entity=album&media=music&limit=1&country=tw&callback=${cb}`;
+  s.onerror = ()=>{ s.remove(); };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

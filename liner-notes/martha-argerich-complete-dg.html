@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深度導聆</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#14131a; --card:#1a1922; --line:#2a2833; --line2:#3a3747;
+    --txt:#ece9f2; --dim:#9b95ab; --dim2:#6f6a7d;
+    --accent:#fa4b6e; --accent2:#ffb26b; --gold:#e8c27a; --cyan:#7ad3e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1000px 560px at 82% -12%, rgba(250,75,110,.13), transparent 62%),
+      radial-gradient(760px 520px at -5% 100%, rgba(120,110,255,.11), transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.8; min-height:100vh;
+  }
+  a{color:inherit}
+  .shell{max-width:1240px;margin:0 auto;padding:0 22px 110px;display:grid;
+    grid-template-columns:200px minmax(0,1fr);gap:38px;align-items:start}
+  @media(max-width:900px){ .shell{grid-template-columns:1fr;gap:0} }
+
+  /* ---------- 側邊目錄 ---------- */
+  nav.toc{position:sticky;top:22px;padding-top:34px}
+  @media(max-width:900px){
+    nav.toc{position:static;padding:16px 0 0;overflow-x:auto;white-space:nowrap;
+      border-bottom:1px solid var(--line);margin-bottom:18px}
+    nav.toc .tocTitle{display:none}
+    nav.toc a{display:inline-block;margin:0 6px 10px 0}
+  }
+  .tocTitle{font-size:11px;letter-spacing:.24em;color:var(--dim2);text-transform:uppercase;margin-bottom:12px}
+  nav.toc a{display:block;font-size:13px;color:var(--dim2);text-decoration:none;padding:6px 10px;
+    border-radius:8px;border-left:2px solid transparent;transition:.16s}
+  nav.toc a:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+  nav.toc a.on{color:var(--accent2);border-left-color:var(--accent);background:rgba(250,75,110,.07)}
+  @media(max-width:900px){ nav.toc a{border-left:0;border-bottom:2px solid transparent}
+    nav.toc a.on{border-left:0;border-bottom-color:var(--accent)} }
+
+  main{padding-top:34px;min-width:0}
+
+  /* ---------- HERO ---------- */
+  .back{display:inline-block;font-size:12.5px;color:var(--dim2);text-decoration:none;margin-bottom:20px}
+  .back:hover{color:var(--txt)}
+  .hero{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+  .hart{width:250px;height:250px;flex:none;border-radius:14px;overflow:hidden;background:#211f2b;
+    position:relative;box-shadow:0 22px 56px rgba(0,0,0,.6)}
+  .hart img{width:100%;height:100%;object-fit:cover;display:block}
+  .hart .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;color:rgba(255,255,255,.2)}
+  .hmeta{flex:1;min-width:280px}
+  .kicker{font-size:11px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+  .hmeta h1{font-size:38px;line-height:1.2;letter-spacing:-.02em;margin:9px 0 5px;font-weight:750}
+  .hmeta .who{font-size:18px;color:var(--dim);margin-bottom:4px}
+  .hmeta .yl{font-size:12.5px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{font-size:11.5px;background:#252331;border:1px solid var(--line);color:var(--dim);
+    padding:4px 11px;border-radius:999px}
+  .chip.g{border-color:rgba(232,194,122,.4);color:var(--gold)}
+  .chip.c{border-color:rgba(122,211,232,.34);color:var(--cyan)}
+  .btns{display:flex;gap:9px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:14px;
+    padding:10px 20px;border-radius:999px;transition:.18s;border:1px solid var(--line2);color:var(--txt);
+    background:var(--card)}
+  .btn:hover{transform:translateY(-1px);border-color:var(--dim2)}
+  .btn.am{background:#fff;color:#111;border-color:#fff}
+  .btn.yt{background:#2a1418;color:#ff8fa3;border-color:#4a2028}
+  .tagline{margin-top:26px;font-size:17.5px;line-height:1.75;color:#ded9ec;
+    border-left:3px solid var(--accent);padding-left:18px;font-weight:520}
+
+  /* ---------- 快速事實 ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px}
+  .facts div{background:var(--bg2);padding:13px 16px}
+  .facts dt{font-size:10.5px;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase;margin-bottom:3px}
+  .facts dd{font-size:14px;color:var(--txt);line-height:1.55}
+
+  /* ---------- 區塊 ---------- */
+  section{margin-top:56px;scroll-margin-top:24px}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;
+    padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .snum{font-size:11px;letter-spacing:.16em;color:var(--dim2);font-variant-numeric:tabular-nums}
+  .shead h2{font-size:19px;letter-spacing:.02em;font-weight:700;color:var(--accent2)}
+  .shead .sen{font-size:11px;letter-spacing:.2em;color:var(--dim2);text-transform:uppercase;margin-left:auto}
+  .prose p{font-size:15.5px;color:#d8d4e4;margin-bottom:14px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{color:var(--gold);font-style:normal;font-weight:600}
+
+  /* ---------- 逐曲導聆 ---------- */
+  .trk{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--bg2),#111017)}
+  .trkhead{display:flex;align-items:center;gap:14px;padding:14px 17px;cursor:pointer;transition:.16s}
+  .trkhead:hover{background:rgba(255,255,255,.03)}
+  .tn{font-size:12px;color:var(--dim2);font-variant-numeric:tabular-nums;width:22px;flex:none}
+  .tt{flex:1;min-width:0}
+  .tt b{display:block;font-size:15.5px;font-weight:640;line-height:1.4}
+  .tt span{font-size:12px;color:var(--dim2)}
+  .tlen{font-size:12.5px;color:var(--dim2);font-variant-numeric:tabular-nums;flex:none}
+  .tcar{font-size:11px;color:var(--dim2);flex:none;transition:.2s}
+  .trk.open .tcar{transform:rotate(90deg)}
+  .trkbody{display:none;padding:2px 17px 18px 53px;border-top:1px solid var(--line)}
+  .trk.open .trkbody{display:block}
+  .trkbody p{font-size:14.5px;color:#d3cfe0;margin:14px 0}
+  .cues{border-left:2px solid var(--line2);padding-left:14px;margin:14px 0}
+  .cue{display:flex;gap:12px;font-size:13.5px;margin-bottom:7px;align-items:baseline}
+  .cue b{color:var(--cyan);font-variant-numeric:tabular-nums;flex:none;font-weight:600;font-size:12.5px}
+  .cue span{color:var(--dim)}
+  .tmeta{font-size:12.5px;color:var(--dim2);margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}
+  .tmeta b{color:var(--dim)}
+  /* ---------- 影音延伸 ---------- */
+  .vnote{font-size:13px;color:var(--dim2);line-height:1.75;margin-bottom:16px;
+    border-left:2px solid var(--line2);padding-left:14px}
+  .vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:11px}
+  .vid{display:block;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:15px 17px;text-decoration:none;transition:.18s}
+  .vid:hover{border-color:#ff8fa3;transform:translateY(-2px);background:#1e1c27}
+  .vtop{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .vkind{font-size:10.5px;letter-spacing:.1em;background:#2a1418;border:1px solid #4a2028;
+    color:#ff8fa3;padding:3px 9px;border-radius:999px}
+  .vsearch{font-size:10.5px;letter-spacing:.1em;background:#1f1d29;border:1px solid var(--line);
+    color:var(--dim2);padding:3px 9px;border-radius:999px}
+  .vlen{font-size:11.5px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  .vid b{display:block;font-size:14.5px;color:var(--txt);font-weight:640;line-height:1.45;margin-bottom:4px}
+  .vby{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+  .vnt{display:block;font-size:12.5px;color:var(--dim2);line-height:1.6}
+
+  /* ---------- 人物誌 ---------- */
+  .people{display:grid;gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:15px;padding:19px 20px;background:var(--bg2)}
+  .prole{font-size:10.5px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .plife{font-size:12.5px;color:var(--dim2);margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .pcard p{font-size:14.5px;color:#d3cfe0;margin-bottom:11px}
+  .phere{background:rgba(250,75,110,.07);border-left:2px solid var(--accent);
+    padding:11px 14px;border-radius:0 9px 9px 0;font-size:14px;color:#e2dded;margin-bottom:12px}
+  .pkey{display:flex;gap:7px;flex-wrap:wrap}
+  .pkey a{font-size:12px;background:#232130;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;border-radius:8px;text-decoration:none;transition:.16s}
+  .pkey a:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- 表格 ---------- */
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .tbl th{background:#1f1d29;color:var(--dim);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-align:left;padding:11px 14px;font-weight:600;border-bottom:1px solid var(--line)}
+  .tbl td{padding:12px 14px;border-bottom:1px solid var(--line);color:#d3cfe0;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tr:hover td{background:rgba(255,255,255,.022)}
+  .tbl .rec{color:var(--gold);white-space:nowrap;font-size:12.5px}
+  .tblwrap{overflow-x:auto}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;font-size:14px}
+  .kv dt{color:var(--dim2);white-space:nowrap}
+  .kv dd{color:#d8d4e4}
+
+  /* ---------- 通用小卡 ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+  .cards a,.cards div.nc{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-decoration:none;transition:.18s}
+  .cards a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .cards b{display:block;font-size:14px;color:var(--txt);margin-bottom:3px;font-weight:640;line-height:1.4}
+  .cards span{font-size:12.5px;color:var(--dim2);line-height:1.5;display:block}
+
+  /* ---------- 時間軸 ---------- */
+  .tl{border-left:2px solid var(--line2);padding-left:20px;margin-left:6px}
+  .tlitem{position:relative;margin-bottom:20px}
+  .tlitem::before{content:'';position:absolute;left:-26px;top:8px;width:9px;height:9px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+  .tlitem .ty{font-size:11.5px;letter-spacing:.14em;color:var(--gold);font-variant-numeric:tabular-nums}
+  .tlitem b{display:block;font-size:15px;margin:2px 0 4px}
+  .tlitem span{font-size:14px;color:var(--dim);line-height:1.65;display:block}
+
+  /* ---------- 路線圖 ---------- */
+  .road{display:grid;gap:12px}
+  .rstep{border:1px solid var(--line);border-radius:14px;padding:17px 19px;background:var(--bg2);
+    display:flex;gap:16px;align-items:flex-start}
+  .rnum{width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0d12;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .rstep b{display:block;font-size:15.5px;margin-bottom:5px}
+  .rstep p{font-size:14.5px;color:#d3cfe0;margin:0}
+
+  .srcs{font-size:12.5px;color:var(--dim2);line-height:2}
+  .srcs a{color:var(--dim);text-decoration:none;border-bottom:1px dotted var(--line2)}
+  .srcs a:hover{color:var(--accent2)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--dim2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .none{color:var(--dim2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc"><div class="tocTitle">目錄</div><div id="toc"></div></nav>
+<main id="main"></main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   資料區 —— 每張專輯只需要換掉這個 D 物件，其餘引擎完全不動
+   ═══════════════════════════════════════════════════════════════ */
+const D = {
+
+/* ── 基本識別 ── */
+artist:"Martha Argerich",
+album:"The Complete Recordings on Deutsche Grammophon",
+year:2015,
+label:"Deutsche Grammophon",
+catalog:"00289 479 4647（通稱 4794647）",
+genre:"古典 · 鋼琴全集",
+styles:["48 CD 套裝","原始封面復刻","獨奏／協奏／二重奏／室內樂","1959–2014"],
+moods:["深夜","專注","週末黑膠"],
+itunesTerm:"Martha Argerich Complete Recordings on Deutsche Grammophon",
+wiki:"https://en.wikipedia.org/wiki/Martha_Argerich",
+compiled:"2026-08-21",
+
+tagline:"48 張 CD、五十五年、一個從不彈安全牌的人。這不是一套「鋼琴獨奏全集」——獨奏只佔九張，其餘三十九張都是她與別人的對話。理解這個比例，就理解了阿格麗希後半生的選擇。",
+
+facts:[
+  ["內容","48 CD · 原始唱片封面復刻 · 附 150 頁解說冊"],
+  ["目錄編號","Deutsche Grammophon 00289 479 4647"],
+  ["發行","2015 年 9 月（DG 已於 2026 年 4 月重新發行）"],
+  ["涵蓋廠牌","DG 與 Philips 的全部錄音（兩者同屬環球）"],
+  ["錄音年代","官方標示 1960–2014；實際最早一軌為 1959 年 1 月 26 日"],
+  ["最晚錄音","2014 年 4 月 19 日，柏林愛樂廳，與巴倫波因的雙鋼琴音樂會"],
+  ["內容分佈","獨奏 9 張、協奏曲 13 張、室內樂與二重奏 26 張（樂評人 Walter Bitner 清點）"],
+  ["盧加諾現場","CD 44–47，收錄 2002–2010 年「阿格麗希計畫」的協奏曲實況"],
+  ["歷史錄音","CD 48 為 1959 與 1967 年柏林 RIAS、科隆 WDR 的單聲道廣播錄音"]
+],
+
+/* ── 1 錄音製作全紀錄 ── */
+production:`這套唱片把阿格麗希在 Deutsche Grammophon 與 Philips 留下的錄音全部收在一起——標題只寫 DG，但內容確實涵蓋兩家廠牌，因為它們同屬環球集團。2015 年 9 月發行，48 張 CD，每一張都用原始 LP 的封面復刻成紙套，連原版黑膠背面的三語解說都縮印在背面，另附一本 150 頁的解說冊，裡面有 Fred Münzmaier 專門畫的素描與 Gregor Willmes 新寫的樂評。
+
+（一個要更正的常見說法：這套並非「限量絕版」。Discogs 的格式欄確實標了 Limited Edition，但 DG 自家文案從未使用限量字樣，而且 DG 官方商店已在 2026 年 4 月重新發行了同樣的 48CD。）
+
+**時間跨度比封面寫的更長。** DG 官方標示是 1960–2014，但套裝裡最早的一軌其實是 1959 年 1 月 26 日錄於柏林 RIAS 第七錄音室的蕭邦第一號敘事曲——那年她十七歲，離蕭邦大賽奪冠還有六年。最晚的一筆是 2014 年 4 月 19 日在柏林愛樂廳與巴倫波因的雙鋼琴音樂會現場。從十七歲到七十二歲，五十五年。
+
+**內容的比例才是真正該注意的事。** 樂評人 Walter Bitner 逐張清點的結果是：獨奏 9 張、協奏曲 13 張、室內樂與二重奏 26 張（其中 8 張是雙鋼琴或四手聯彈）。也就是說，這套「鋼琴全集」裡有超過八成不是純獨奏。這不是編輯的偏好，是她本人的人生軌跡——1983 年那張舒曼《兒時情景／克萊斯勒魂》就是她最後一張錄音室獨奏專輯，此後三十年她幾乎只錄協奏曲與室內樂。
+
+套裝大致依原始發行年代排序，最後五張則是特殊項目：CD 44–47 是 DG 在 2012 年發行的《Lugano Concertos》，收錄 2002 至 2010 年間盧加諾「阿格麗希計畫」的協奏曲現場；CD 48 是 2010 年才首度公開的廣播電台錄音，來自 1959 年的柏林 RIAS 與 1967 年的柏林 Studio Lankwitz、柏林音樂院現場、科隆 WDR，全部是單聲道。`,
+
+/* ── 2 深度樂評 ── */
+review:`面對 48 張 CD，最沒用的問題是「哪張最好」，最有用的問題是「這個比例在說什麼」。
+
+九張獨奏對三十九張合奏。而且那九張裡有八張集中在 1960 到 1983 這二十三年間，之後就沒有了。阿格麗希本人給過解釋——柏林愛樂的人物特寫裡寫得很含蓄：她不喜歡獨自站在舞台上，形容那是一種「赤裸」的感覺，孤獨感過於強烈。一位公認的世紀技巧型鋼琴家，在四十出頭的年紀主動退出獨奏會這條路，然後用往後三十年去做另一件事：跟人一起彈。
+
+所以這套唱片真正的敘事線不是「一位鋼琴家的曲目版圖」，而是「一個人如何找到自己願意待著的位置」。而且她找的對象非常固定：阿巴多從 1967 年的普羅高菲夫第三號一路到 2013 年的莫札特，橫跨四十六年；克萊曼的小提琴奏鳴曲佔了七張；麥斯基的大提琴佔了七張；弗雷瑞、艾科諾穆、普雷特涅夫、巴倫波因輪流坐在第二台鋼琴前。這些不是專案式的合作，是關係。
+
+要說她的演奏，四個特質大概沒有爭議：速度與清晰度的結合（快而不糊，這是最難的）、音色的極端幅度（從拉威爾的水光到舒曼的內省可以瞬間切換）、對「安全」的厭惡（同一首曲子的兩次演出可以差很多），以及最重要的——她從不把鋼琴當伴奏。聽她和克萊曼的《克羅采》，那是兩個人在互相挑釁；聽她和麥斯基的巴赫古大提琴奏鳴曲，鋼琴的右手線條完全是對等的第二個聲部。
+
+如果要挑毛病，這套的問題在於它的完整性本身。48 張裡有相當比例是同曲目的不同版本——拉威爾 G 大調協奏曲出現兩次（CD 3 的柏林愛樂版與 CD 4 的倫敦交響版）、柴可夫斯基第一號出現三次、巴爾托克《雙鋼琴與打擊奏鳴曲》出現兩次。對研究者這是寶藏，對一般聽眾則是負擔。這也是為什麼「該從哪裡開始」比「有什麼」更重要。
+
+另外要誠實說：盧加諾那四張（CD 44–47）的錄音水準與錄音室作品不在同一個層級，那是音樂節實況，有現場的鬆動也有現場的火花。而 CD 48 是單聲道歷史錄音，聽的是史料價值——1959 年那個十七歲的她。
+
+最後一件值得記下的事。這套裡沒有她 1965 年蕭邦大賽的現場，也沒有她在 EMI 留下的許多名演（1965 年的蕭邦、1999 年的蕭邦兩首協奏曲）。所以嚴格說，這是「她在環球體系內的全集」，不是「她的全集」。這一點在標題裡其實寫得很清楚，只是容易被 48 這個數字蓋過去。`,
+
+/* ── 3 逐目導聆（48 CD） ── */
+tracks:[
+{n:1, title:"CD 1 · 首演專輯", len:"1960", writer:"獨奏｜普羅高菲夫・蕭邦・布拉姆斯・拉威爾・李斯特",
+ personnel:"1960 年 7 月 4–8 日錄於漢諾威 Beethovensaal，1961 年發行",
+ note:`十九歲的第一張唱片，整套的起點。曲目是蕭邦第 3 號詼諧曲 Op.39、布拉姆斯兩首狂想曲 Op.79、普羅高菲夫《觸技曲》Op.11、拉威爾《水之嬉戲》、蕭邦《船歌》Op.60、李斯特《匈牙利狂想曲》第 6 號。
+
+這張最驚人的地方在於它已經完全成形。普羅高菲夫的《觸技曲》是機械式的極速重複音，一般鋼琴家在這裡會糊掉，她的每一顆音都站得住；李斯特的匈牙利狂想曲則是純粹的能量爆發。但同一張裡的《水之嬉戲》與《船歌》證明她從一開始就不只有速度。
+
+注意這是錄音年份，不是發行年份——1961 年才上市。`,
+ cues:[["普羅高菲夫《觸技曲》","極速重複音。她招牌技巧的第一份文件，十九歲"],
+       ["拉威爾《水之嬉戲》","同一張裡的另一極：光的顆粒感"],
+       ["李斯特匈牙利狂想曲第 6 號","能量爆發。聽她如何在最快的段落維持每個音的邊界"]]},
+
+{n:2, title:"CD 2 · 蕭邦", len:"1967", writer:"獨奏｜第 3 號奏鳴曲・幻想波蘭舞曲 Op.61・英雄波蘭舞曲 Op.53・三首馬祖卡 Op.59",
+ note:`蕭邦大賽奪冠兩年後的錄音室成果。她在 1965 年第七屆華沙蕭邦大賽拿下首獎，同時獲得最佳馬祖卡演奏獎——所以這張裡的三首 Op.59 馬祖卡不是隨便放的。
+
+第 3 號奏鳴曲的末樂章是她蕭邦詮釋的招牌：不是華麗，是推進力。BBC《Classical Music》選她的最佳錄音時挑的是 1965 年 EMI 那版，但這張 1967 年的 DG 錄音是同一批曲目的錄音室版本，正好可以對照。`,
+ cues:[["第 3 號奏鳴曲 · 末樂章","洶湧的推進力，一氣呵成不換氣"],
+       ["三首馬祖卡 Op.59","1965 年大賽最佳馬祖卡獎得主的正式錄音"],
+       ["英雄波蘭舞曲","左手的節奏骨架，不靠踏板撐"]]},
+
+{n:3, title:"CD 3 · 普羅高菲夫第 3 號 ＆ 拉威爾 G 大調", len:"1967", writer:"協奏曲｜阿巴多／柏林愛樂",
+ personnel:"Claudio Abbado 指揮 Berliner Philharmoniker",
+ note:`整套最有名的一張，也是她與阿巴多四十六年合作的起點。
+
+普羅高菲夫第 3 號的第一樂章從單簧管的孤獨引子開始，然後鋼琴以幾乎粗暴的方式切進來——那個落差是全曲的核心。末樂章鋼琴與樂團的追逐是純粹的競速。而拉威爾 G 大調的第二樂章慢板，開頭是一段長達數分鐘的右手獨白，左手只做最簡單的伴奏；那是全套裡最能說明「技巧為什麼要存在」的段落。
+
+一個常見的錯誤：這張是柏林愛樂，不是倫敦交響。拉威爾 G 大調在這套裡出現兩次，CD 4 那次才是倫敦交響。`,
+ cues:[["普三 · 第一樂章開頭","單簧管的引子，然後鋼琴切進來。整套最有名的十幾秒"],
+       ["普三 · 末樂章","鋼琴與樂團互相追逐，速度推到極限"],
+       ["拉威爾 · 第二樂章開頭","數分鐘的右手獨白。左手只做最簡單的事，全部重量在右手的呼吸上"]]},
+
+{n:4, title:"CD 4 · 蕭邦第 1 號・李斯特第 1 號・拉威爾 G 大調", len:"1968", writer:"協奏曲｜阿巴多／倫敦交響樂團",
+ personnel:"Claudio Abbado 指揮 London Symphony Orchestra",
+ note:"與阿巴多的第二次合作，換了樂團。這張的拉威爾 G 大調與 CD 3 是同曲不同版本——柏林愛樂厚、倫敦交響利，兩張連著聽是這套裡最方便的版本比較。李斯特第 1 號的三角鐵樂章是她少見的幽默感。",
+ cues:[["拉威爾 G 大調","與 CD 3 對照聽。同一位獨奏、同一位指揮、不同的樂團"],
+       ["李斯特第 1 號 · 第三樂章","著名的三角鐵。聽她怎麼處理這個曾被樂評嘲笑的配器"]]},
+
+{n:5, title:"CD 5 · 柴可夫斯基第 1 號 ＆ 孟德爾頌雙協奏曲", len:"—", writer:"協奏曲｜杜特華／皇家愛樂・克萊曼／奧菲斯室內樂團",
+ personnel:"Charles Dutoit 指揮 Royal Philharmonic Orchestra；後半為 Gidon Kremer 與 Orpheus Chamber Orchestra",
+ note:"柴可夫斯基第 1 號是她演出最多的協奏曲之一，這套裡出現三次。杜特華這版的特色是快——BBC《Classical Music》形容她在這類曲目裡是「閃電般的反應」。（這張的確切錄音年份在 Discogs 與 DG 官方資料上都查不到，此處不填。）",
+ cues:[["柴一 · 開頭的和弦","那組著名的降 D 大調和弦，聽她的重量分配"],
+       ["柴一 · 末樂章","速度是重點。與這套裡另外兩個版本比較"]]},
+
+{n:6, title:"CD 6 · 李斯特 ＆ 舒曼", len:"1971", writer:"獨奏｜李斯特 B 小調奏鳴曲・舒曼第 2 號鋼琴奏鳴曲",
+ note:"兩首單樂章／緊密結構的大曲子放在一起。李斯特 B 小調奏鳴曲是三十分鐘不間斷的單樂章，考驗的是長距離的結構感而非局部炫技——這張證明她不只有爆發力。舒曼第 2 號的末樂章則是速度標記上的難題（他自己改過三次）。",
+ cues:[["李斯特 B 小調 · 開頭下行音階","全曲的種子。三十分鐘後它會以完全不同的樣子回來"],
+       ["李斯特 · 賦格段","結構最緊的一段，也是最容易散掉的地方"],
+       ["舒曼第 2 號 · 末樂章","速度的難題。她選了哪一種？"]]},
+
+{n:7, title:"CD 7 · 蕭邦《送葬》奏鳴曲", len:"1974", writer:"獨奏｜第 2 號奏鳴曲・平靜的行板與華麗大波蘭舞曲・第 2 號詼諧曲",
+ note:"第 2 號奏鳴曲因第三樂章的〈送葬進行曲〉得名，但真正的謎題是末樂章：一分半鐘的雙手齊奏疾走，沒有旋律、沒有和聲功能，像一陣風吹過墓地。蕭邦自己說那是「送葬後的閒聊」。",
+ cues:[["第三樂章〈送葬進行曲〉","中段轉大調的那段，是全曲唯一的光"],
+       ["末樂章","一分半的齊奏疾走。聽完你會理解為什麼當年的樂評看不懂這首曲子"]]},
+
+{n:8, title:"CD 8 · 拉威爾《夜之加斯巴》", len:"1974", writer:"獨奏｜夜之加斯巴・小奏鳴曲・高貴而傷感的圓舞曲",
+ personnel:"1974 年 11 月錄於柏林，1975 年發行",
+ note:`唱片史上的標竿錄音之一，也是整套裡最被反覆推薦的獨奏專輯。
+
+《夜之加斯巴》取材自貝特朗的散文詩，三段分別是水妖〈Ondine〉、絞刑台〈Le Gibet〉、惡靈〈Scarbo〉。〈Scarbo〉公認是鋼琴曲目裡技術最難的作品之一，但真正的難點不在快，而在〈Le Gibet〉——那是一個持續不斷的降 B 音喪鐘，從頭敲到尾，力度幾乎不能變，卻要讓周圍的和聲一直換色。彈快容易，彈得住這個音才難。`,
+ cues:[["〈Ondine〉開頭","右手的水波震音。聽它如何維持均勻，同時還在換顏色"],
+       ["〈Le Gibet〉","那個持續的降 B 喪鐘從頭響到尾。這一段才是真正的試金石"],
+       ["〈Scarbo〉","鬼魅式的跳躍。注意她在極速中每個音仍有邊界"]]},
+
+{n:9, title:"CD 9 · 蕭邦：前奏曲全集", len:"1975–77", writer:"獨奏｜24 首前奏曲 Op.28・前奏曲 Op.45・遺作前奏曲",
+ note:"二十四首對應二十四個大小調，每首從幾十秒到幾分鐘。蕭邦讓「前奏曲」第一次成為獨立的藝術小品——它們不前奏任何東西。這張的關鍵在於整體：二十四首要當一個作品聽，聽她如何用對比與留白把它們串成一條線。",
+ cues:[["第 4 首 e 小調","四十幾秒，右手幾乎不動，左手一路往下沉"],
+       ["第 15 首「雨滴」","全套最長的一首。中段轉暗之後的那個持續音"],
+       ["第 24 首 d 小調","最後三個低音 D。整組作品的終止式"]]},
+
+{n:10, title:"CD 10 · 史特拉汶斯基《婚禮》・巴爾托克雙鋼琴協奏曲", len:"大編制", writer:"室內樂／協奏｜辛曼／皇家大會堂管弦樂團 等",
+ note:"《婚禮》是四架鋼琴、打擊樂與人聲的怪物編制，阿格麗希是四位鋼琴家之一。巴爾托克那首則是《雙鋼琴與打擊奏鳴曲》的樂團擴編版。兩首都是「鋼琴作為打擊樂器」的極端案例。",
+ cues:[["《婚禮》","四架鋼琴＋打擊＋合唱。找出她在哪裡"],
+       ["巴爾托克","與 CD 11、CD 31 的雙鋼琴原版對照聽"]]},
+
+{n:11, title:"CD 11 · 巴爾托克・莫札特・德布西", len:"雙鋼琴", writer:"二重奏｜與柯瓦謝維契",
+ personnel:"Stephen Kovacevich（雙鋼琴）",
+ note:`巴爾托克《雙鋼琴與打擊奏鳴曲》Sz.110 是雙鋼琴錄音的試金石——兩台鋼琴加兩位打擊樂手要織成單一的節奏機器，任何一點不同步都會暴露。第一樂章從緩慢神秘的引子開始，逐步累積到爆裂。
+
+同碟還有莫札特四手聯彈變奏與德布西《黑與白》。柯瓦謝維契是她當時的伴侶，這批錄音有一種罕見的默契。`,
+ cues:[["巴爾托克 · 第一樂章引子","極慢、極輕。之後所有的爆發都從這裡長出來"],
+       ["巴爾托克 · 第一樂章高潮","四個人變成一台機器的那一刻"],
+       ["德布西《黑與白》","轉換到完全不同的聲音世界"]]},
+
+{n:12, title:"CD 12 · 舒曼 ＆ 蕭邦協奏曲", len:"協奏曲", writer:"協奏曲｜羅斯托波維契／國家交響樂團",
+ personnel:"Mstislav Rostropovich 指揮 National Symphony Orchestra",
+ note:"大提琴家羅斯托波維契在此擔任指揮。舒曼鋼琴協奏曲是浪漫派協奏曲裡最不炫技的一首——它幾乎是一首室內樂，鋼琴與木管不斷交換旋律。這對後半生選擇了室內樂的阿格麗希來說是很合適的曲目。",
+ cues:[["舒曼 · 第一樂章","鋼琴與雙簧管的交換。誰是主角？"],
+       ["蕭邦第 2 號 · 第二樂章","與 CD 4 的第 1 號協奏曲對照，聽兩首協奏曲不同的抒情策略"]]},
+
+{n:13, title:"CD 13 · 巴赫", len:"獨奏", writer:"獨奏｜觸技曲 BWV911・第 2 號組曲 BWV826・英國組曲第 2 號 BWV807",
+ note:"她的巴赫是現代鋼琴的巴赫，不做大鍵琴的模仿，但也不像顧爾德那樣重構。特色是清晰——多聲部的每一條線都聽得見，而且各自有語氣。BWV911 的觸技曲與 CD 1 的普羅高菲夫觸技曲放在一起聽，會發現「觸技」這個字在她手上是同一件事。",
+ cues:[["觸技曲 BWV911","與 CD 1 的普羅高菲夫觸技曲對照"],
+       ["第 2 號組曲 · 觸技曲樂章","賦格段的聲部分離"],
+       ["英國組曲第 2 號 · 前奏曲","動力節奏，不靠踏板"]]},
+
+{n:14, title:"CD 14 · 蕭邦 ＆ 舒曼大提琴作品", len:"室內樂", writer:"二重奏｜與羅斯托波維契（大提琴）",
+ personnel:"Mstislav Rostropovich（大提琴）",
+ note:"蕭邦大提琴奏鳴曲 Op.65 是他最後完成的作品，寫給大提琴家 Auguste Franchomme——鋼琴部分難得驚人，幾乎是協奏曲的規模。這正好證明蕭邦從來沒把鋼琴寫成伴奏，而阿格麗希也不會這樣彈。",
+ cues:[["蕭邦 Op.65 · 第一樂章","鋼琴開場，大提琴後進。誰在主導？"],
+       ["蕭邦 · 第三樂章 Largo","四分鐘，全曲最安靜的地方"]]},
+
+{n:15, title:"CD 15 · 拉赫曼尼諾夫・拉威爾・盧托斯瓦夫斯基", len:"雙鋼琴", writer:"二重奏｜與弗雷瑞",
+ personnel:"Nelson Freire（雙鋼琴）",
+ note:"與弗雷瑞的第一張雙鋼琴專輯。兩人是相識超過半世紀的摯友，這種關係在音樂上聽得出來——沒有誰讓誰，也沒有誰搶誰。盧托斯瓦夫斯基的《帕格尼尼主題變奏》是二十世紀雙鋼琴曲目裡最刺激的一首。",
+ cues:[["拉赫曼尼諾夫第 2 號組曲 · 圓舞曲","兩台鋼琴的重量平衡"],
+       ["盧托斯瓦夫斯基《帕格尼尼變奏》","不到六分鐘，密度極高"]]},
+
+{n:16, title:"CD 16 · 拉赫曼尼諾夫第 3 號 ＆ 柴可夫斯基第 1 號", len:"現場", writer:"協奏曲｜夏伊／柏林廣播交響・康德拉辛／巴伐利亞廣播",
+ personnel:"Riccardo Chailly、Kirill Kondrashin 指揮",
+ note:"拉赫曼尼諾夫第 3 號是鋼琴協奏曲曲目裡的體力極限，而她的處理方式是「從容」——香港的 Interlude 網站選她的五大演出時就是用這個字：她以從容駕馭了所有技術要求。同碟的柴可夫斯基是與康德拉辛的現場，這套裡柴一的第二個版本。",
+ cues:[["拉三 · 第一樂章主題","極簡的旋律，全曲從這裡長出四十分鐘"],
+       ["拉三 · 第三樂章尾聲","體力的終點。聽她還剩多少"],
+       ["柴一（康德拉辛版）","與 CD 5 的杜特華版對照"]]},
+
+{n:17, title:"CD 17 · 柴可夫斯基《胡桃鉗》・拉赫曼尼諾夫《交響舞曲》", len:"雙鋼琴", writer:"二重奏｜與艾科諾穆",
+ personnel:"Nicolas Economou（雙鋼琴）",
+ note:"艾科諾穆是塞浦路斯鋼琴家兼作曲家，1993 年車禍身故，年僅四十歲。這張《胡桃鉗》組曲的雙鋼琴版是他自己編的。管弦樂原曲的色彩被壓縮進兩台鋼琴，反而讓節奏骨架更清楚。",
+ cues:[["《胡桃鉗》· 花之圓舞曲","豎琴的華彩在鋼琴上變成什麼樣子"],
+       ["《交響舞曲》· 第一樂章","拉赫曼尼諾夫最後的作品，雙鋼琴版是作曲家自己的編寫"]]},
+
+{n:18, title:"CD 18 · 舒曼《兒時情景》・《克萊斯勒魂》", len:"1983", writer:"獨奏｜她最後一張錄音室獨奏專輯",
+ personnel:"1983 年 4 月錄於慕尼黑，1984 年發行",
+ note:`如果只能聽一張獨奏，就是這張。它也是整套裡一個時代的終點——這是阿格麗希最後一張錄音室獨奏專輯，之後三十年她再沒錄過。
+
+《克萊斯勒魂》的靈感來自霍夫曼筆下那位狂想樂長克萊斯勒，八個樂段在狂熱與溫柔之間劇烈擺盪，是舒曼「弗洛雷斯坦／歐塞比烏斯」雙重人格最直接的音樂化。而《兒時情景》十三首小品裡的〈夢幻曲〉則是全然的溫柔。兩者放在同一張唱片上，正好對應阿格麗希自己的兩極。
+
+（順帶更正一個流傳很廣的說法：這張**沒有**得過葛萊美獎。她的三座葛萊美分別是 2000、2005、2006 年，見「評價與歷史地位」。）`,
+ cues:[["《兒時情景》〈夢幻曲〉","最有名的三分鐘。聽她的呼吸長度"],
+       ["《克萊斯勒魂》第 1 段","開頭就是全速。狂熱的那一面"],
+       ["《克萊斯勒魂》第 2 段","立刻切換到最慢最柔。兩段之間的落差就是舒曼的雙重人格"],
+       ["《克萊斯勒魂》第 8 段","結尾消失得極輕，像沒有結束"]]},
+
+{n:19, title:"CD 19 · 舒伯特《琶音琴奏鳴曲》・舒曼小品", len:"室內樂", writer:"二重奏｜與麥斯基（大提琴）",
+ personnel:"Mischa Maisky（大提琴）",
+ note:"與麥斯基長期合作的起點之一。《琶音琴奏鳴曲》原本寫給一種已經消失的樂器（六弦的弓弦吉他），現在多由大提琴演奏，音域的困難因此變成演奏的一部分。舒曼的《幻想小品》Op.73 與《民歌風小品》Op.102 則是這套裡反覆出現的曲目——CD 35 還會再來一次。",
+ cues:[["舒伯特 · 第一樂章","大提琴要在原本不屬於它的音域裡唱歌"],
+       ["舒曼《幻想小品》Op.73","與 CD 35 的版本對照"]]},
+
+{n:20, title:"CD 20 · 貝多芬小提琴奏鳴曲第 1–3 號 Op.12", len:"室內樂", writer:"二重奏｜與克萊曼（小提琴）",
+ personnel:"Gidon Kremer（小提琴）",
+ note:"與克萊曼的貝多芬小提琴奏鳴曲全集從這裡開始，橫跨 CD 20、25、32、33 四張。要記得一件事：貝多芬把這套作品題為「給鋼琴與小提琴的奏鳴曲」，鋼琴在前——這正是阿格麗希與克萊曼演奏的前提。",
+ cues:[["第 1 號 · 第一樂章","鋼琴先出。這個順序不是偶然"],
+       ["第 3 號 · 末樂章","兩人的速度默契"]]},
+
+{n:21, title:"CD 21 · 巴赫古大提琴奏鳴曲 BWV1027–1029", len:"室內樂", writer:"二重奏｜與麥斯基（大提琴）",
+ personnel:"Mischa Maisky（大提琴）",
+ note:"這三首原本是給古大提琴（viola da gamba）與大鍵琴的三重奏鳴曲——大鍵琴的右手是完全獨立的第三聲部。也就是說，鋼琴在這裡本來就不是伴奏，而是兩個聲部。整套裡最能說明「對等」這件事的錄音之一。",
+ cues:[["BWV1027 · 第一樂章","鋼琴右手的線條與大提琴平行進行，兩條旋律"],
+       ["BWV1029 · 第二樂章","全曲最內省的一段"]]},
+
+{n:22, title:"CD 22 · 聖桑《動物狂歡節》", len:"室內樂", writer:"合奏｜與克萊曼、麥斯基、巴許基洛娃 等",
+ personnel:"Gidon Kremer、Mischa Maisky、Elena Bashkirova 等",
+ note:"整套裡最輕鬆的一張。《動物狂歡節》是聖桑生前禁止公開演出的玩笑之作（只有〈天鵝〉例外），裡面充滿對同行的戲仿。一群一流獨奏家湊在一起演這個，本身就是這批人關係的證明。",
+ cues:[["〈鋼琴家〉","聖桑戲仿練習曲的段落——兩位鋼琴家要故意彈得很生硬"],
+       ["〈天鵝〉","麥斯基的大提琴"],
+       ["〈終曲〉","所有動物一起出場"]]},
+
+{n:23, title:"CD 23 · 貝多芬第 1 號 ＆ 第 2 號鋼琴協奏曲", len:"協奏曲", writer:"協奏曲｜辛諾波里／愛樂管弦樂團",
+ personnel:"Giuseppe Sinopoli 指揮 Philharmonia Orchestra",
+ note:"貝多芬協奏曲在這套裡出現兩組（CD 23 與 CD 36），值得對照。辛諾波里這版的樂團偏厚，與 CD 36 阿巴多／馬勒室內樂團的輕盈路線正好相反。第 2 號其實比第 1 號早寫，編號是出版順序造成的。",
+ cues:[["第 1 號 · 第一樂章華彩","貝多芬自己寫了三個，聽她選哪一個"],
+       ["第 2 號 · 末樂章","與 CD 36 的阿巴多版對照聽"]]},
+
+{n:24, title:"CD 24 · 舒曼小提琴奏鳴曲第 1・2 號", len:"室內樂", writer:"二重奏｜與克萊曼（小提琴）",
+ personnel:"Gidon Kremer（小提琴）",
+ note:"Op.105 與 Op.121 都寫於 1851 年，是舒曼精神崩潰前三年的作品。第 2 號有四個樂章、將近三十五分鐘，規模接近交響曲。這是全套裡氣氛最緊繃的錄音之一。",
+ cues:[["第 1 號 · 第一樂章","標題就叫「熱情的表情」"],
+       ["第 2 號 · 第三樂章","以聖詠曲調為基礎的變奏，全曲的中心"]]},
+
+{n:25, title:"CD 25 · 貝多芬小提琴奏鳴曲第 4 號・第 5 號《春》", len:"室內樂", writer:"二重奏｜與克萊曼（小提琴）",
+ personnel:"Gidon Kremer（小提琴）",
+ note:"《春》是這套曲目裡最著名也最容易被彈得甜膩的一首。克萊曼與阿格麗希的版本不甜——他們把它當成貝多芬而不是沙龍音樂，速度偏快，句子的稜角保留著。",
+ cues:[["第 5 號《春》· 第一樂章開頭","小提琴的著名旋律。聽鋼琴在下面做什麼"],
+       ["第 4 號 · 第一樂章","a 小調，與《春》的性格完全相反"]]},
+
+{n:26, title:"CD 26 · 巴爾托克・楊納捷克・梅湘", len:"室內樂", writer:"二重奏｜與克萊曼（小提琴）",
+ personnel:"Gidon Kremer（小提琴）",
+ note:"二十世紀的三個聲音放在一起。梅湘的《主題與變奏》是他二十四歲的作品，寫給他的第一任妻子、小提琴家 Claire Delbos。楊納捷克的奏鳴曲則充滿捷克語的語調。這張是整套裡曲目最「現代」的一張。",
+ cues:[["梅湘《主題與變奏》","最後一個變奏的和聲，已經是他日後的語言"],
+       ["楊納捷克 · 第一樂章","小提琴的顫音像說話"]]},
+
+{n:27, title:"CD 27 · 貝多芬大提琴奏鳴曲 Op.5 ＆ 變奏曲", len:"室內樂", writer:"二重奏｜與麥斯基（大提琴）",
+ personnel:"Mischa Maisky（大提琴）",
+ note:"與麥斯基的貝多芬大提琴奏鳴曲全集分成 CD 27 與 CD 29 兩張。Op.5 的兩首寫於 1796 年，是音樂史上第一批把大提琴與鋼琴當成對等夥伴的奏鳴曲——在此之前大提琴幾乎只負責低音線。",
+ cues:[["Op.5 No.1 · 導奏","極長的慢速導奏，之後才進入快板"],
+       ["《莫札特主題變奏》","取材自《魔笛》"]]},
+
+{n:28, title:"CD 28 · 普羅高菲夫小提琴奏鳴曲", len:"室內樂", writer:"二重奏｜與克萊曼（小提琴）",
+ personnel:"Gidon Kremer（小提琴）",
+ note:"第 1 號 f 小調是普羅高菲夫最陰暗的作品之一，他自己形容第一樂章的音階段落像「風吹過墓地」。第 2 號原本是長笛奏鳴曲，應歐伊斯特拉赫的要求改成小提琴版。兩首放在一起，等於兩種完全不同的普羅高菲夫。",
+ cues:[["第 1 號 · 第一樂章","那段被形容為「風吹過墓地」的音階"],
+       ["第 2 號 · 第一樂章","原本是長笛，聽得出來嗎"]]},
+
+{n:29, title:"CD 29 · 貝多芬大提琴奏鳴曲 Op.69 & 102", len:"室內樂", writer:"二重奏｜與麥斯基（大提琴）",
+ personnel:"Mischa Maisky（大提琴）",
+ note:"Op.102 的兩首寫於 1815 年，屬於貝多芬晚期，其中第 5 號的末樂章是一首賦格——那是他晚年對位執念的早期徵兆。這兩張貝多芬大提琴奏鳴曲全集的完成度是整套室內樂錄音裡最高的之一。",
+ cues:[["Op.69 · 第一樂章開頭","大提琴獨自唱出主題，鋼琴後進"],
+       ["Op.102 No.2 · 末樂章賦格","貝多芬晚期風格的預告"]]},
+
+{n:30, title:"CD 30 · 蕭士塔高維契第 1 號・海頓・柴可夫斯基", len:"協奏曲", writer:"協奏曲｜阿巴多／柏林愛樂・費爾伯／符騰堡室內",
+ personnel:"Claudio Abbado 指揮 Berliner Philharmoniker；Jörg Faerber 指揮 Württembergisches Kammerorchester",
+ note:"蕭士塔高維契第 1 號協奏曲的編制很怪：鋼琴、小號與弦樂團——小號幾乎是第二位獨奏。BBC《Classical Music》在評她的錄音時說，她這首曲子錄過三次，其中一次是「最好的」。這張是三次中的一次，正好可以自己判斷。同碟還有這套裡柴一的第三個版本。",
+ cues:[["蕭士塔高維契 · 第一樂章","鋼琴與小號的關係。誰在挑釁誰"],
+       ["蕭士塔高維契 · 末樂章","全曲最外向的一段，帶著馬戲團的氣味"],
+       ["柴一（第三個版本）","與 CD 5、CD 16 對照"]]},
+
+{n:31, title:"CD 31 · 巴爾托克 ＆ 拉威爾雙鋼琴", len:"雙鋼琴", writer:"二重奏｜與弗雷瑞",
+ personnel:"Nelson Freire（雙鋼琴）",
+ note:"巴爾托克《雙鋼琴與打擊奏鳴曲》的第二個版本（第一次在 CD 11 與柯瓦謝維契）。同一首曲子、同一位鋼琴家、不同的夥伴，是整套裡最值得做的 A／B 比較之一。拉威爾《鵝媽媽》原是四手聯彈的兒童作品。",
+ cues:[["巴爾托克 Sz.110","與 CD 11 的柯瓦謝維契版對照。夥伴換了，音樂差多少"],
+       ["《鵝媽媽》〈仙境花園〉","最後一曲，鐘聲式的和聲"]]},
+
+{n:32, title:"CD 32 · 貝多芬小提琴奏鳴曲第 6–8 號 Op.30", len:"室內樂", writer:"二重奏｜與克萊曼（小提琴）",
+ personnel:"Gidon Kremer（小提琴）",
+ note:"Op.30 的三首寫於 1802 年，正是他寫下《海利根施塔特遺書》那年。第 7 號 c 小調是其中最戲劇性的一首，也是他把小提琴奏鳴曲推向交響規模的起點。",
+ cues:[["第 7 號 · 第一樂章","c 小調，貝多芬最嚴肅的調性"],
+       ["第 8 號 · 末樂章","突然的輕快，與前一首形成刻意的對比"]]},
+
+{n:33, title:"CD 33 · 貝多芬《克羅采》・第 10 號", len:"室內樂", writer:"二重奏｜與克萊曼（小提琴）",
+ personnel:"Gidon Kremer（小提琴）",
+ note:`整套室內樂裡火花最強的一張。《克羅采》Op.47 貝多芬自己在標題上寫「以近乎協奏曲的方式（molto concertante）寫成」——兩件樂器不是合作，是競爭。托爾斯泰後來用這首曲子當同名小說的核心意象，講的正是音樂裡那股危險的能量。
+
+聽這一軌要注意的是：鋼琴從不退居伴奏。克萊曼與阿格麗希兩個都是強烈到有點難相處的音樂人格，這張唱片就是那種人格的正面對撞。`,
+ cues:[["第一樂章 · 小提琴獨奏開場","四小節之後鋼琴進來，立刻把主導權搶走"],
+       ["第一樂章 · 呈示部","兩人的能量角力。誰在推誰"],
+       ["第二樂章變奏曲","唯一的休戰"],
+       ["末樂章","塔朗泰拉舞曲，全速到底"]]},
+
+{n:34, title:"CD 34 · 蕭士塔高維契 ＆ 柴可夫斯基鋼琴三重奏", len:"室內樂", writer:"三重奏｜與克萊曼、麥斯基",
+ personnel:"Gidon Kremer（小提琴）、Mischa Maisky（大提琴）",
+ note:"兩首都是輓歌。柴可夫斯基 Op.50 寫給剛過世的魯賓斯坦，副標是「紀念一位偉大的藝術家」；蕭士塔高維契 Op.67 寫於 1944 年，末樂章那段猶太主題被普遍理解為對納粹屠殺的回應。這是整套裡情緒最重的一張。",
+ cues:[["蕭士塔高維契 · 開頭","大提琴的泛音，在極高音域，聽起來不像大提琴"],
+       ["蕭士塔高維契 · 末樂章","那段猶太舞曲的主題"],
+       ["柴可夫斯基 · 第二樂章變奏","十一段變奏，最後回到開頭的葬禮進行曲"]]},
+
+{n:35, title:"CD 35 · 舒曼 ＆ 貝多芬", len:"室內樂", writer:"合奏｜與麥斯基（大提琴）、列賓（小提琴）",
+ personnel:"Mischa Maisky（大提琴）、Vadim Repin（小提琴）",
+ note:"舒曼的《慢板與快板》《幻想小品》《民歌風小品》在這套裡都出現不只一次，可以與 CD 14、CD 19 對照。加上另一個《克羅采》版本（與列賓），這張等於是一張「同曲異演」的合輯。",
+ cues:[["舒曼《童話繪本》","原為中提琴與鋼琴，四首性格小品"],
+       ["《克羅采》（列賓版）","與 CD 33 的克萊曼版對照——這是全套最直接的夥伴比較"]]},
+
+{n:36, title:"CD 36 · 貝多芬第 2 號 ＆ 第 3 號鋼琴協奏曲", len:"葛萊美", writer:"協奏曲｜阿巴多／馬勒室內樂團",
+ personnel:"Claudio Abbado 指揮 Mahler Chamber Orchestra",
+ note:"這張為她贏得第 48 屆葛萊美獎（2006 年頒發）最佳器樂獨奏（協奏）演出。與 CD 23 辛諾波里／愛樂管弦樂團的版本正好對照：馬勒室內樂團編制小、線條清楚，速度也更利落。第 3 號 c 小調是貝多芬第一首真正戲劇化的協奏曲。",
+ cues:[["第 3 號 · 第一樂章","c 小調。與第 1、2 號的性格斷然不同"],
+       ["第 3 號 · 第二樂章","E 大調，離主調極遠。轉調的瞬間是重點"],
+       ["第 2 號","與 CD 23 的辛諾波里版對照"]]},
+
+{n:37, title:"CD 37 · 蕭邦・法朗克・德布西（日本現場）", len:"現場", writer:"二重奏｜與麥斯基（大提琴）",
+ personnel:"Mischa Maisky（大提琴）",
+ note:"日本音樂會現場。法朗克的奏鳴曲原為小提琴與鋼琴（他送給小提琴家易沙意的結婚禮物），大提琴版是後來的改編。德布西的大提琴奏鳴曲則是他生命最後三年那批「法國風」奏鳴曲之一。",
+ cues:[["法朗克 · 第四樂章","著名的卡農樂章：大提琴與鋼琴一前一後追同一條旋律"],
+       ["德布西 · 第二樂章","被稱為「小丑」的段落，撥弦與斷奏"]]},
+
+{n:38, title:"CD 38 · 布拉姆斯第 1 號鋼琴四重奏 ＆ 舒曼", len:"室內樂", writer:"四重奏｜與克萊曼、麥斯基、巴許梅特",
+ personnel:"Gidon Kremer（小提琴）、Yuri Bashmet（中提琴）、Mischa Maisky（大提琴）",
+ note:"布拉姆斯 Op.25 的末樂章是著名的〈吉普賽輪旋曲〉——荀白克後來把整首曲子配成管弦樂版，稱之為「布拉姆斯第五號交響曲」。這個陣容（克萊曼、巴許梅特、麥斯基）是 1990 年代室內樂的夢幻組合。",
+ cues:[["第一樂章","二十分鐘的大結構，鋼琴的分量接近協奏曲"],
+       ["末樂章〈吉普賽輪旋曲〉","全套裡最外向的室內樂終曲之一"]]},
+
+{n:39, title:"CD 39 · 史特拉汶斯基・普羅高菲夫・蕭士塔高維契（現場）", len:"現場", writer:"二重奏｜與麥斯基（大提琴）",
+ personnel:"Mischa Maisky（大提琴）",
+ note:"史特拉汶斯基《義大利組曲》改編自芭蕾《普欽奈拉》，素材來自十八世紀的佩戈雷西——是他「新古典時期」的代表。普羅高菲夫的大提琴奏鳴曲則寫給羅斯托波維契。",
+ cues:[["《義大利組曲》· 序曲","十八世紀的素材加上二十世紀的節奏重音"],
+       ["普羅高菲夫 · 第一樂章","大提琴在最低音域開始"]]},
+
+{n:40, title:"CD 40 · 普羅高菲夫《灰姑娘》・拉威爾《鵝媽媽》", len:"葛萊美", writer:"二重奏｜與普雷特涅夫",
+ personnel:"Mikhail Pletnev（雙鋼琴）",
+ note:"這張為她與普雷特涅夫贏得第 47 屆葛萊美獎（2005 年頒發）最佳室內樂演出。《灰姑娘》的雙鋼琴組曲是普雷特涅夫自己改編的——他同時是頂尖鋼琴家與指揮，改編功力極高，芭蕾原曲的管弦色彩被翻譯成兩台鋼琴而幾乎沒有損失。",
+ cues:[["《灰姑娘》· 午夜的鐘聲","管弦樂裡最戲劇性的一段，在鋼琴上怎麼做"],
+       ["《鵝媽媽》","與 CD 31 弗雷瑞的版本對照"]]},
+
+{n:41, title:"CD 41 · 薩爾茲堡現場", len:"現場", writer:"二重奏｜與弗雷瑞",
+ personnel:"Nelson Freire（雙鋼琴）",
+ note:"薩爾茲堡音樂節現場。布拉姆斯《海頓主題變奏》的雙鋼琴版其實是作曲家自己先寫的（Op.56b），管弦樂版反而是之後的事。舒伯特的《大迴旋曲》D951 是四手聯彈曲目裡最好的作品之一。",
+ cues:[["布拉姆斯《海頓變奏》· 終曲","帕薩卡利亞。低音線一路重複到最後"],
+       ["舒伯特《大迴旋曲》","兩人共用一台琴，四隻手的空間問題"]]},
+
+{n:42, title:"CD 42 · 莫札特第 25 號 ＆ 第 20 號協奏曲", len:"2013", writer:"協奏曲｜阿巴多／莫札特管弦樂團",
+ personnel:"Claudio Abbado 指揮 Orchestra Mozart，2013 年 3 月琉森音樂節現場，2014 年 2 月發行",
+ note:`與阿巴多四十六年合作的終點。這是兩人最後一次合作錄音，阿巴多在 2014 年 1 月過世。
+
+BBC《Classical Music》評這個錄音時用了「無懈可擊的速度判斷」與「不造作的詩意」。K466 是莫札特唯二的小調協奏曲之一（另一首是 K491），第一樂章的樂團開頭是切分的不安；K503 則是他最龐大、最「交響」的一首。
+
+從 CD 3 那個 1967 年的普羅高菲夫第三號，到這張 2013 年的莫札特——同一位鋼琴家、同一位指揮，中間隔了四十六年。整套唱片如果要挑一組對照聽，就是這兩張。`,
+ cues:[["K466 · 第一樂章樂團開頭","切分節奏的不安，鋼琴要等很久才進來"],
+       ["K466 · 第二樂章 Romanze","中段突然轉暗的那一段"],
+       ["K503 · 第一樂章","莫札特最大編制的協奏曲之一"],
+       ["整體","與 CD 3 對照。四十六年前後的同一組人"]]},
+
+{n:43, title:"CD 43 · 與巴倫波因的雙鋼琴", len:"2014", writer:"二重奏｜莫札特 K448・舒伯特 D813・史特拉汶斯基《春之祭》",
+ personnel:"Daniel Barenboim，2014 年 4 月 19 日柏林愛樂廳現場",
+ note:`整套時間軸上的最後一筆錄音。兩人相識超過六十年——同樣出身布宜諾斯艾利斯，童年就認識。
+
+《春之祭》的四手聯彈版是史特拉汶斯基自己寫的，而且寫在管弦樂版之前（他用它來給狄亞基列夫試聽）。少了樂團的色彩，剩下的是純粹的節奏暴力——那正是這首曲子當年引發暴動的核心。兩位七十多歲的鋼琴家在柏林愛樂廳把它彈完，是這套唱片非常合適的收尾。`,
+ cues:[["莫札特 K448","唯一一首莫札特為兩台鋼琴寫的奏鳴曲。開場的齊奏"],
+       ["《春之祭》〈春之預兆〉","那組著名的重音錯位和弦，在鋼琴上更赤裸"],
+       ["《春之祭》〈獻祭之舞〉","結尾。全套 48 張的最後一個現場"]]},
+
+{n:44, title:"CD 44 · 盧加諾協奏曲 I", len:"2002–10", writer:"現場｜貝多芬第 1 號・浦朗克雙鋼琴協奏曲・莫札特三鋼琴協奏曲 K242",
+ personnel:"Orchestra della Svizzera Italiana 等",
+ note:"「阿格麗希計畫」（Progetto Martha Argerich）2002 年在盧加諾創辦，2016 年 6 月因贊助商撤資舉行最後一屆。DG 這四張《Lugano Concertos》收錄 2002 至 2010 年的協奏曲實況，2012 年發行。BBC《Classical Music》選她的最佳錄音時，挑的正是盧加諾的貝多芬第 1 號，形容為「柔韌、節奏威力、結構的莊嚴與親密」。莫札特 K242 的三鋼琴協奏曲需要三位獨奏，正是這個音樂節的精神。",
+ cues:[["貝多芬第 1 號","BBC 選為她最佳錄音之一"],
+       ["莫札特 K242","三台鋼琴。找出她的聲部"],
+       ["浦朗克雙鋼琴協奏曲","1932 年的作品，混著爵士與峇里島甘美朗"]]},
+
+{n:45, title:"CD 45 · 盧加諾協奏曲 II", len:"2002–10", writer:"現場｜舒曼鋼琴協奏曲・普羅高菲夫第 1・3 號",
+ note:"普羅高菲夫第 3 號的現場版，與 CD 3 那個 1967 年的錄音室經典相隔數十年。這是整套裡最直接的「同一首曲子、不同人生階段」對照。舒曼協奏曲則與 CD 12 的羅斯托波維契版對照。",
+ cues:[["普羅高菲夫第 3 號","與 CD 3 對照。同一首曲子，數十年後"],
+       ["普羅高菲夫第 1 號","二十歲的普羅高菲夫，只有十五分鐘"],
+       ["舒曼協奏曲","與 CD 12 對照"]]},
+
+{n:46, title:"CD 46 · 盧加諾協奏曲 III", len:"2002–10", writer:"現場｜貝多芬第 2 號・李斯特第 1 號・巴爾托克第 3 號・莫札特 K501",
+ note:"巴爾托克第 3 號協奏曲是他臨終前寫給妻子的作品，最後十七小節由學生完成——與他前兩首協奏曲的暴烈完全不同，第二樂章甚至有鳥鳴。這是整套裡難得的溫柔巴爾托克。",
+ cues:[["巴爾托克第 3 號 · 第二樂章","中段的鳥鳴。與 CD 10、11、31 的暴烈巴爾托克對照"],
+       ["李斯特第 1 號","與 CD 4 的阿巴多錄音室版對照"]]},
+
+{n:47, title:"CD 47 · 盧加諾協奏曲 IV", len:"2002–10", writer:"現場｜舒伯特 D818・布拉姆斯《愛之歌圓舞曲》・史特拉汶斯基《婚禮》・米堯《斯卡拉姆虛》",
+ note:"四張盧加諾裡曲目最雜也最有趣的一張。史特拉汶斯基《婚禮》與 CD 10 的錄音室版對照；米堯的《斯卡拉姆虛》是雙鋼琴曲目裡最歡樂的一首，末樂章是巴西風的 Brazileira。",
+ cues:[["米堯《斯卡拉姆虛》· 末樂章","巴西風。全套 48 張裡最輕快的幾分鐘之一"],
+       ["《婚禮》","與 CD 10 對照"]]},
+
+{n:48, title:"CD 48 · 蕭邦：廣播錄音（單聲道）", len:"1959/1967", writer:"獨奏｜敘事曲・練習曲・馬祖卡・夜曲・第 3 號奏鳴曲",
+ personnel:"1959 年柏林 RIAS 第七錄音室；1967 年柏林 Studio Lankwitz、柏林音樂院現場、科隆 WDR",
+ note:`整套裡史料價值最高的一張，2010 年才首度公開發行（DG 4777557《Argerich plays Chopin》）。
+
+第一軌的第 1 號敘事曲錄於 **1959 年 1 月 26 日**，柏林 RIAS 第七錄音室——那年她十七歲，離蕭邦大賽奪冠還有六年。這也是整套 48 張裡最早的一筆錄音，比官方標示的「1960」還早一年。
+
+其餘曲目錄於 1967 年：練習曲、馬祖卡、夜曲錄於柏林 Studio Lankwitz（12 月 3 日）；三首 Op.59 馬祖卡錄於 10 月 31 日；第 3 號奏鳴曲則是 3 月 15 日柏林音樂院的現場。全部是單聲道，音質乾淨。
+
+要注意的是這不是 1965 年蕭邦大賽的現場錄音——那批錄音不在這套裡。`,
+ cues:[["第 1 號敘事曲","1959 年 1 月 26 日，十七歲。整套的真正起點"],
+       ["夜曲 Op.15 No.1 / Op.55 No.2","單聲道的近距離，聽她的弱音"],
+       ["第 3 號奏鳴曲（現場）","1967 年 3 月柏林音樂院，與 CD 2 的錄音室版對照"]]}
+],
+
+/* ── 4 人物誌 ── */
+people:[
+{role:"鋼琴", name:"Martha Argerich 瑪塔・阿格麗希", life:"1941 年 6 月 5 日生 · 阿根廷布宜諾斯艾利斯",
+ bio:`三歲接觸鋼琴，五歲起師事布宜諾斯艾利斯的 Vincenzo Scaramuzza，約八歲首度與樂團合作演出協奏曲。1955 年舉家遷往維也納——父親經裴隆政府安排取得外交職位，目的就是讓她能跟 Friedrich Gulda 學琴。
+
+師承名單很長：Scaramuzza、Gulda、Stefan Askenase、Maria Curcio、Madeleine Lipatti（李帕第的遺孀）、Abbey Simon、Nikita Magaloff。至於常被提到的米凱蘭傑利——她在十八個月間只上了四堂課，米氏本人後來被問到教了她什麼，答案是「我教會她沉默的天分」。
+
+1957 年，十六歲的她在同一年拿下波札諾的布梭尼大賽與日內瓦國際音樂大賽兩項首獎（廣泛流傳的說法是三週之內，但沒有來源列出兩場的確切日期）。1965 年 2 月至 3 月的第七屆華沙蕭邦國際鋼琴大賽，二十三歲的她奪得首獎，並獲最佳馬祖卡演奏獎。
+
+她極少受訪。柏林愛樂的人物特寫引過她一句話：「說話比彈琴更難。」`,
+ here:`這套唱片的比例本身就是她的傳記。九張獨奏、十三張協奏曲、二十六張室內樂與二重奏——而那九張獨奏裡有八張集中在 1960 到 1983 年。1983 年的舒曼《兒時情景／克萊斯勒魂》（CD 18）是她最後一張錄音室獨奏專輯，之後三十年沒有再錄過。
+
+原因她說得很含蓄：她不喜歡獨自站在舞台上，形容那是一種「赤裸」的感覺，孤獨感過於強烈。所以這套的後半幾乎全是合奏——不是妥協，是選擇。她在柏林愛樂的專訪裡還說過另一句：「音樂對我而言，是一種美好的溝通工具。」
+
+演奏上她最容易被記住的是速度，但真正稀有的是她在極速下仍維持每個音的邊界（CD 1 的普羅高菲夫《觸技曲》，十九歲）；以及她對「安全」的厭惡——同一首曲子的兩次演出可以差很多，這套裡的同曲異演正好給了你驗證的機會。`,
+ key:[["Prokofiev: Piano Concerto No. 3","1967"],["Ravel: Gaspard de la nuit","1974"],["Schumann: Kinderszenen / Kreisleriana","1983"],["Chopin: 24 Préludes","1975–77"],["Beethoven: Piano Concertos 2 & 3","2004"]]},
+
+{role:"指揮 · 四十六年的夥伴", name:"Claudio Abbado 克勞迪奧・阿巴多", life:"1933–2014 · 義大利米蘭",
+ bio:"從米蘭史卡拉、維也納國家歌劇院到柏林愛樂（1989–2002），二十世紀後半最重要的指揮之一。晚年因胃癌切除大部分胃部，之後創辦莫札特管弦樂團與琉森音樂節管弦樂團，把重心放在小編制與音樂家的自主性上。2014 年 1 月去世。",
+ here:`他和阿格麗希的合作橫跨四十六年，是整套裡最長的一條線：1967 年的普羅高菲夫第 3 號與拉威爾 G 大調（CD 3，柏林愛樂）、1968 年的蕭邦與李斯特（CD 4，倫敦交響）、1994 年的蕭士塔高維契（CD 30）、2004 年拿下葛萊美的貝多芬第 2、3 號（CD 36，馬勒室內樂團），一直到 2013 年琉森的莫札特 K503 與 K466（CD 42）——那是兩人最後一次合作錄音，隔年他就過世了。
+
+要理解阿格麗希為什麼選擇合奏，聽 CD 3 與 CD 42 就夠了。同樣兩個人，中間隔了四十六年。`,
+ key:[["Mahler: Symphony No. 2","1976"],["Verdi: Simon Boccanegra","1977"],["Beethoven: Symphonies (Berliner Philharmoniker)","2001"]]},
+
+{role:"小提琴", name:"Gidon Kremer 吉頓・克萊曼", life:"1947 年生 · 拉脫維亞里加",
+ bio:"歐伊斯特拉赫的學生，1970 年柴可夫斯基大賽首獎。以曲目的冒險著稱——他把皮亞佐拉、席尼特克、佩爾特、坎切利推上國際舞台，1997 年創辦波羅的海室內樂團。演奏風格銳利、不甜、帶著知性的距離感。",
+ here:"整套裡他佔了七張（CD 20、24、25、26、28、32、33），核心是與阿格麗希合錄的貝多芬小提琴奏鳴曲全集。這組合的化學反應來自兩個都很強烈、都不讓步的音樂人格——CD 33 的《克羅采》是最直接的證據。貝多芬把這套作品題為「給鋼琴與小提琴的奏鳴曲」，鋼琴在前，這正是他們演奏的前提。",
+ key:[["Beethoven: Violin Sonatas (with Argerich)","1980s–90s"],["Piazzolla: Hommage à Piazzolla","1996"],["Schnittke: Concerto Grosso No. 1","1988"]]},
+
+{role:"大提琴", name:"Mischa Maisky 米夏・麥斯基", life:"1948 年生 · 拉脫維亞里加",
+ bio:"史上唯一同時師事羅斯托波維契與皮亞蒂戈斯基的大提琴家。1970 年代因申請移民以色列而被蘇聯當局送進勞改營，出獄後輾轉赴西方。音色濃厚、樂句極度自由，是浪漫派路線的代表。",
+ here:"整套裡他也佔了七張（CD 19、21、27、29、35、37、39），加上 CD 22、34、38 的合奏，是出現次數最多的夥伴之一。與阿格麗希的貝多芬大提琴奏鳴曲全集（CD 27、29）完成度最高；而 CD 21 的巴赫古大提琴奏鳴曲則最能說明「鋼琴不是伴奏」——那三首原本就寫給大鍵琴的兩個獨立聲部與古大提琴。",
+ key:[["Bach: Cello Suites","1985"],["Schubert: Arpeggione Sonata (with Argerich)","1980s"],["Shostakovich & Tchaikovsky: Piano Trios","1998"]]},
+
+{role:"雙鋼琴夥伴", name:"弗雷瑞・柯瓦謝維契・艾科諾穆・普雷特涅夫・巴倫波因", life:"整套 8 張雙鋼琴／四手聯彈作品的第二台琴",
+ bio:`**Nelson Freire**（1944–2021，巴西）：與阿格麗希相識超過半世紀的摯友，兩人的雙鋼琴錄音有一種罕見的無爭鬥感（CD 15、31、41）。
+
+**Stephen Kovacevich**（1940 年生，美國）：1970 年代與她是伴侶，巴爾托克《雙鋼琴與打擊奏鳴曲》的第一個版本（CD 11）。
+
+**Nicolas Economou**（1953–1993，塞浦路斯）：鋼琴家兼作曲家，《胡桃鉗》雙鋼琴版是他自己編的（CD 17）。四十歲死於車禍。
+
+**Mikhail Pletnev**（1957 年生，俄羅斯）：鋼琴家兼指揮，《灰姑娘》雙鋼琴組曲是他的改編（CD 40），這張為兩人贏得 2005 年的葛萊美。
+
+**Daniel Barenboim**（1942 年生，阿根廷）：同樣出身布宜諾斯艾利斯，兩人童年就認識。CD 43 是整套最後一筆錄音。`,
+ here:"這五個人加起來構成了整套裡最有趣的一組對照實驗：巴爾托克《雙鋼琴與打擊奏鳴曲》在 CD 11（柯瓦謝維契）與 CD 31（弗雷瑞）各出現一次；拉威爾《鵝媽媽》在 CD 31（弗雷瑞）與 CD 40（普雷特涅夫）各出現一次。同一首曲子、同一位鋼琴家、不同的夥伴——這是全套最能聽出「她如何被對方改變」的地方。",
+ key:[]}
+],
+
+/* ── 5 完整 Credits ── */
+credits:[
+ ["鋼琴","Martha Argerich"],
+ ["內容","48 CD · 收錄 DG 與 Philips 的全部錄音"],
+ ["目錄編號","Deutsche Grammophon 00289 479 4647（通稱 4794647）"],
+ ["條碼","0028947946472"],
+ ["發行","2015 年 9 月（歐版 9 月 3–4 日，美版 9 月 25 日）"],
+ ["重新發行","DG 官方商店於 2026 年 4 月 17 日再版"],
+ ["包裝","原始唱片封面復刻紙套；原版 LP 背面的三語解說縮印於紙套背面"],
+ ["解說冊","150 頁，含 Fred Münzmaier 專門繪製的素描與 Gregor Willmes 撰寫的新樂評"],
+ ["錄音年代","官方標示 1960–2014；實際最早一軌為 1959 年 1 月 26 日（CD 48）"],
+ ["內容分佈","獨奏 9 · 協奏曲 13 · 室內樂與二重奏 26（含 8 張雙鋼琴／四手聯彈）—— 樂評人 Walter Bitner 清點"],
+ ["主要合作者","Claudio Abbado、Gidon Kremer、Mischa Maisky、Nelson Freire、Mstislav Rostropovich、Daniel Barenboim、Stephen Kovacevich、Mikhail Pletnev、Nicolas Economou、Charles Dutoit、Giuseppe Sinopoli、Riccardo Chailly、Kirill Kondrashin 等"],
+ ["未收錄","她在 EMI／Warner 等其他廠牌的錄音（含 1965 年蕭邦大賽現場、1999 年蕭邦兩首協奏曲）"]
+],
+
+/* ── 6 評價與歷史地位 ── */
+reception:{
+ scores:[
+  ["Walter Bitner（2017 開箱長文）","目前網路上對這套最完整的爬梳，形容它「或許是史上最偉大的古典鋼琴錄音合集」，並逐張清點出 9／13／26 的內容分佈"],
+  ["ClassicsToday · David Hurwitz","在他的「阿格麗希十大錄音」影片評論中，多張本套裝收錄的錄音獲藝術與音質雙 10/10"],
+  ["AllMusic","評述她對曲目的好奇心與跨世代合作的冒險精神"],
+  ["BBC《Classical Music》","專文以「鋼琴女神」為題；另在「阿格麗希最佳錄音」選單中多次點名本套裝收錄的版本"]
+ ],
+ chart:[
+  ["三座葛萊美獎","2000 年第 42 屆（普羅高菲夫第 1、3 號與巴爾托克第 3 號協奏曲，杜特華／蒙特婁，EMI——此張不在本套裝內）"],
+  ["","2005 年第 47 屆最佳室內樂演出（普羅高菲夫《灰姑娘》雙鋼琴組曲與拉威爾《鵝媽媽》，與普雷特涅夫 —— 本套裝 CD 40）"],
+  ["","2006 年第 48 屆最佳器樂獨奏（協奏）演出（貝多芬第 2、3 號鋼琴協奏曲，阿巴多／馬勒室內樂團 —— 本套裝 CD 36）"],
+  ["提名紀錄","生涯累計 3 座得獎、20 項提名（Grammy 官方資料庫）"]
+ ],
+ awards:[
+  ["1957 · 十六歲雙冠","同年拿下波札諾布梭尼大賽與日內瓦國際音樂大賽首獎"],
+  ["1965 · 華沙蕭邦大賽","第七屆首獎，並獲最佳馬祖卡演奏獎（不是「樂評人獎」，這是常見的誤傳）"],
+  ["2012 · Gramophone 名人堂","首屆五十人名單之一"],
+  ["2016 · 甘迺迪中心榮譽獎","第 39 屆得主，同屆包括 The Eagles、Al Pacino、James Taylor"],
+  ["2002–2016 · 盧加諾「阿格麗希計畫」","她主持的音樂節，2016 年 6 月因主要贊助商撤資舉行最後一屆"]
+ ],
+ legacy:`這套唱片的歷史位置很特殊：它不是「一位鋼琴家的錄音全集」，而是「一位鋼琴家在環球體系內的錄音全集」。她在 EMI／Warner 留下的許多名演——包括 1965 年那批蕭邦、1999 年的蕭邦兩首協奏曲——都不在裡面。48 這個數字很容易讓人忽略這件事。
+
+但即使有這個缺口，它仍是理解阿格麗希最完整的單一入口，理由是那個比例。八成以上不是獨奏，而且獨奏集中在前二十三年。這個結構把一個通常被講成「技巧神話」的故事，改寫成一個關於選擇的故事：一位公認的世紀技巧型演奏家，在四十出頭主動離開了獨奏會的舞台，然後用三十年去和別人一起彈。
+
+另一個值得記的是它的對照價值。同一首曲子在這套裡反覆出現——柴可夫斯基第 1 號三次、拉威爾 G 大調兩次、巴爾托克《雙鋼琴與打擊奏鳴曲》兩次、拉威爾《鵝媽媽》兩次、《克羅采》兩次（不同的小提琴家）。對一般聽眾這是冗餘，對想理解「即興與危險感」到底是什麼意思的人，這是最好的實驗材料。
+
+2026 年 4 月 DG 重新發行了這套，所以它現在不是絕版品。`
+},
+
+/* ── 7 脈絡與影響網絡 ── */
+context:{
+ era:`要理解這套唱片，先要理解 1960 年代的鋼琴市場長什麼樣子。
+
+那是一個獨奏家至上的年代。霍洛維茲、魯賓斯坦、李希特、顧爾德——大家期待的是一個人坐在台上，把觀眾征服。阿格麗希 1965 年蕭邦大賽奪冠時，市場給她的劇本很清楚：她會是下一個。她的技術條件也完全符合——1960 年那張首演專輯裡的普羅高菲夫《觸技曲》，十九歲，速度與清晰度已經到了幾乎沒有人做得到的程度。
+
+然後她拒絕了這個劇本。1983 年之後她不再錄獨奏專輯，1980 年代起也幾乎不開純獨奏會。取而代之的是三十年的室內樂與協奏曲。這在當時是很反常的選擇——室內樂的市場地位遠低於獨奏，唱片公司不會鼓勵。
+
+而她這個選擇後來變成了某種預告。1990 年代之後，室內樂在古典樂界的地位明顯上升，音樂節文化興起，「音樂家共同體」的模式取代了「大師巡演」的模式。她 2002 年創辦的盧加諾「阿格麗希計畫」正是這個轉向的典型：一群音樂家在一個地方待兩三週，排出誰也不知道會變成什麼樣的節目，資深帶新人。
+
+所以這 48 張唱片同時是兩份文件：一位鋼琴家的作品目錄，以及古典音樂表演文化從「獨奏會」轉向「合作」的一份側面紀錄。`,
+ timeline:[
+  ["1941-06-05","生於布宜諾斯艾利斯","三歲接觸鋼琴，五歲起師事 Vincenzo Scaramuzza"],
+  ["1949 前後","首度與樂團合作","約八歲，在布宜諾斯艾利斯演出協奏曲"],
+  ["1955","舉家遷往維也納","父親取得外交職位，目的是讓她能跟 Friedrich Gulda 學琴"],
+  ["1957","十六歲雙冠","同年拿下波札諾布梭尼大賽與日內瓦國際音樂大賽首獎"],
+  ["1959-01-26","本套裝最早的一軌","柏林 RIAS 第七錄音室，蕭邦第 1 號敘事曲（CD 48）。她十七歲"],
+  ["1960-07","首張 DG 專輯錄音","漢諾威。CD 1，1961 年發行"],
+  ["1965-03","華沙蕭邦大賽首獎","第七屆，並獲最佳馬祖卡演奏獎。時年 23 歲"],
+  ["1967","與阿巴多的第一次","普羅高菲夫第 3 號＋拉威爾 G 大調（CD 3）。這段合作將持續四十六年"],
+  ["1974–77","獨奏黃金期","《夜之加斯巴》（CD 8）、蕭邦前奏曲全集（CD 9）陸續誕生"],
+  ["1983-04","最後一張錄音室獨奏專輯","舒曼《兒時情景／克萊斯勒魂》（CD 18），慕尼黑錄音，1984 年發行"],
+  ["1980s–90s","轉向室內樂","與克萊曼、麥斯基深耕二重奏，構成本套裝 CD 19–39 的主體"],
+  ["2002","創辦盧加諾「阿格麗希計畫」","CD 44–47 收錄 2002–2010 年的協奏曲實況"],
+  ["2005","第 47 屆葛萊美","與普雷特涅夫的《灰姑娘》雙鋼琴（CD 40）"],
+  ["2006","第 48 屆葛萊美","與阿巴多的貝多芬第 2、3 號（CD 36）"],
+  ["2012","入選首屆 Gramophone 名人堂","五十人名單之一"],
+  ["2013-03","與阿巴多最後一次錄音","琉森，莫札特 K503 與 K466（CD 42）。阿巴多隔年 1 月過世"],
+  ["2014-04-19","本套裝最後一筆錄音","柏林愛樂廳，與巴倫波因的雙鋼琴（CD 43）"],
+  ["2015-09","48CD 套裝發行","附 150 頁解說冊"],
+  ["2016","盧加諾計畫最後一屆","主要贊助商撤資"],
+  ["2016","甘迺迪中心榮譽獎","第 39 屆"],
+  ["2026-04","DG 重新發行","這套並非絕版限量品"]
+ ],
+ influencedBy:[
+  ["Friedrich Gulda","Beethoven: The Piano Sonatas","1955 年舉家遷歐就是為了跟他學琴"],
+  ["Arturo Benedetti Michelangeli","Debussy: Images","十八個月只上了四堂課。他說「我教會她沉默的天分」"],
+  ["Vladimir Horowitz","Horowitz in Moscow","戰後鋼琴超技傳統的參照點"],
+  ["Dinu Lipatti","Chopin: Waltzes","她的老師之一是李帕第的遺孀 Madeleine Lipatti"]
+ ],
+ influenced:[
+  ["Yuja Wang","Ravel / Prokofiev: Piano Concertos","2016 年甘迺迪中心榮譽獎上以皮亞佐拉向她致敬"],
+  ["Khatia Buniatishvili","Rachmaninoff: Piano Concerto No. 2","新一代「危險感」路線的直系"],
+  ["Gabriela Montero","Bach: The Jazz Album","盧加諾計畫提攜的音樂家之一"],
+  ["Sergio Tiempo","Legacy","盧加諾計畫的常客，阿根廷同鄉"]
+ ],
+ covers:[
+  ["Martha Argerich / Nelson Freire","Bartók: Sonata for Two Pianos and Percussion","CD 31 —— 與 CD 11 柯瓦謝維契版的同曲對照"],
+  ["Martha Argerich / Mikhail Pletnev","Ravel: Ma Mère l'Oye","CD 40 —— 與 CD 31 弗雷瑞版的同曲對照"],
+  ["Martha Argerich / Vadim Repin","Beethoven: Kreutzer Sonata","CD 35 —— 與 CD 33 克萊曼版的同曲對照"]
+ ]
+},
+
+/* ── 8 版本／音質指南 ── */
+versions:[
+ {name:"本套裝：DG 48CD（4794647）", year:"2015 / 2026 再版", source:"原始封面復刻 · 150 頁解說冊",
+  note:"她在 DG 與 Philips 的全部錄音。要一次擁有 1959–2014 的完整脈絡，這是唯一選擇。2026 年 4 月 DG 已再版，不是絕版品。", rec:5},
+ {name:"Warner／EMI 系列（單張與盒裝）", year:"—", source:"另一個廠牌體系",
+  note:"她的 EMI 錄音完全不在本套裝內，包括 1965 年那批蕭邦與 1999 年的蕭邦兩首協奏曲。想聽「另一半的阿格麗希」必須另外找。", rec:5},
+ {name:"《The Lugano Recordings》22CD（Warner）", year:"2002–2016", source:"盧加諾室內樂系列",
+  note:"與本套裝 CD 44–47 是兩條不同的線：DG 收的是協奏曲（2002–2010），Warner 這套收的是室內樂，一路到 2016 年最後一屆。互補而非重複。", rec:4},
+ {name:"單張再版（如《Argerich plays Chopin》4777557）", year:"2010", source:"CD 48 的原始發行",
+  note:"如果只想要那批 1959／1967 年的單聲道廣播錄音，可以單買這張，不必為它買整套。", rec:4},
+ {name:"串流（Apple Music / Spotify / IDAGIO）", year:"—", source:"數位",
+  note:"48 張全部上架，且分成原本的單張專輯。實務上串流反而比實體好用——你可以直接跳到想聽的那張，不必在盒子裡翻。IDAGIO 的古典分類最適合這種曲目導向的瀏覽。", rec:5},
+ {name:"原始 LP（1960–80 年代 DG）", year:"—", source:"類比黑膠",
+  note:"本套裝的紙套復刻的就是這些封面。原版黑膠在二手市場價格差異極大，音質也隨壓片批次不同。收藏取向，不是聆聽取向。", rec:3}
+],
+versionsNote:`實務建議：如果你只是想聽，串流就夠了——48 張全部上架，而且保留了原本的單張專輯切分，比實體盒裝好操作。實體版的價值在那本 150 頁解說冊與原始封面復刻，那是資料與收藏的價值。
+
+要注意的是這套的錄音年代橫跨五十五年，音質不可能一致。1959 與 1967 年的 CD 48 是單聲道；1960 到 1980 年代的類比錄音是 DG 那個年代的典型聲底（中頻厚、堂音適中）；1990 年代之後轉數位；盧加諾那四張是音樂節實況，水準與錄音室作品不在同一個層級。不要用同一套標準去期待。
+
+最後一件事：這不是「阿格麗希全集」。她在 EMI／Warner 的錄音完全不在裡面。如果你聽完覺得意猶未盡，下一步不是找更多 DG，是去找 EMI。`,
+
+/* ── 9 聆聽路線圖 ── */
+roadmap:[
+ {title:"第一次聽 · 三張就好", body:"不要從 CD 1 開始按順序聽。先聽三張：CD 3（普羅高菲夫第 3 號＋拉威爾 G 大調，能量）、CD 8（拉威爾《夜之加斯巴》，色彩與技術）、CD 18（舒曼《兒時情景／克萊斯勒魂》，內省與雙重性格）。這三張建立起對「速度＋色彩」的完整印象，也剛好是她獨奏生涯的三個座標。"},
+ {title:"第二次聽 · 走合作者這條線", body:"以夥伴為索引，一次聽一個人：阿巴多（CD 3、4、30、36、42）、克萊曼（CD 20、24、25、26、28、32、33）、麥斯基（CD 19、21、27、29、35、37、39）、弗雷瑞與巴倫波因（CD 15、31、41、43）。她在不同人面前是不同的鋼琴家，這是整套最有價值的觀察。"},
+ {title:"第三次聽 · 同曲異演的對照實驗", body:"這套裡有大量重複曲目，而那正是它的隱藏價值。四組最值得比：① 巴爾托克《雙鋼琴與打擊奏鳴曲》—— CD 11（柯瓦謝維契）對 CD 31（弗雷瑞）；② 《克羅采》—— CD 33（克萊曼）對 CD 35（列賓）；③ 拉威爾 G 大調協奏曲 —— CD 3（柏林愛樂）對 CD 4（倫敦交響）；④ 柴可夫斯基第 1 號 —— CD 5、16、30 三個版本。"},
+ {title:"進階 · 四十六年的兩端", body:"CD 3（1967，普羅高菲夫第 3 號，阿巴多／柏林愛樂）與 CD 42（2013，莫札特 K466／K503，阿巴多／莫札特管弦樂團）連著聽。同一位鋼琴家、同一位指揮，中間隔了四十六年，而且後者是兩人最後一次合作。這是整套最有分量的一組對照。"},
+ {title:"史料 · 從最後一張倒著開始", body:"CD 48 的第一軌錄於 1959 年 1 月 26 日，柏林 RIAS，她十七歲。那是整套 48 張裡最早的一筆錄音，比封面標示的 1960 還早一年。單聲道、音質乾淨。先聽它，再聽 CD 1（1960 年的首演專輯），你會聽到一年之間的差別。"},
+ {title:"情境 · 音量 · 訊源", body:"這套的動態範圍與錄音年代都不一致，不適合設一個音量從頭聽到尾。獨奏專輯（CD 1–9、13、18）適合安靜環境與耳機；協奏曲與雙鋼琴適合喇叭；CD 48 的單聲道用耳機聽細節最好。48 張總長超過五十小時，不要試圖照順序聽完——這套唱片的設計本來就是給人挑著聽的。"}
+],
+
+/* ── 10 視覺與實體 ── */
+physical:{
+ "包裝形式":"48 張 CD 各自裝在原始 LP 封面復刻的紙套裡，連原版黑膠背面的三語解說都縮印在紙套背面。這是 DG 這類全集套裝的標準做法，但對這套特別有意義——它同時是一部 DG 封面設計史的縮影，從 1960 年代的手繪與人像攝影一路到 2010 年代的極簡。",
+ "解說冊":"150 頁，收錄 Fred Münzmaier 為這套專門繪製的素描系列，以及 Gregor Willmes 撰寫的新樂評。（網路上流傳的「154 頁」查不到出處，官方文案寫的是 150 頁。）",
+ "是否限量":"Discogs 的格式欄標記 Limited Edition，但 DG 自家文案從未使用限量或編號字樣，而且 DG 官方商店已於 2026 年 4 月 17 日重新發行同樣的 48CD。把它當成常態品項比較準確。",
+ "目錄編號":"完整編號為 00289 479 4647，零售端多寫成 4794647，條碼 0028947946472。",
+ "查證管道":"Discogs 的 release 8907525 有官方釋出的逐軌曲目與封面圖庫，是目前最可靠的公開資料來源；DG 官方商店頁面則有包裝與解說冊的正式描述。"
+},
+
+/* ── 影音延伸 ── */
+videos:[
+ {kind:"訪談", title:"Martha Argerich, in her own words（2019 訪談，附英文字幕）", by:"Argerich Vault",
+  url:"https://www.youtube.com/watch?v=xj3QJqIBI9M",
+  note:"她極少受訪，這支是少數她本人完整說話的紀錄。想認識這個人而不只是這雙手，從這裡開始。"},
+ {kind:"紀錄片", title:"Bloody Daughter — 由女兒 Stéphanie Argerich 執導", by:"EuroArts 官方頻道",
+  url:"https://www.youtube.com/watch?v=CHWYofrfPak",
+  note:"最貼身的視角：母親、鋼琴家、傳奇之間的真實面貌。由她自己的女兒拍攝，這個位置沒有別人能取代。"},
+ {kind:"演出紀錄", title:"Martha Argerich and Daniel Barenboim — 雙鋼琴音樂會", by:"EuroArts 官方頻道",
+  url:"https://www.youtube.com/watch?v=l7GtXZTrKJc",
+  note:"2014 年 4 月 19 日柏林愛樂廳，正是本套裝 CD 43 的同一場演出。看得到聽不到的部分：兩個七十多歲的人怎麼看對方。"},
+ {kind:"技巧分析", title:"Martha Argerich's secret piano technique", by:"Ugnius.Pianist",
+  url:"https://www.youtube.com/watch?v=xdc7oLPfrtM",
+  note:"從演奏技術角度拆解她的手型與觸鍵。看懂「怎麼辦到的」，再回頭聽 CD 1 的普羅高菲夫《觸技曲》會不一樣。"},
+ {kind:"新聞紀錄", title:"Martha Argerich at the 2016 Kennedy Center Honors", by:"Altenburg Arts",
+  url:"https://www.youtube.com/watch?v=84pNihZY3vg",
+  note:"第 39 屆甘迺迪中心榮譽獎現場。王羽佳以皮亞佐拉《Grand Tango》向她致敬。"},
+ {kind:"新聞紀錄", title:"Martha Argerich honored at 2016 Kennedy Center Honors", by:"WTOP News",
+  url:"https://www.youtube.com/watch?v=VNW3W6oY5yM",
+  note:"同一場的新聞報導版本，較短。"},
+ {kind:"樂評導讀", title:"Dave's Classical Guide — 阿格麗希十大錄音", by:"David Hurwitz（ClassicsToday 創辦人）",
+  q:"Dave's Classical Guide Martha Argerich ten best recordings",
+  note:"逾五千支影片的古典樂評頻道，多次深談她的錄音優劣，直言不諱。他的「十大錄音」影片評論可以當本套裝的選片參考。"},
+ {kind:"分析導讀", title:"tonebase Piano 的阿格麗希分析", q:"tonebase piano Martha Argerich analysis technique",
+  note:"茱莉亞名師群的鋼琴教育平台，從手型、觸鍵、重複音技巧等角度剖析大師，多支影片以她為分析對象。"},
+ {kind:"串流平台", title:"medici.tv 的阿格麗希專頁", q:"medici tv Martha Argerich",
+  note:"收錄她的音樂會實況、紀錄片與大師班影像。要看「現場的阿格麗希」，這是最完整的入口（需訂閱）。"}
+],
+
+/* ── 11 延伸聆聽 ── */
+further:[
+ {artist:"Martha Argerich", album:"Chopin: Piano Concertos 1 & 2 (EMI, 1999)", why:"不在本套裝內。她在另一個廠牌體系的代表作之一"},
+ {artist:"Martha Argerich", album:"The Lugano Recordings", why:"Warner 的 22CD，收錄 2002–2016 的盧加諾室內樂，與本套裝 CD 44–47 互補"},
+ {artist:"Martha Argerich", album:"Prokofiev & Bartók: Piano Concertos (Dutoit)", why:"為她拿下 2000 年葛萊美的那張，EMI 發行，不在本套裝內"},
+ {artist:"Claudio Abbado", album:"Beethoven: Symphonies (Berliner Philharmoniker)", why:"整套裡出現最多次的那位指揮，聽聽他自己的代表作"},
+ {artist:"Gidon Kremer", album:"Piazzolla: Hommage à Piazzolla", why:"CD 20–33 那位小提琴家在自己的曲目版圖上做了什麼"},
+ {artist:"Mischa Maisky", album:"Bach: Cello Suites", why:"另一位長期夥伴的獨奏代表作"},
+ {artist:"Nelson Freire", album:"Chopin: Nocturnes", why:"與她相識超過半世紀的巴西摯友，2021 年過世"},
+ {artist:"Yuja Wang", album:"The Berlin Recital", why:"下一代裡最常被拿來與她比較的人"}
+],
+
+/* ── 12 資料來源 ── */
+sources:[
+ {title:"Discogs — 本套裝 release 8907525（逐軌曲目與 credits）", url:"https://www.discogs.com/release/8907525-Martha-Argerich-The-Complete-Recordings-On-Deutsche-Grammophon"},
+ {title:"Deutsche Grammophon 官方商店 — 套裝頁（包裝、解說冊、再版資訊）", url:"https://store.deutschegrammophon.com/en-en/products/martha-argerich-the-complete-recordings-on-dg-114442"},
+ {title:"Walter Bitner — 本套裝最完整的開箱長文（2017）", url:"https://walterbitner.com/2017/08/11/martha-argerich-the-complete-recordings-on-deutsche-grammophon/"},
+ {title:"AllMusic — 套裝專頁", url:"https://www.allmusic.com/album/the-complete-recordings-on-deutsche-grammophon-mw0002868038"},
+ {title:"Grammy 官方 — Martha Argerich 得獎與提名紀錄", url:"https://www.grammy.com/artists/martha-argerich/81"},
+ {title:"Wikipedia — Martha Argerich", url:"https://en.wikipedia.org/wiki/Martha_Argerich"},
+ {title:"Wikipedia — 第七屆國際蕭邦鋼琴大賽（1965）", url:"https://en.wikipedia.org/wiki/VII_International_Chopin_Piano_Competition"},
+ {title:"柏林愛樂 — 人物特寫〈La Martha〉（語錄出處）", url:"https://www.berliner-philharmoniker.de/en/stories/martha-argerich-portrait/"},
+ {title:"Presto Music — Argerich plays Chopin（CD 48 逐軌錄音日期與地點）", url:"https://www.prestomusic.com/classical/products/7984797--argerich-plays-chopin"},
+ {title:"ClassicsToday — David Hurwitz「阿格麗希十大錄音」", url:"https://www.classicstoday.com/review/martha-argerichs-10-best-recordings-video-review/"},
+ {title:"BBC Classical Music — Martha Argerich: goddess of the piano", url:"https://www.classical-music.com/features/artists/martha-argerich-2"},
+ {title:"Pianist Magazine — 盧加諾計畫 2016 年最後一屆", url:"https://www.pianistmagazine.com/news/argerich-in-lugano-2016/"},
+ {title:"Wikipedia — Gramophone Hall of Fame", url:"https://en.wikipedia.org/wiki/Gramophone_Hall_of_Fame"},
+ {title:"Interlude — 阿格麗希五大傳奇演出", url:"https://interlude.hk/five-of-the-greatest-martha-argerich-performances/"}
+]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   渲染引擎 —— 以下不需要修改
+   ═══════════════════════════════════════════════════════════════ */
+const E = s => String(s==null?'':s);
+const has = x => Array.isArray(x) ? x.length>0 : (x && Object.keys(x).length>0);
+const amURL = t => 'https://music.apple.com/tw/search?term=' + encodeURIComponent(t);
+const ytURL = t => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(t);
+const P = txt => E(txt).split(/\n\s*\n/).map(x=>`<p>${x.trim()}</p>`).join('');
+
+document.title = `${D.album} · 深度導聆`;
+
+const SEC = [];
+function sec(id, zh, en, html){ if(html) SEC.push({id, zh, en, html}); }
+
+/* 1 · 錄音製作全紀錄 */
+sec('production','錄音製作全紀錄','Production', D.production ? `<div class="prose">${P(D.production)}</div>` : '');
+
+/* 2 · 深度樂評 */
+sec('review','深度樂評','Critique', D.review ? `<div class="prose">${P(D.review)}</div>` : '');
+
+/* 3 · 逐曲導聆 */
+sec('tracks','逐曲導聆','Track by Track', has(D.tracks) ? D.tracks.map((t,i)=>`
+  <div class="trk" data-i="${i}">
+    <div class="trkhead">
+      <span class="tn">${t.n||i+1}</span>
+      <span class="tt"><b>${E(t.title)}</b>${t.writer?`<span>${E(t.writer)}</span>`:''}</span>
+      <span class="tlen">${E(t.len)}</span>
+      <span class="tcar">▶</span>
+    </div>
+    <div class="trkbody">
+      ${t.note?P(t.note):''}
+      ${has(t.cues)?`<div class="cues">${t.cues.map(c=>`<div class="cue"><b>${E(c[0])}</b><span>${E(c[1])}</span></div>`).join('')}</div>`:''}
+      ${t.personnel?`<div class="tmeta"><b>編制：</b>${E(t.personnel)}</div>`:''}
+    </div>
+  </div>`).join('') : '');
+
+/* 4 · 人物誌 */
+sec('people','人物誌 · 作曲家／演奏家／主唱','People', has(D.people) ? `<div class="people">${
+  D.people.map(p=>`
+  <div class="pcard">
+    <div class="prole">${E(p.role)}</div>
+    <div class="pname">${E(p.name)}</div>
+    <div class="plife">${E(p.life)}</div>
+    ${p.bio?P(p.bio):''}
+    ${p.here?`<div class="phere"><b style="color:var(--accent)">在這張專輯裡 · </b>${E(p.here)}</div>`:''}
+    ${has(p.key)?`<div class="pkey">${p.key.map(k=>`<a href="${amURL(p.name+' '+k[0])}" target="_blank" rel="noopener">${E(k[0])}${k[1]?` · ${k[1]}`:''}</a>`).join('')}</div>`:''}
+  </div>`).join('')}</div>` : '');
+
+/* 5 · 完整 Credits */
+sec('credits','完整 Credits','Credits', has(D.credits) ?
+  `<dl class="kv">${D.credits.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl>` : '');
+
+/* 6 · 評價與歷史地位 */
+let recHTML = '';
+if(has(D.reception)){
+  const R = D.reception;
+  if(has(R.scores)) recHTML += `<div class="tblwrap"><table class="tbl"><thead><tr><th>來源</th><th>評價</th></tr></thead><tbody>${
+    R.scores.map(s=>`<tr><td>${E(s[0])}</td><td>${E(s[1])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(has(R.chart)) recHTML += `<div style="margin-top:16px"><dl class="kv">${
+    R.chart.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl></div>`;
+  if(has(R.awards)) recHTML += `<div style="margin-top:16px" class="cards">${
+    R.awards.map(a=>`<div class="nc"><b>${E(a[0])}</b><span>${E(a[1])}</span></div>`).join('')}</div>`;
+  if(R.legacy) recHTML += `<div class="prose" style="margin-top:20px">${P(R.legacy)}</div>`;
+}
+sec('reception','評價與歷史地位','Reception & Legacy', recHTML);
+
+/* 7 · 脈絡與影響網絡 */
+let ctxHTML = '';
+if(has(D.context)){
+  const C = D.context;
+  if(C.era) ctxHTML += `<div class="prose">${P(C.era)}</div>`;
+  if(has(C.timeline)) ctxHTML += `<div class="tl" style="margin-top:22px">${
+    C.timeline.map(t=>`<div class="tlitem"><div class="ty">${E(t[0])}</div><b>${E(t[1])}</b><span>${E(t[2])}</span></div>`).join('')}</div>`;
+  const grp = (title, arr) => has(arr) ? `<div style="margin-top:24px">
+    <div style="font-size:11px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase;margin-bottom:9px">${title}</div>
+    <div class="cards">${arr.map(x=>`<a href="${amURL(x[0]+' '+(x[1]||''))}" target="_blank" rel="noopener">
+      <b>${E(x[1]||x[0])}</b><span>${E(x[1]?x[0]:'')}${x[2]?` — ${E(x[2])}`:''}</span></a>`).join('')}</div></div>` : '';
+  ctxHTML += grp('影響了這張的作品', C.influencedBy);
+  ctxHTML += grp('被這張影響的作品', C.influenced);
+  ctxHTML += grp('翻唱 · 取樣 · 引用', C.covers);
+}
+sec('context','脈絡與影響網絡','Context & Influence', ctxHTML);
+
+/* 8 · 版本／音質指南 */
+sec('versions','版本／音質指南','Editions & Sound', has(D.versions) ? `<div class="tblwrap">
+  <table class="tbl"><thead><tr><th>版本</th><th>年份</th><th>母帶／載體</th><th>說明</th><th>推薦</th></tr></thead>
+  <tbody>${D.versions.map(v=>`<tr>
+    <td><b style="color:var(--txt)">${E(v.name)}</b></td><td>${E(v.year)}</td>
+    <td>${E(v.source)}</td><td>${E(v.note)}</td>
+    <td class="rec">${'★'.repeat(v.rec||0)}${'☆'.repeat(Math.max(0,5-(v.rec||0)))}</td></tr>`).join('')}
+  </tbody></table></div>${D.versionsNote?`<div class="prose" style="margin-top:18px">${P(D.versionsNote)}</div>`:''}` : '');
+
+/* 9 · 聆聽路線圖 */
+sec('roadmap','聆聽路線圖','How to Listen', has(D.roadmap) ? `<div class="road">${
+  D.roadmap.map((r,i)=>`<div class="rstep"><div class="rnum">${i+1}</div>
+    <div><b>${E(r.title)}</b><p>${E(r.body)}</p></div></div>`).join('')}</div>` : '');
+
+/* 10 · 視覺與實體 */
+sec('physical','視覺與實體','Artwork & Object', has(D.physical) ?
+  `<dl class="kv">${Object.entries(D.physical).map(([k,v])=>`<dt>${E(k)}</dt><dd>${E(v)}</dd>`).join('')}</dl>` : '');
+
+/* 11 · 影音延伸 —— 介紹、紀錄片、訪談；不是聽音樂的連結 */
+sec('videos','影音延伸','Watch', has(D.videos) ? `
+  <div class="vnote">以下都是「認識這張唱片」的影音資料——官方介紹、紀錄片、分析與訪談，不是拿來聽音樂的。
+  標示「搜尋」的項目會帶你到 YouTube 的搜尋結果頁（影片會下架、網址會失效，用搜尋比較耐放）。</div>
+  <div class="vids">${D.videos.map(v=>`
+    <a class="vid" href="${v.url ? E(v.url) : ytURL(v.q || (D.artist+' '+D.album))}" target="_blank" rel="noopener">
+      <div class="vtop">
+        <span class="vkind">${E(v.kind||'影片')}</span>
+        ${v.url ? '' : '<span class="vsearch">搜尋</span>'}
+        ${v.len ? `<span class="vlen">${E(v.len)}</span>` : ''}
+      </div>
+      <b>${E(v.title)}</b>
+      ${v.by ? `<span class="vby">${E(v.by)}</span>` : ''}
+      ${v.note ? `<span class="vnt">${E(v.note)}</span>` : ''}
+    </a>`).join('')}</div>` : '');
+
+/* 12 · 延伸聆聽 */
+sec('further','延伸聆聽','Go Deeper', has(D.further) ? `<div class="cards">${
+  D.further.map(f=>`<a href="${amURL(f.artist+' '+f.album)}" target="_blank" rel="noopener">
+    <b>${E(f.album)}</b><span>${E(f.artist)}${f.why?`<br>${E(f.why)}`:''}</span></a>`).join('')}</div>` : '');
+
+/* 13 · 資料來源 */
+sec('sources','資料來源','Sources', has(D.sources) ? `<div class="srcs">${
+  D.sources.map(s=>s.url?`<a href="${E(s.url)}" target="_blank" rel="noopener">${E(s.title)}</a>`:E(s.title)).join(' · ')}</div>` : '');
+
+/* ---------- HERO ---------- */
+const heroHTML = `
+  ${D.backLink!==false?`<a class="back" href="${E(D.backLink||'../index.html')}">← 回專輯推薦</a>`:''}
+  <div class="hero">
+    <div class="hart" id="hart"><div class="ph">${E(D.album).slice(0,2)}</div></div>
+    <div class="hmeta">
+      <div class="kicker">深度導聆 · Deep Listening</div>
+      <h1>${E(D.album)}</h1>
+      <div class="who">${E(D.artist)}</div>
+      <div class="yl">${E(D.year)}${D.label?` · ${E(D.label)}`:''}${D.catalog?` · ${E(D.catalog)}`:''}</div>
+      <div class="chips">
+        ${D.genre?`<span class="chip g">${E(D.genre)}</span>`:''}
+        ${(D.styles||[]).map(s=>`<span class="chip">${E(s)}</span>`).join('')}
+        ${(D.moods||[]).map(s=>`<span class="chip c">${E(s)}</span>`).join('')}
+      </div>
+      <div class="btns">
+        <a class="btn am" href="${amURL(D.itunesTerm || (D.artist+' '+D.album))}" target="_blank" rel="noopener">▶ 在 Apple Music 聽</a>
+        ${has(D.videos)?`<a class="btn yt" href="#videos">▶ 影音延伸 · ${D.videos.length}</a>`:''}
+        ${D.wiki?`<a class="btn" href="${E(D.wiki)}" target="_blank" rel="noopener">Wikipedia</a>`:''}
+      </div>
+    </div>
+  </div>
+  ${D.tagline?`<div class="tagline">${E(D.tagline)}</div>`:''}
+  ${has(D.facts)?`<dl class="facts">${D.facts.map(f=>`<div><dt>${E(f[0])}</dt><dd>${E(f[1])}</dd></div>`).join('')}</dl>`:''}`;
+
+document.getElementById('main').innerHTML = heroHTML + SEC.map((s,i)=>`
+  <section id="${s.id}">
+    <div class="shead"><span class="snum">${String(i+1).padStart(2,'0')}</span>
+      <h2>${s.zh}</h2><span class="sen">${s.en}</span></div>
+    ${s.html}
+  </section>`).join('') + `
+  <footer><span>${E(D.artist)} — ${E(D.album)}</span><span>由 Claude 整理 · ${E(D.compiled||'')}</span></footer>`;
+
+document.getElementById('toc').innerHTML = SEC.map(s=>`<a href="#${s.id}">${s.zh.split(' · ')[0]}</a>`).join('');
+
+/* 逐曲展開 */
+document.querySelectorAll('.trkhead').forEach(h=>{
+  h.onclick = ()=> h.parentElement.classList.toggle('open');
+});
+
+/* 目錄高亮 */
+const links = [...document.querySelectorAll('#toc a')];
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-10% 0px -75% 0px'});
+SEC.forEach(s=>{ const el=document.getElementById(s.id); if(el) obs.observe(el); });
+
+/* 封面：iTunes Search API（JSONP，可在 file:// 直接跑） */
+(function(){
+  if(D.cover){ document.getElementById('hart').innerHTML = `<img src="${D.cover}" alt="">`; return; }
+  const cb = '__amcb1';
+  const s = document.createElement('script');
+  window[cb] = j => {
+    const r = (j.results||[])[0];
+    if(r && r.artworkUrl100)
+      document.getElementById('hart').innerHTML =
+        `<img src="${r.artworkUrl100.replace('100x100bb','1000x1000bb')}" alt="">`;
+    s.remove(); delete window[cb];
+  };
+  s.src = `https://itunes.apple.com/search?term=${encodeURIComponent(D.itunesTerm||(D.artist+' '+D.album))}`
+        + `&entity=album&media=music&limit=1&country=tw&callback=${cb}`;
+  s.onerror = ()=>{ s.remove(); };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>
