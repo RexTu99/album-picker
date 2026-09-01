@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今天聽這張 · 專輯推薦</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#14131a; --card:#1a1922; --line:#2a2833; --line2:#3a3747;
+    --txt:#ece9f2; --dim:#9b95ab; --dim2:#6f6a7d;
+    --accent:#fa4b6e; --accent2:#ffb26b; --gold:#e8c27a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(250,75,110,.14), transparent 60%),
+      radial-gradient(700px 500px at 0% 100%, rgba(120,110,255,.12), transparent 60%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.75; min-height:100vh;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 22px 90px}
+
+  header{margin-bottom:26px}
+  .kicker{font-size:12px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+  h1{font-size:31px;letter-spacing:-.01em;margin:8px 0 6px;font-weight:700}
+  .sub{color:var(--dim);font-size:14.5px;max-width:640px}
+
+  .tabs{display:flex;gap:8px;margin:26px 0 22px;flex-wrap:wrap}
+  .tab{
+    background:var(--card);border:1px solid var(--line);color:var(--dim);
+    padding:9px 17px;border-radius:999px;font-size:14px;cursor:pointer;
+    transition:.18s; font-family:inherit;
+  }
+  .tab:hover{color:var(--txt);border-color:#3d3a4a}
+  .tab.on{background:var(--txt);color:#12111a;border-color:var(--txt);font-weight:600}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:16px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    cursor:pointer;transition:.2s;
+  }
+  .card:hover{transform:translateY(-3px);border-color:#453f58;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+  .art{aspect-ratio:1;background:#211f2b;position:relative;overflow:hidden}
+  .art img{width:100%;height:100%;object-fit:cover;display:block}
+  .art .ph{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:800;color:rgba(255,255,255,.22);letter-spacing:-.03em;
+  }
+  .card .del{
+    position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.18);background:rgba(12,11,16,.72);color:#cfc9dc;
+    font-size:12px;line-height:1;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:scale(.85);transition:.16s;backdrop-filter:blur(6px);
+  }
+  .card:hover .del{opacity:1;transform:none}
+  .card .del:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  @media(hover:none){ .card .del{opacity:1;transform:none} }
+  .card .meta{padding:11px 12px 13px}
+
+  .hiddenbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    font-size:12.5px;color:var(--dim2);margin:0 0 16px}
+  .hiddenbar:empty{display:none}
+
+  /* ---------- 批次選取 ---------- */
+  .toolrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .toolrow .count{margin:0;flex:1;min-width:140px}
+  #selBtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  .card.picking{cursor:pointer}
+  .card.picking .art::after{content:'';position:absolute;inset:0;background:rgba(10,9,14,.35);
+    opacity:0;transition:.16s}
+  .card.picking:hover .art::after{opacity:1}
+  .card.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 14px 34px rgba(250,75,110,.28)}
+  .card.sel .art::after{opacity:1}
+  .pick{position:absolute;top:8px;left:8px;z-index:2;width:24px;height:24px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.55);background:rgba(12,11,16,.6);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+  .card.sel .pick{background:var(--accent);border-color:var(--accent)}
+
+  .bulkbar{position:sticky;bottom:14px;z-index:20;margin-top:22px;
+    display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+    background:rgba(22,21,29,.94);backdrop-filter:blur(14px);
+    border:1px solid var(--line2);border-radius:16px;padding:12px 16px;
+    box-shadow:0 16px 44px rgba(0,0,0,.6)}
+  .bulkbar:empty{display:none}
+  .bulkbar .n{font-size:13.5px;font-weight:700;color:var(--txt);margin-right:4px}
+  .bulkbar .n em{color:var(--accent);font-style:normal;font-size:16px}
+  .bulkbar .sp{flex:1;min-width:8px}
+  .bbtn{background:var(--card);border:1px solid var(--line2);color:var(--dim);border-radius:10px;
+    padding:8px 14px;font-size:12.5px;cursor:pointer;font-family:inherit;transition:.16s;white-space:nowrap}
+  .bbtn:hover{color:var(--txt);border-color:var(--dim2)}
+  .bbtn:disabled{opacity:.38;cursor:default}
+  .bbtn:disabled:hover{color:var(--dim);border-color:var(--line2)}
+  .bbtn.primary{background:var(--txt);color:#12111a;border-color:var(--txt);font-weight:650}
+  .bbtn.primary:hover{color:#12111a}
+  .bbtn.danger{border-color:rgba(255,90,90,.4);color:#ff7a7a}
+  .bbtn.danger:hover:not(:disabled){background:#ff5a5a;border-color:#ff5a5a;color:#fff}
+  @media(max-width:560px){ .bulkbar{gap:6px;padding:10px 12px} .bbtn{padding:7px 11px;font-size:12px} }
+
+  .dbtn{
+    display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13.5px;
+    padding:10px 17px;border-radius:999px;cursor:pointer;transition:.18s;
+    background:transparent;border:1px dashed var(--line);color:var(--dim2);
+  }
+  .dbtn:hover{border-color:var(--accent);border-style:solid;color:var(--accent)}
+  .dbtn.danger{border-color:rgba(255,90,90,.35);color:#ff7a7a}
+  .dbtn.danger:hover{background:#ff5a5a;border-color:#ff5a5a;color:#fff;border-style:solid}
+  .lbtn.danger{border-color:rgba(255,90,90,.35);color:#ff7a7a}
+  .lbtn.danger:hover{background:#ff5a5a;border-color:#ff5a5a;color:#fff}
+  .card .a{font-size:13.5px;font-weight:650;line-height:1.35;margin-bottom:3px}
+  .card .b{font-size:12px;color:var(--dim2)}
+
+  /* detail */
+  .detail{margin-top:8px;background:linear-gradient(180deg,var(--bg2),#121118);
+    border:1px solid var(--line);border-radius:20px;padding:26px;display:none}
+  .detail.on{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .dhead{display:flex;gap:24px;flex-wrap:wrap}
+  .dart{width:216px;height:216px;flex:none;border-radius:12px;overflow:hidden;background:#211f2b;position:relative;
+    box-shadow:0 18px 46px rgba(0,0,0,.55)}
+  .dart img{width:100%;height:100%;object-fit:cover;display:block}
+  .dinfo{flex:1;min-width:250px}
+  .dinfo .yr{font-size:12px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+  .dinfo h2{font-size:27px;margin:7px 0 4px;letter-spacing:-.01em;line-height:1.25}
+  .dinfo .art-name{font-size:16px;color:var(--dim);margin-bottom:12px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{font-size:11.5px;background:#252331;border:1px solid var(--line);color:var(--dim);
+    padding:4px 10px;border-radius:999px}
+  .chip.g{border-color:rgba(232,194,122,.4);color:var(--gold)}
+  .play{
+    display:inline-flex;align-items:center;gap:9px;background:#fff;color:#111;text-decoration:none;
+    font-weight:700;font-size:14.5px;padding:11px 22px;border-radius:999px;transition:.18s;
+  }
+  .play:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(255,255,255,.16)}
+  .guide{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-family:inherit;
+    font-weight:700;font-size:14.5px;padding:11px 22px;border-radius:999px;cursor:pointer;transition:.18s;
+    background:linear-gradient(135deg,rgba(250,75,110,.18),rgba(255,178,107,.14));
+    border:1px solid rgba(250,75,110,.5);color:var(--accent2);
+  }
+  .guide:hover{transform:translateY(-1px);border-color:var(--accent);
+    background:linear-gradient(135deg,rgba(250,75,110,.3),rgba(255,178,107,.22))}
+  .guide.off{background:var(--card);border:1px dashed var(--line);color:var(--dim2)}
+  .guide.off:hover{border-color:var(--dim2);color:var(--dim);background:var(--card)}
+
+  .sec{margin-top:30px;padding-top:24px;border-top:1px solid var(--line)}
+  .sec h3{font-size:12.5px;letter-spacing:.2em;color:var(--accent2);text-transform:uppercase;margin-bottom:11px;font-weight:700}
+  .sec p{font-size:15px;color:#d5d1e0}
+  .trk{margin-bottom:15px;padding-left:14px;border-left:2px solid #322f40}
+  .trk b{display:block;font-size:14.5px;color:var(--txt);margin-bottom:2px}
+  .trk span{font-size:14px;color:var(--dim)}
+  .ess{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+  .ess a{display:block;background:var(--card);border:1px solid var(--line);border-radius:11px;
+    padding:12px 14px;text-decoration:none;transition:.18s}
+  .ess a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .ess b{display:block;font-size:13.5px;color:var(--txt);margin-bottom:2px;font-weight:640}
+  .ess span{font-size:12px;color:var(--dim2)}
+
+  .count{font-size:12.5px;color:var(--dim2);margin-bottom:14px}
+
+  /* 收藏 */
+  .lbtn{background:var(--card);border:1px solid var(--line);color:var(--dim);border-radius:10px;
+     padding:10px 16px;font-size:13px;cursor:pointer;font-family:inherit;transition:.18s}
+  .lbtn:hover{color:var(--txt);border-color:var(--accent)}
+  .badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.72);color:var(--accent2);
+     font-size:10.5px;padding:3px 8px;border-radius:999px;letter-spacing:.06em}
+  /* 類別頁籤的計數 */
+  .tab .tn{font-size:11.5px;color:var(--dim2);margin-left:3px;font-variant-numeric:tabular-nums}
+  .tab.on .tn{color:rgba(18,17,26,.55)}
+
+  /* 已有導聆頁的徽章 */
+  .badge.gd{left:auto;right:8px;top:auto;bottom:8px;
+    background:linear-gradient(135deg,rgba(250,75,110,.9),rgba(255,178,107,.85));color:#1a0d12;font-weight:700}
+
+  .empty{color:var(--dim2);font-size:13px;padding:14px 0}
+  footer{margin-top:44px;color:var(--dim2);font-size:12px;text-align:center;line-height:1.9}
+  @media(max-width:560px){ h1{font-size:25px} .dart{width:100%;height:auto;aspect-ratio:1} .detail{padding:18px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Apple Music · Album Picker</div>
+  <h1>今天聽這張</h1>
+  <p class="sub">挑片、讀懂、按下播放——播放交給你手機／電腦裡原本的 Apple Music。</p>
+</header>
+
+<div class="tabs" id="catTabs"></div>
+
+<div class="toolrow">
+  <div class="count" id="allCount"></div>
+  <button class="lbtn" id="selBtn">☑ 批次選取</button>
+</div>
+<div class="hiddenbar" id="hiddenBar"></div>
+<div class="grid" id="allGrid"></div>
+<div class="bulkbar" id="bulkBar"></div>
+
+<div class="detail" id="detail"></div>
+
+<footer>
+  封面與連結即時取自 Apple Music 目錄 · 點「在 Apple Music 開啟」會直接跳進你的 App<br>
+  要新增專輯或補導聆頁，跟 Claude 說一聲就好 · 作業方式見資料夾裡的 README.md
+</footer>
+
+</div>
+
+<script>
+/* ═══ 深度導聆索引 ═══
+   每產生一份導聆頁，就在這裡加一行： "藝人|專輯": "檔名.html"
+   （file:// 環境無法偵測檔案是否存在，所以用索引表登記）           */
+const GUIDES = {
+  "Krystian Zimerman|Schubert: Piano Sonatas, D. 959 & 960": "zimerman-schubert-959-960.html",
+  "Martha Argerich|The Complete Recordings on Deutsche Grammophon": "martha-argerich-complete-dg.html",
+  "Sueye Park, Rundfunk-Sinfonieorchester Berlin & Valentin Egel|Goldmark and Sibelius: Works for Violin and Orchestra": "sueye-park-goldmark-sibelius.html",
+  "Miles Davis|Kind of Blue": "miles-davis-kind-of-blue.html",
+  "Los Angeles Philharmonic & Gustavo Dudamel|Schumann: The Complete Symphonies": "dudamel-schumann-complete-symphonies.html"
+};
+const GUIDE_DIR = "liner-notes/";
+const guideOf = a => GUIDES[a.artist + "|" + a.album];
+
+const MOODS = {
+  night:   {name:'深夜',     desc:'燈關掉，音量轉小，一個人聽完'},
+  focus:   {name:'專注',     desc:'寫東西、讀資料時的背景重力'},
+  commute: {name:'通勤',     desc:'有節奏、撐得住耳機與噪音'},
+  vinyl:   {name:'週末黑膠', desc:'兩面聽完，值得從頭放到尾'}
+};
+
+const ALBUMS = [
+{
+  artist:"Krystian Zimerman", album:"Schubert: Piano Sonatas, D. 959 & 960", year:2017,
+  label:"Deutsche Grammophon", genre:"古典 · 鋼琴獨奏",
+  q:"Zimerman Schubert Piano Sonatas D 959 960",
+  moods:["night","focus","vinyl"],
+  why:"齊瑪曼睽違二十三年的獨奏錄音——上一張純獨奏是 1994 年的德布西《前奏曲》。2016 年 1 月錄於日本新潟縣柏崎市文化會館 Art-Forêt：2007 年新潟中越沖地震後他曾到當地義演，重建後的音樂廳落成，市長把整座廳提供給他錄音一週。他把自己設計製作的整副鍵盤機構裝進 Steinway，改變琴槌的擊弦落點以強化歌唱性；並堅持用 32-bit 錄製，他說可能是 DG 史上第一次。",
+  review:"這張最重要的決定是：兩首奏鳴曲的第一樂章呈示部他都完整反覆了。D.960 因此跑了二十分鐘（不反覆通常十三到十五分鐘）。他的理由很具體——那個低音顫音只有在呈示部結尾的九小節第一結束句裡才以 fortissimo 出現，跳過反覆就永遠聽不到。這場爭論吵了快四十年：席夫說省略它等於「截肢」，布蘭德爾則公開表明「在任何情況下」都不同意演。齊瑪曼站在席夫那邊，而且把理由建立在樂譜事實上。整張的性格是一個矛盾：他刻意打破「臨終之作」的迷思，卻又說這兩首的慢樂章「大概是我所知最悲傷的音樂」。",
+  tracks:[
+    ["D.959 · II. Andantino","前半是憂鬱的船歌，中段突然爆發——布蘭德爾把它形容為一場「精神崩潰」。齊瑪曼說那是音樂史上的里程碑，幾乎預示了華格納。"],
+    ["D.960 · I. Molto moderato","二十分十四秒。第 8 小節那個低音顫音，席夫稱為「音樂史上最不凡的顫音」；而呈示部結尾九小節裡它唯一一次的 fortissimo，就是本片存在的理由。"],
+    ["D.959 · IV. Rondo","主題取自 1817 年 D.537 的第二樂章，十一年後的自我回收。最後一頁把第一樂章的開頭號角整段倒著再唱一次——手稿證明這是舒伯特最後才加的。"]
+  ],
+  essentials:[["Wilhelm Kempff","Schubert: The Piano Sonatas"],["András Schiff","Schubert: Piano Sonatas (ECM)"],["Krystian Zimerman","Debussy: Préludes"]]
+},
+{
+  artist:"Martha Argerich", album:"The Complete Recordings on Deutsche Grammophon", year:2015,
+  label:"Deutsche Grammophon", genre:"古典 · 鋼琴全集",
+  q:"Martha Argerich Complete Recordings on Deutsche Grammophon",
+  moods:["night","focus","vinyl"],
+  why:"48 張 CD，收錄阿格麗希在 DG 與 Philips 的全部錄音，2015 年 9 月發行，原始唱片封面復刻，附 150 頁解說冊。官方標示的年代是 1960–2014，但套裝裡最早的一軌其實是 1959 年 1 月 26 日錄於柏林 RIAS 的蕭邦第一號敘事曲——那年她十七歲。最晚的一筆是 2014 年 4 月 19 日柏林愛樂廳與巴倫波因的雙鋼琴音樂會。DG 已於 2026 年 4 月重新發行，不是絕版品。",
+  review:"這套唱片真正的重點是它的比例：獨奏只有 9 張，協奏曲 13 張，室內樂與二重奏 26 張。而那 9 張獨奏有 8 張集中在 1960 到 1983 這二十三年間，之後就沒有了——1983 年那張舒曼《兒時情景／克萊斯勒魂》是她最後一張錄音室獨奏專輯。一位公認的世紀技巧型鋼琴家，在四十出頭主動離開獨奏會的舞台，然後用三十年跟別人一起彈。她給的理由很含蓄：不喜歡獨自站在台上，那種「赤裸」的孤獨感太強烈。所以這不是一套曲目版圖，是一個人如何找到自己願意待著的位置。另外要說清楚：這是「她在環球體系內的全集」，EMI 那批名演完全不在裡面。",
+  tracks:[
+    ["CD 3 · 普羅高菲夫第 3 號 ＆ 拉威爾 G 大調（1967）","與阿巴多四十六年合作的起點。普三第一樂章單簧管引子之後鋼琴切進來那幾秒，是整套最有名的段落。注意是柏林愛樂，不是倫敦交響。"],
+    ["CD 8 · 拉威爾《夜之加斯巴》（1974）","唱片史上的標竿。真正的難點不是〈Scarbo〉的速度，是〈Le Gibet〉那個從頭敲到尾的降 B 喪鐘。"],
+    ["CD 48 · 蕭邦廣播錄音（1959／1967）","2010 年才首度公開的單聲道錄音。第一軌錄於 1959 年 1 月 26 日，她十七歲——整套 48 張真正的起點。"]
+  ],
+  essentials:[["Martha Argerich","Chopin: Piano Concertos 1 & 2 (EMI)"],["Martha Argerich","The Lugano Recordings"],["Claudio Abbado","Beethoven: Symphonies"]]
+},
+{
+  artist:"Sueye Park, Rundfunk-Sinfonieorchester Berlin & Valentin Egel",
+  album:"Goldmark and Sibelius: Works for Violin and Orchestra", year:2026,
+  label:"BIS Records", genre:"古典 · 小提琴與管弦樂",
+  q:"Sueye Park Goldmark and Sibelius Works for Violin and Orchestra",
+  moods:["focus","night","vinyl"],
+  why:"起點是一條師徒線：1890 年 11 月，二十四歲的西貝流士在維也納敲開高德馬克的門，對方說自己已多年不收學生，但願意看他的作品。十三年前，高德馬克剛寫完這首 a 小調小提琴協奏曲。朴秀藝把兩人放進同一張唱片，2024 年 5 月與 2025 年 7 月分兩批錄於柏林 Haus des Rundfunks，2026 年 7 月 10 日由 BIS 發行。內頁特別註明：協奏曲是完整版本，沒有任何刪節。",
+  review:"高德馬克這首寫於 1877 年，比布拉姆斯與柴可夫斯基的小提琴協奏曲還早一年，當年三者不分軒輊，後來只剩兩首還在演。它消失的原因不是音樂變差——版權散在十幾家出版商手上沒人推廣，加上他過世後維也納的思想氣候轉變。朴秀藝的音色被《衛報》形容為「銀質」：不厚、不濃、不靠揉音撐分量，靠線條的連續性取勝，對高德馬克那些綿長的抒情句是理想的，但在《兩首莊重的旋律》上就少了一點重量。真正把這張撐起來的是節目編排——老師寫的是要征服音樂廳的作品，學生晚年寫的是不打算給任何人聽的東西，兩者之間隔了四十年。",
+  tracks:[
+    ["高德馬克協奏曲 · 第三樂章 Moderato – Allegretto","十七分半，比第一樂章還長。那個舞蹈節奏被普遍認為預示了西貝流士自己協奏曲的波蘭舞曲終樂章——這是整張編排的核心論據。"],
+    ["西貝流士組曲 · 第二樂章 Serenade. Evening in Spring","《衛報》點名的「絕美極弱奏」。這套組曲 1929 年被紐約出版商退稿，西貝流士在手稿寫下「草稿。待改寫！」，終生沒動，1990 年才首演。"],
+    ["高德馬克協奏曲 · 第二樂章 Andante（多數版本標作 Air）","被形容為「孟德爾頌式的無言歌，帶一點華格納的和聲染色」。全張最適合單獨聽的一軌。"]
+  ],
+  essentials:[["Joshua Bell","Sibelius & Goldmark: Violin Concertos"],["Nathan Milstein","Goldmark: Violin Concerto"],["Sueye Park","Echoes of Exile"]]
+},
+{
+  artist:"Los Angeles Philharmonic & Gustavo Dudamel", album:"Schumann: The Complete Symphonies", year:2026,
+  label:"Platoon", genre:"古典 · 浪漫派交響曲",
+  q:"Schumann Complete Symphonies Dudamel Los Angeles Philharmonic",
+  moods:["focus","vinyl","night"],
+  why:"2018 年 5 月，杜達美在 Walt Disney Concert Hall 舉行「Schumann Focus」音樂節，連續三個週末把舒曼四首交響曲全部演完並錄音。當時樂評就寫明「這些演出正在錄音，但還不知道何時、由哪個廠牌發行」。答案等了八年：2026 年 8 月 7 日由 Platoon 發行，作為杜達美十七年 LA Phil 任期的告別禮。第四號採用 1851 年杜塞道夫修訂版。",
+  review:"舒曼的交響曲背了一百多年「不會配器」的罪名。2010 年兩百週年之後，指揮界的主流解法是縮編、加速、增加透明度。杜達美這套站在同一個潮流裡，但沒有縮編——他擴編弦樂、管樂維持一個聲部一人，靠 Disney Hall 的高解析音響與平衡控制去換清晰度。結果是一種罕見的質地：聲音飽滿、弦樂厚實，但中聲部依然聽得見。詮釋取向是結構優先，《洛杉磯時報》的評語很準：「重視方法而非瘋狂。」這既是讚美也是保留——舒曼那個恐懼發瘋、最後死在療養院裡的自己，在這套錄音裡被收得比較緊。",
+  tracks:[
+    ["第二號 · 詼諧曲","小提琴從頭到尾的十六分音符無窮動，速度接近極限。全集最能證明這個樂團技術水準的一軌。"],
+    ["第三號「萊茵」· 第四樂章 Feierlich","三支長號在前三個樂章一次都沒吹過，第一次出聲就是極弱的眾讚歌。整套錄音最難的十秒。"],
+    ["第四號 · 終樂章","從詼諧曲的黑暗中試探著長出來，然後爆發成 D 大調。舒曼 1841 年就寫出了貝多芬第五號那種過渡。"]
+  ],
+  essentials:[["Leonard Bernstein","Schumann: The Symphonies"],["Wolfgang Sawallisch","Schumann: Symphonies"],["Gustavo Dudamel","Ives: Complete Symphonies"]]
+},
+{
+  artist:"Miles Davis", album:"Kind of Blue", year:1959, label:"Columbia", genre:"爵士 · 調式",
+  moods:["night","focus","vinyl"],
+  why:"1959 年三、四月，Miles 只在紐約 30th Street Studio 錄了兩天。他刻意不給樂手完整譜，只在錄音當天發下幾行調式與音階草稿，逼所有人放棄背熟的和弦套路、當場即興。Bill Evans 帶來德布西式的印象派聲響，John Coltrane 與 Cannonball Adderley 一冷一熱。幾乎每首都是第一或第二次 take。",
+  review:"這張唱片改寫了爵士的語法：從「和弦跑多快」轉向「在一個音階裡待多久」。和聲變換慢了下來，空間就長出來了——樂句之間的沉默第一次和音符一樣重要。它也因此成為史上最好入門、卻最難聽膩的爵士專輯：初聽是氣氛，十年後再聽會發現 Paul Chambers 的低音線一直在悄悄轉調。當代錄音的溫度感也是關鍵，Columbia 的三軌母帶把 Miles 弱音器的呼吸聲留了下來。",
+  tracks:[
+    ["So What","兩個調式、一段對答式的主題。Miles 的獨奏只用了極少的音，卻定義了往後六十年「留白」的標準。"],
+    ["Blue in Green","Bill Evans 幾乎確定是實際作者。十個小節的循環像一個走不出去的房間，深夜聽會有點危險。"],
+    ["Flamenco Sketches","五段自由調式，每位樂手自行決定停留多久。全張最接近冥想的一軌。"]
+  ],
+  essentials:[["Bill Evans Trio","Sunday at the Village Vanguard"],["John Coltrane","Blue Train"],["Miles Davis","In a Silent Way"]]
+},
+
+/* ========== 爵士補完 ========== */
+
+
+];
+
+/* ---------- state ---------- */
+/* ═══════════════════════════════════════════════════════════════
+   以下是頁面邏輯。新增專輯請改上面的 ALBUMS 與 GUIDES，這裡不用動。
+   ═══════════════════════════════════════════════════════════════ */
+
+const $ = s => document.querySelector(s);
+const key = a => (a.artist + " " + a.album).replace(/（.*?）/g,'');
+const cache = {};
+
+/* ---------- 兩大類別：古典 / 爵士，其餘歸「其他」 ----------
+   規則：看 genre 第一段（" · " 之前）。
+   要手動指定就在該張專輯加 cat:"classical" / "jazz" / "other"。   */
+const CATS = [
+  {k:'all',       name:'全部專輯'},
+  {k:'classical', name:'古典'},
+  {k:'jazz',      name:'爵士'},
+  {k:'other',     name:'其他'}
+];
+function catOf(a){
+  if(a.cat) return a.cat;
+  const head = (a.genre||'').split(' · ')[0];
+  if(/古典|極簡主義|室內樂|交響|歌劇|管弦/.test(head)) return 'classical';
+  if(/爵士|Bebop|Bossa/.test(head)) return 'jazz';
+  return 'other';
+}
+let currentCat = 'all';
+
+function fallbackLink(a){
+  return 'https://music.apple.com/tw/search?term=' + encodeURIComponent(a.artist + ' ' + a.album);
+}
+
+/* ---------- iTunes Search API（JSONP，file:// 也能跑） ---------- */
+let jsonpN = 0;
+function jsonp(url, timeout=6000){
+  return new Promise(res=>{
+    const cb = '__itcb' + (++jsonpN);
+    const s = document.createElement('script');
+    let done = false;
+    const finish = v => { if(done) return; done = true;
+      try{ delete window[cb]; }catch(e){}
+      s.remove(); res(v); };
+    window[cb] = j => finish(j);
+    s.onerror = () => finish(null);
+    setTimeout(()=>finish(null), timeout);
+    s.src = url + '&callback=' + cb;
+    document.head.appendChild(s);
+  });
+}
+
+const pending = {};
+async function lookup(a){
+  if(a.user) return {art:a.art||null, url:a.url||fallbackLink(a)};
+  const k = key(a);
+  if(cache[k] !== undefined) return cache[k];
+  if(pending[k]) return pending[k];
+  pending[k] = (async ()=>{
+    const term = encodeURIComponent(a.q || (a.artist + " " + a.album));
+    const j = await jsonp(`https://itunes.apple.com/search?term=${term}&entity=album&media=music&limit=3&country=tw`);
+    const hit = j && (j.results||[])[0];
+    cache[k] = hit
+      ? { art:(hit.artworkUrl100||'').replace('100x100bb','1000x1000bb'),
+          url: hit.collectionViewUrl || fallbackLink(a) }
+      : { art:null, url:fallbackLink(a) };
+    delete pending[k];
+    return cache[k];
+  })();
+  return pending[k];
+}
+
+function initials(a){ return a.album.slice(0,2); }
+
+/* ---------- 批次選取狀態 ---------- */
+let selMode = false;
+let SEL = new Set();          // 存 idOf(a)
+let lastPicked = -1;          // 給 Shift 範圍選取用
+
+function cardHTML(a,i){
+  const on = SEL.has(idOf(a));
+  return `<div class="card${selMode?' picking':''}${on?' sel':''}" data-i="${i}">
+    <div class="art">${a.art?`<img src="${a.art}" alt="">`:`<div class="ph">${initials(a)}</div>`}
+      ${a.user?'<span class="badge">待補樂評</span>':''}
+      ${guideOf(a)?'<span class="badge gd">導聆</span>':''}
+      ${selMode
+        ? `<span class="pick">${on?'✓':''}</span>`
+        : `<button class="del" title="${a.user?'從清單移除':'隱藏這張（可回復）'}">✕</button>`}</div>
+    <div class="meta"><div class="a">${a.album}</div><div class="b">${a.artist}${a.year?' · '+a.year:''}</div></div>
+  </div>`;
+}
+
+function paintGrid(el, list){
+  if(!list.length){ el.innerHTML = '<div class="empty">這個類別目前是空的</div>'; return; }
+  el.innerHTML = list.map((a,i)=>cardHTML(a,i)).join('');
+  el.querySelectorAll('.card').forEach(c=>{
+    const i = +c.dataset.i;
+    const a = list[i];
+    c.onclick = e=>{
+      if(selMode){ pick(list, i, e.shiftKey); return; }
+      showDetail(a);
+    };
+    const del = c.querySelector('.del');
+    if(del) del.onclick = e=>{ e.stopPropagation(); removeAlbum(a); };
+    if(!a.art) lookup(a).then(d=>{ if(d.art) c.querySelector('.art').innerHTML = `<img src="${d.art}" alt="">`; });
+  });
+}
+
+/* 勾選一張；按住 Shift 可以選一整段 */
+function pick(list, i, shift){
+  if(shift && lastPicked >= 0){
+    const [s, e] = lastPicked < i ? [lastPicked, i] : [i, lastPicked];
+    const turnOn = !SEL.has(idOf(list[i]));
+    for(let p = s; p <= e; p++){
+      const id = idOf(list[p]);
+      turnOn ? SEL.add(id) : SEL.delete(id);
+    }
+  }else{
+    const id = idOf(list[i]);
+    SEL.has(id) ? SEL.delete(id) : SEL.add(id);
+  }
+  lastPicked = i;
+  repaintAll();
+}
+
+function selected(){ return POOL().filter(a=>SEL.has(idOf(a))); }
+
+function setSelMode(on){
+  selMode = on;
+  if(!on){ SEL.clear(); lastPicked = -1; }
+  $('#selBtn').classList.toggle('on', on);
+  $('#selBtn').textContent = on ? '✕ 離開選取' : '☑ 批次選取';
+  $('#detail').classList.remove('on');
+  repaintAll();
+}
+
+function renderBulkBar(){
+  const bar = $('#bulkBar');
+  if(!selMode){ bar.innerHTML = ''; return; }
+  const n = SEL.size;
+  const view = VIEW();
+  const allOn = view.length > 0 && view.every(a=>SEL.has(idOf(a)));
+  bar.innerHTML =
+    `<span class="n">已選 <em>${n}</em> 張</span>
+     <button class="bbtn" id="bAll">${allOn?'取消全選':'全選本頁'}</button>
+     <button class="bbtn" id="bInv">反選</button>
+     <span class="sp"></span>
+     <button class="bbtn primary" id="bGuide" ${n?'':'disabled'}>📋 複製導聆需求</button>
+     <button class="bbtn" id="bHide" ${n?'':'disabled'}>🙈 隱藏</button>
+     <button class="bbtn danger" id="bPurge" ${n?'':'disabled'}>🗑 完全刪除</button>`;
+
+  $('#bAll').onclick = ()=>{
+    view.forEach(a=> allOn ? SEL.delete(idOf(a)) : SEL.add(idOf(a)));
+    lastPicked = -1; repaintAll();
+  };
+  $('#bInv').onclick = ()=>{
+    view.forEach(a=>{ const id = idOf(a); SEL.has(id) ? SEL.delete(id) : SEL.add(id); });
+    lastPicked = -1; repaintAll();
+  };
+  if(n){
+    $('#bGuide').onclick = ()=> copyGuideRequest(selected());
+    $('#bHide').onclick  = ()=> hideAlbums(selected());
+    $('#bPurge').onclick = ()=> purgeAlbums(selected());
+  }
+}
+
+/* 批次隱藏：內建的加進 HIDDEN，自己加的直接從 MINE 移除 */
+function hideAlbums(list){
+  if(!list.length) return;
+  const mine = list.filter(a=>a.user), built = list.filter(a=>!a.user);
+  const msg = built.length && mine.length
+    ? `隱藏 ${built.length} 張內建專輯，並移除 ${mine.length} 張你自己加的？`
+    : built.length
+      ? `隱藏這 ${built.length} 張？之後可以按「↩︎ 全部回復」找回來。`
+      : `移除這 ${mine.length} 張？`;
+  if(!confirm(msg)) return;
+  built.forEach(a=>{ if(!isHidden(a)) HIDDEN.push(idOf(a)); });
+  if(built.length) saveHidden();
+  if(mine.length){
+    const ids = new Set(mine.map(idOf));
+    MINE = MINE.filter(m=>!ids.has(idOf(m)));
+    saveMine();
+  }
+  SEL.clear(); lastPicked = -1;
+  repaintAll();
+}
+
+async function showDetail(a){
+  const d = $('#detail');
+  d.classList.add('on');
+  const info = await lookup(a);
+  d.innerHTML = `
+    <div class="dhead">
+      <div class="dart">${info.art ? `<img src="${info.art}" alt="">` : `<div class="ph">${initials(a)}</div>`}</div>
+      <div class="dinfo">
+        <div class="yr">${a.year} · ${a.label}</div>
+        <h2>${a.album}</h2>
+        <div class="art-name">${a.artist}</div>
+        <div class="chips">
+          <span class="chip g">${a.genre}</span>
+          ${(a.moods||[]).filter(m=>MOODS[m]).map(m=>`<span class="chip">${MOODS[m].name}</span>`).join('')}
+        </div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <a class="play" href="${info.url}" target="_blank" rel="noopener">▶ 在 Apple Music 開啟</a>
+          ${guideOf(a)
+            ? `<a class="guide" href="${GUIDE_DIR}${guideOf(a)}">📖 深度導聆</a>`
+            : `<button class="guide off" data-ask="1">📖 深度導聆 · 尚未建立</button>`}
+          <button class="dbtn" data-del="1">✕ ${a.user?'從清單移除':'隱藏這張'}</button>
+          ${a.user?'':'<button class="dbtn danger" data-purge="1">🗑 完全刪除</button>'}
+        </div>
+      </div>
+    </div>
+    ${a.why ? `<div class="sec"><h3>製作緣由 · 錄音背景</h3><p>${a.why}</p></div>` : ''}
+    ${a.review ? `<div class="sec"><h3>深度樂評</h3><p>${a.review}</p></div>` : ''}
+    ${(a.tracks&&a.tracks.length) ? `<div class="sec"><h3>關鍵曲目</h3>
+      ${a.tracks.map(t=>`<div class="trk"><b>${t[0]}</b><span>${t[1]}</span></div>`).join('')}</div>` : ''}
+    ${(a.essentials&&a.essentials.length) ? `<div class="sec"><h3>延伸必聽</h3>
+      <div class="ess">${a.essentials.map(e=>`
+        <a href="https://music.apple.com/tw/search?term=${encodeURIComponent(e[0]+' '+e[1])}" target="_blank" rel="noopener">
+          <b>${e[1]}</b><span>${e[0]}</span></a>`).join('')}</div></div>` : ''}
+    ${!a.review ? `<div class="sec"><h3>樂評</h3><p style="color:var(--dim)">這張還沒有錄音背景與樂評。按上面的「深度導聆」複製需求給 Claude，我會查證後補上。</p></div>` : ''}`;
+
+  const ask = d.querySelector('.guide.off');
+  if(ask) ask.onclick = ()=> copyGuideRequest([a]);
+  const del = d.querySelector('[data-del]');
+  if(del) del.onclick = ()=> removeAlbum(a);
+  const pg = d.querySelector('[data-purge]');
+  if(pg) pg.onclick = ()=> purgeAlbums([a]);
+  d.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* 產生一段可直接貼給 Claude 的「深度導聆」指令 */
+function copyGuideRequest(list){
+  const txt =
+`請幫我做深度導聆頁（照 liner-notes/_template.html 的 D 物件格式），對象：
+
+${list.map(a=>`· ${a.artist} — ${a.album}${a.year?` (${a.year})`:''}`).join('\n')}
+
+要求：
+1. 先查證事實（錄音日期／地點／製作人／錄音師／參與人員／版本歷史），有出處
+2. 逐曲導聆要涵蓋全專輯每一軌，含聽點提示
+3. 人物誌要包含作曲家、演奏家、主唱者的生平與重要作品
+4. 要有版本／音質指南、評價與歷史地位、脈絡與影響網絡、聆聽路線圖、視覺與實體、延伸聆聽
+5. 影音延伸要放「認識這張唱片」的內容（官方介紹、紀錄片、分析導讀、訪談講座），不要放聽音樂的連結；網址要查證過
+6. 存到 liner-notes/<artist-album>.html，並把索引加進 album-picker.html 的 GUIDES`;
+  navigator.clipboard.writeText(txt).then(
+    ()=>alert('已複製導聆需求，貼給 Claude 即可'),
+    ()=>prompt('複製這段文字交給 Claude：', txt)
+  );
+}
+
+/* ---------- 舊版「我的收藏」殘留資料：仍會顯示，但已無新增入口 ---------- */
+const LS = 'myAlbums.v1';
+let MINE = [];
+try{ MINE = JSON.parse(localStorage.getItem(LS) || '[]'); }catch(e){ MINE = []; }
+function saveMine(){ try{ localStorage.setItem(LS, JSON.stringify(MINE)); }catch(e){} }
+
+/* ---------- 隱藏專輯（可回復，只存在這台瀏覽器） ---------- */
+const LSH = 'hiddenAlbums.v1';
+let HIDDEN = [];
+try{ HIDDEN = JSON.parse(localStorage.getItem(LSH) || '[]'); }catch(e){ HIDDEN = []; }
+function saveHidden(){ try{ localStorage.setItem(LSH, JSON.stringify(HIDDEN)); }catch(e){} }
+const idOf = a => a.artist + '|' + a.album;
+const isHidden = a => HIDDEN.includes(idOf(a));
+
+const POOL = ()=> ALBUMS.concat(MINE).filter(a=>!isHidden(a));
+const VIEW = ()=> currentCat==='all' ? POOL() : POOL().filter(a=>catOf(a)===currentCat);
+
+/* 刪除／隱藏一張專輯。內建的只是隱藏，隨時可回復 */
+function removeAlbum(a){
+  if(a.user){
+    if(!confirm(`要把《${a.album}》移除嗎？`)) return false;
+    MINE = MINE.filter(m=>!(m.artist===a.artist && m.album===a.album));
+    saveMine();
+  }else{
+    if(!confirm(`要隱藏《${a.album}》嗎？\n\n它不會被真的刪掉，之後可以按「回復已隱藏」找回來。`)) return false;
+    if(!isHidden(a)){ HIDDEN.push(idOf(a)); saveHidden(); }
+  }
+  repaintAll();
+  return true;
+}
+
+function renderCatTabs(){
+  const P = POOL();
+  $('#catTabs').innerHTML = CATS.map(c=>{
+    const n = c.k==='all' ? P.length : P.filter(a=>catOf(a)===c.k).length;
+    return `<button class="tab${c.k===currentCat?' on':''}" data-cat="${c.k}">${c.name} <span class="tn">${n}</span></button>`;
+  }).join('');
+  $('#catTabs').querySelectorAll('.tab').forEach(b=>{
+    b.onclick = ()=>{
+      currentCat = b.dataset.cat;
+      $('#detail').classList.remove('on');
+      repaintAll();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   完全刪除：真的把該張從這個檔案的 ALBUMS 與 GUIDES 裡切掉。
+   瀏覽器不能直接改自己的檔案，所以做法是重建一份新的 HTML：
+   支援 File System Access API 的瀏覽器（Chrome / Edge）可以直接
+   選原檔覆蓋；Safari 等則會下載一份新檔，請自行覆蓋回資料夾。
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 取得這個頁面「乾淨的」原始碼（把動態渲染的內容清掉） */
+function currentSource(){
+  const clone = document.documentElement.cloneNode(true);
+  ['catTabs','allCount','hiddenBar','allGrid','bulkBar'].forEach(id=>{
+    const el = clone.querySelector('#'+id); if(el) el.innerHTML = '';
+  });
+  const det = clone.querySelector('#detail');
+  if(det){ det.innerHTML = ''; det.setAttribute('class','detail'); }
+  const sb = clone.querySelector('#selBtn');
+  if(sb){ sb.textContent = '☑ 批次選取'; sb.setAttribute('class','lbtn'); }
+  return '<!DOCTYPE html>\n' + clone.outerHTML + '\n';
+}
+
+/* 從原始碼裡切掉一整個專輯物件（用括號配對掃描，字串內的括號不算） */
+function cutAlbum(src, a){
+  const needle = 'artist:"' + a.artist + '", album:"' + a.album + '"';
+  const hit = src.indexOf(needle);
+  if(hit < 0) return null;
+  const start = src.lastIndexOf('{', hit);
+  if(start < 0) return null;
+
+  let depth = 0, inStr = false, quote = '', esc = false, end = -1;
+  for(let p = start; p < src.length; p++){
+    const c = src[p];
+    if(inStr){
+      if(esc){ esc = false; continue; }
+      if(c === '\\'){ esc = true; continue; }
+      if(c === quote) inStr = false;
+      continue;
+    }
+    if(c === '"' || c === "'" || c === '`'){ inStr = true; quote = c; continue; }
+    if(c === '{') depth++;
+    else if(c === '}'){ depth--; if(depth === 0){ end = p; break; } }
+  }
+  if(end < 0) return null;
+
+  let after = end + 1;
+  if(src[after] === ',') after++;              // 吃掉物件後面的逗號
+  while(after < src.length && /[ \t]/.test(src[after])) after++;
+  if(src[after] === '\n') after++;             // 吃掉那一行的換行
+  return src.slice(0, start) + src.slice(after);
+}
+
+/* 從 GUIDES 索引裡切掉對應那一行 */
+function cutGuide(src, a){
+  const k = (a.artist + '|' + a.album).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return src.replace(new RegExp('[ \\t]*"' + k + '"\\s*:\\s*"[^"]*",?[ \\t]*\\n?', ''), '');
+}
+
+/* 存檔：優先直接覆蓋原檔，不支援就下載 */
+async function saveSource(src){
+  const blob = new Blob([src], {type:'text/html'});
+  if(window.showSaveFilePicker){
+    try{
+      const h = await window.showSaveFilePicker({
+        suggestedName:'album-picker.html',
+        types:[{description:'HTML', accept:{'text/html':['.html']}}]
+      });
+      const w = await h.createWritable();
+      await w.write(blob); await w.close();
+      return 'saved';
+    }catch(e){
+      if(e && e.name === 'AbortError') return 'abort';
+      /* 其他錯誤就掉回下載 */
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = 'album-picker.html';
+  link.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 5000);
+  return 'download';
+}
+
+async function purgeAlbums(list){
+  if(!list.length) return;
+
+  /* 自己加的專輯根本不在檔案裡，直接從 MINE 拿掉就好 */
+  const mine = list.filter(a=>a.user);
+  list = list.filter(a=>!a.user);
+  if(mine.length){
+    const ids = new Set(mine.map(idOf));
+    MINE = MINE.filter(m=>!ids.has(idOf(m)));
+    saveMine();
+    if(!list.length){ SEL.clear(); repaintAll(); return; }
+  }
+
+  const names = list.length > 6
+    ? list.slice(0,6).map(a=>`《${a.album}》`).join('、') + ` 等 ${list.length} 張`
+    : list.map(a=>`《${a.album}》`).join('、');
+  const withGuide = list.filter(a=>guideOf(a));
+  const warn = withGuide.length
+    ? `\n\n注意：${withGuide.map(a=>`《${a.album}》`).join('、')} 有導聆頁，`
+      + `liner-notes/ 裡的檔案不會被刪掉（瀏覽器沒有權限），要清掉再跟 Claude 說一聲。`
+    : '';
+  if(!confirm(
+      `完全刪除 ${list.length} 張：${names}\n\n`
+    + `這會產生一份移除後的 album-picker.html。\n`
+    + `Chrome／Edge 會跳出存檔視窗，選原本那個檔案覆蓋即可；\n`
+    + `Safari 則會下載到「下載」資料夾，請自行覆蓋回去。\n\n`
+    + `這個動作不可逆，但 _backup/ 資料夾裡有 Claude 留的備份。` + warn)) return;
+
+  let src = currentSource();
+  const missed = [];
+  for(const a of list){
+    const cut = cutAlbum(src, a);
+    if(cut === null){ missed.push(a.album); continue; }
+    src = cutGuide(cut, a);
+  }
+  if(missed.length){
+    alert(`這幾張在原始碼裡找不到，已略過：\n${missed.join('\n')}\n\n請改用「跟 Claude 說一聲」的方式刪除。`);
+    if(missed.length === list.length) return;
+  }
+
+  const r = await saveSource(src);
+  if(r === 'abort') return;
+
+  /* 清掉 localStorage 裡對應的隱藏紀錄 */
+  const ids = list.map(idOf);
+  HIDDEN = HIDDEN.filter(h=>!ids.includes(h));
+  saveHidden();
+
+  SEL.clear(); lastPicked = -1;
+  if(r === 'saved'){
+    if(confirm('已寫入。要現在重新整理看結果嗎？')) location.reload();
+    else repaintAll();
+  }else{
+    alert('已下載 album-picker.html。\n請把它覆蓋回原本的資料夾，再重新整理這一頁。');
+    repaintAll();
+  }
+}
+
+function renderHiddenBar(){
+  const bar = $('#hiddenBar');
+  if(!HIDDEN.length){ bar.innerHTML = ''; return; }
+  bar.innerHTML = `<span>已隱藏 ${HIDDEN.length} 張</span>
+    <button class="lbtn" id="unhideBtn">↩︎ 全部回復</button>
+    <button class="lbtn danger" id="purgeHiddenBtn">🗑 把這 ${HIDDEN.length} 張完全刪除</button>`;
+  $('#unhideBtn').onclick = ()=>{ HIDDEN = []; saveHidden(); repaintAll(); };
+  $('#purgeHiddenBtn').onclick = ()=>{
+    const list = ALBUMS.filter(a=>isHidden(a));
+    if(!list.length){ alert('已隱藏的都是你自己加的專輯，本來就不在檔案裡。'); return; }
+    purgeAlbums(list);
+  };
+}
+
+function repaintAll(){
+  renderCatTabs();
+  renderHiddenBar();
+  const list = VIEW();
+  const label = CATS.find(c=>c.k===currentCat).name;
+  $('#allCount').textContent = currentCat==='all'
+    ? `${list.length} 張專輯${HIDDEN.length?`（另有 ${HIDDEN.length} 張已隱藏）`:''}`
+    : `${label} — ${list.length} 張`;
+  paintGrid($('#allGrid'), list);
+  renderBulkBar();
+}
+
+$('#selBtn').onclick = ()=> setSelMode(!selMode);
+
+/* Esc 離開選取模式 */
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && selMode) setSelMode(false);
+});
+
+repaintAll();
+
+</script>
+
+
+
+
+
+</body></html>
