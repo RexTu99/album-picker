@@ -545,7 +545,7 @@ ${list.map(a=>`· ${a.artist} — ${a.album}${a.year?` (${a.year})`:''}`).join('
 3. 人物誌要包含作曲家、演奏家、主唱者的生平與重要作品
 4. 要有版本／音質指南、評價與歷史地位、脈絡與影響網絡、聆聽路線圖、視覺與實體、延伸聆聽
 5. 影音延伸要放「認識這張唱片」的內容（官方介紹、紀錄片、分析導讀、訪談講座），不要放聽音樂的連結；網址要查證過
-6. 存到 liner-notes/<artist-album>.html，並把索引加進 album-picker.html 的 GUIDES`;
+6. 存到 liner-notes/<artist-album>.html，並把索引加進 index.html 的 GUIDES`;
   navigator.clipboard.writeText(txt).then(
     ()=>alert('已複製導聆需求，貼給 Claude 即可'),
     ()=>prompt('複製這段文字交給 Claude：', txt)
@@ -655,13 +655,16 @@ function cutGuide(src, a){
   return src.replace(new RegExp('[ \\t]*"' + k + '"\\s*:\\s*"[^"]*",?[ \\t]*\\n?', ''), '');
 }
 
-/* 存檔：優先直接覆蓋原檔，不支援就下載 */
+/* 是否為本機開啟的檔案（file://）。線上版無法覆寫伺服器上的檔案，一律走下載 */
+const IS_LOCAL = location.protocol === 'file:';
+
+/* 存檔：本機版優先直接覆蓋原檔；線上版一律下載 */
 async function saveSource(src){
   const blob = new Blob([src], {type:'text/html'});
-  if(window.showSaveFilePicker){
+  if(IS_LOCAL && window.showSaveFilePicker){
     try{
       const h = await window.showSaveFilePicker({
-        suggestedName:'album-picker.html',
+        suggestedName:'index.html',
         types:[{description:'HTML', accept:{'text/html':['.html']}}]
       });
       const w = await h.createWritable();
@@ -674,7 +677,7 @@ async function saveSource(src){
   }
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.href = url; link.download = 'album-picker.html';
+  link.href = url; link.download = 'index.html';
   link.click();
   setTimeout(()=>URL.revokeObjectURL(url), 5000);
   return 'download';
@@ -699,14 +702,18 @@ async function purgeAlbums(list){
   const withGuide = list.filter(a=>guideOf(a));
   const warn = withGuide.length
     ? `\n\n注意：${withGuide.map(a=>`《${a.album}》`).join('、')} 有導聆頁，`
-      + `liner-notes/ 裡的檔案不會被刪掉（瀏覽器沒有權限），要清掉再跟 Claude 說一聲。`
+      + `liner-notes/ 裡的檔案不會被刪掉（瀏覽器沒有權限），要清掉跟 Claude 說一聲。`
     : '';
-  if(!confirm(
-      `完全刪除 ${list.length} 張：${names}\n\n`
-    + `這會產生一份移除後的 album-picker.html。\n`
-    + `Chrome／Edge 會跳出存檔視窗，選原本那個檔案覆蓋即可；\n`
-    + `Safari 則會下載到「下載」資料夾，請自行覆蓋回去。\n\n`
-    + `這個動作不可逆，但 _backup/ 資料夾裡有 Claude 留的備份。` + warn)) return;
+  const how = IS_LOCAL
+    ? `這會產生一份移除後的 index.html。\n`
+      + `Chrome／Edge 會跳出存檔視窗，選原本那個檔案覆蓋即可；\n`
+      + `Safari 則會下載到「下載」資料夾，請自行覆蓋回去。\n\n`
+      + `這個動作不可逆，但 _backup/ 資料夾裡有備份。`
+    : `你現在看的是線上版，瀏覽器不能改伺服器上的檔案。\n`
+      + `按下確定會下載一份移除後的 index.html，\n`
+      + `把它上傳到 GitHub 取代原本那個檔案，網站就會更新。\n\n`
+      + `（在網站更新之前，這一頁重新整理後專輯還是會在。）`;
+  if(!confirm(`完全刪除 ${list.length} 張：${names}\n\n` + how + warn)) return;
 
   let src = currentSource();
   const missed = [];
@@ -733,7 +740,9 @@ async function purgeAlbums(list){
     if(confirm('已寫入。要現在重新整理看結果嗎？')) location.reload();
     else repaintAll();
   }else{
-    alert('已下載 album-picker.html。\n請把它覆蓋回原本的資料夾，再重新整理這一頁。');
+    alert(IS_LOCAL
+      ? '已下載 index.html。\n請把它覆蓋回原本的資料夾，再重新整理這一頁。'
+      : '已下載 index.html。\n請上傳到 GitHub 取代原本的 index.html，網站更新後就會生效。');
     repaintAll();
   }
 }
