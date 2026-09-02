@@ -212,6 +212,7 @@
    每產生一份導聆頁，就在這裡加一行： "藝人|專輯": "檔名.html"
    （file:// 環境無法偵測檔案是否存在，所以用索引表登記）           */
 const GUIDES = {
+  "María Dueñas, Wiener Symphoniker & Manfred Honeck|Beethoven and Beyond": "maria-duenas-beethoven-and-beyond.html",
   "Krystian Zimerman|Schubert: Piano Sonatas, D. 959 & 960": "zimerman-schubert-959-960.html",
   "Martha Argerich|The Complete Recordings on Deutsche Grammophon": "martha-argerich-complete-dg.html",
   "Sueye Park, Rundfunk-Sinfonieorchester Berlin & Valentin Egel|Goldmark and Sibelius: Works for Violin and Orchestra": "sueye-park-goldmark-sibelius.html",
@@ -229,6 +230,20 @@ const MOODS = {
 };
 
 const ALBUMS = [
+{
+  artist:"María Dueñas, Wiener Symphoniker & Manfred Honeck", album:"Beethoven and Beyond", year:2023,
+  label:"Deutsche Grammophon", genre:"古典 · 小提琴協奏曲",
+  q:"Maria Duenas Beethoven and Beyond",
+  moods:["focus","night","vinyl"],
+  why:"杜尼亞絲的 DG 首張專輯，錄音時她二十歲。分三批錄成：貝多芬協奏曲與 Ysaÿe、Kreisler 錄自 2023 年 1 月 27 日維也納金色大廳的現場；Spohr、Saint-Saëns、Wieniawski 是隔天在 Synchron Stage Vienna 的錄音室；第二張 CD 那五首無伴奏裝飾奏更早，2022 年 7 月錄於柏林 Meistersaal。貝多芬協奏曲她用 Gagliano，浪漫小品換成 1710 年的 Stradivari「Duc de Camposelice」。",
+  review:"貝多芬沒有為這首協奏曲寫裝飾奏——那在古典時期是常態，留給獨奏者填。杜尼亞絲把這個空白當成整張唱片的題目：三個樂章全部用自己寫的，第二張 CD 再收 Spohr、Ysaÿe、Saint-Saëns、Wieniawski、Kreisler 五位前輩的第一樂章版本。這是很聰明的構想，但幾份主要樂評的保留意見高度一致——把五首裝飾奏孤立地排在第二張碟上像附錄而非論證，而且第一樂章拉到二十七分五十五秒，《BBC 音樂雜誌》說最終印象「比較像一連串精緻的小品，而不是貝多芬完整的交響畫布」。《留聲機》的結論仍然很高：「多麼好的一位演奏家，多麼好的一種展開錄音生涯的方式。」",
+  tracks:[
+    ["CD2 的五首裝飾奏（第 9–13 軌）","十七分鐘，五個人怎麼填同一個空白。從 Spohr 那首一分二十一秒的古典版本，到 Kreisler 那首公認最常被演奏的四分鐘浪漫版本。這張唱片真正的賣點。"],
+    ["貝多芬協奏曲 · 第一樂章","開頭五下定音鼓——史上第一次有協奏曲這樣開始。獨奏進來時在一個不屬於本調的升 D 上模仿它。整個樂章都被這個節奏型浸透。"],
+    ["貝多芬協奏曲 · 第二樂章 Larghetto","全張最被稱讚的地方。表面上是變奏曲，但中途被獨奏者帶進的一段全新樂念打斷——所以它不是嚴格的變奏曲。"]
+  ],
+  essentials:[["Wolfgang Schneiderhan","Beethoven: Violin Concerto (Jochum)"],["Isabelle Faust","Beethoven: Violin Concerto (Abbado)"],["Patricia Kopatchinskaja","Beethoven: Violin Concerto"]]
+},
 {
   artist:"Krystian Zimerman", album:"Schubert: Piano Sonatas, D. 959 & 960", year:2017,
   label:"Deutsche Grammophon", genre:"古典 · 鋼琴獨奏",

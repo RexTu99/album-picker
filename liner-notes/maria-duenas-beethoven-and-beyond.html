@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>深度導聆</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#14131a; --card:#1a1922; --line:#2a2833; --line2:#3a3747;
+    --txt:#ece9f2; --dim:#9b95ab; --dim2:#6f6a7d;
+    --accent:#fa4b6e; --accent2:#ffb26b; --gold:#e8c27a; --cyan:#7ad3e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1000px 560px at 82% -12%, rgba(250,75,110,.13), transparent 62%),
+      radial-gradient(760px 520px at -5% 100%, rgba(120,110,255,.11), transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.8; min-height:100vh;
+  }
+  a{color:inherit}
+  .shell{max-width:1240px;margin:0 auto;padding:0 22px 110px;display:grid;
+    grid-template-columns:200px minmax(0,1fr);gap:38px;align-items:start}
+  @media(max-width:900px){ .shell{grid-template-columns:1fr;gap:0} }
+
+  /* ---------- 側邊目錄 ---------- */
+  nav.toc{position:sticky;top:22px;padding-top:34px}
+  @media(max-width:900px){
+    nav.toc{position:static;padding:16px 0 0;overflow-x:auto;white-space:nowrap;
+      border-bottom:1px solid var(--line);margin-bottom:18px}
+    nav.toc .tocTitle{display:none}
+    nav.toc a{display:inline-block;margin:0 6px 10px 0}
+  }
+  .tocTitle{font-size:11px;letter-spacing:.24em;color:var(--dim2);text-transform:uppercase;margin-bottom:12px}
+  nav.toc a{display:block;font-size:13px;color:var(--dim2);text-decoration:none;padding:6px 10px;
+    border-radius:8px;border-left:2px solid transparent;transition:.16s}
+  nav.toc a:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+  nav.toc a.on{color:var(--accent2);border-left-color:var(--accent);background:rgba(250,75,110,.07)}
+  @media(max-width:900px){ nav.toc a{border-left:0;border-bottom:2px solid transparent}
+    nav.toc a.on{border-left:0;border-bottom-color:var(--accent)} }
+
+  main{padding-top:34px;min-width:0}
+
+  /* ---------- HERO ---------- */
+  .back{display:inline-block;font-size:12.5px;color:var(--dim2);text-decoration:none;margin-bottom:20px}
+  .back:hover{color:var(--txt)}
+  .hero{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+  .hart{width:250px;height:250px;flex:none;border-radius:14px;overflow:hidden;background:#211f2b;
+    position:relative;box-shadow:0 22px 56px rgba(0,0,0,.6)}
+  .hart img{width:100%;height:100%;object-fit:cover;display:block}
+  .hart .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;color:rgba(255,255,255,.2)}
+  .hmeta{flex:1;min-width:280px}
+  .kicker{font-size:11px;letter-spacing:.28em;color:var(--dim2);text-transform:uppercase}
+  .hmeta h1{font-size:38px;line-height:1.2;letter-spacing:-.02em;margin:9px 0 5px;font-weight:750}
+  .hmeta .who{font-size:18px;color:var(--dim);margin-bottom:4px}
+  .hmeta .yl{font-size:12.5px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{font-size:11.5px;background:#252331;border:1px solid var(--line);color:var(--dim);
+    padding:4px 11px;border-radius:999px}
+  .chip.g{border-color:rgba(232,194,122,.4);color:var(--gold)}
+  .chip.c{border-color:rgba(122,211,232,.34);color:var(--cyan)}
+  .btns{display:flex;gap:9px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:14px;
+    padding:10px 20px;border-radius:999px;transition:.18s;border:1px solid var(--line2);color:var(--txt);
+    background:var(--card)}
+  .btn:hover{transform:translateY(-1px);border-color:var(--dim2)}
+  .btn.am{background:#fff;color:#111;border-color:#fff}
+  .btn.yt{background:#2a1418;color:#ff8fa3;border-color:#4a2028}
+  .tagline{margin-top:26px;font-size:17.5px;line-height:1.75;color:#ded9ec;
+    border-left:3px solid var(--accent);padding-left:18px;font-weight:520}
+
+  /* ---------- 快速事實 ---------- */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px}
+  .facts div{background:var(--bg2);padding:13px 16px}
+  .facts dt{font-size:10.5px;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase;margin-bottom:3px}
+  .facts dd{font-size:14px;color:var(--txt);line-height:1.55}
+
+  /* ---------- 區塊 ---------- */
+  section{margin-top:56px;scroll-margin-top:24px}
+  .shead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;
+    padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .snum{font-size:11px;letter-spacing:.16em;color:var(--dim2);font-variant-numeric:tabular-nums}
+  .shead h2{font-size:19px;letter-spacing:.02em;font-weight:700;color:var(--accent2)}
+  .shead .sen{font-size:11px;letter-spacing:.2em;color:var(--dim2);text-transform:uppercase;margin-left:auto}
+  .prose p{font-size:15.5px;color:#d8d4e4;margin-bottom:14px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{color:var(--gold);font-style:normal;font-weight:600}
+
+  /* ---------- 逐曲導聆 ---------- */
+  .trk{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;
+    background:linear-gradient(180deg,var(--bg2),#111017)}
+  .trkhead{display:flex;align-items:center;gap:14px;padding:14px 17px;cursor:pointer;transition:.16s}
+  .trkhead:hover{background:rgba(255,255,255,.03)}
+  .tn{font-size:12px;color:var(--dim2);font-variant-numeric:tabular-nums;width:22px;flex:none}
+  .tt{flex:1;min-width:0}
+  .tt b{display:block;font-size:15.5px;font-weight:640;line-height:1.4}
+  .tt span{font-size:12px;color:var(--dim2)}
+  .tlen{font-size:12.5px;color:var(--dim2);font-variant-numeric:tabular-nums;flex:none}
+  .tcar{font-size:11px;color:var(--dim2);flex:none;transition:.2s}
+  .trk.open .tcar{transform:rotate(90deg)}
+  .trkbody{display:none;padding:2px 17px 18px 53px;border-top:1px solid var(--line)}
+  .trk.open .trkbody{display:block}
+  .trkbody p{font-size:14.5px;color:#d3cfe0;margin:14px 0}
+  .cues{border-left:2px solid var(--line2);padding-left:14px;margin:14px 0}
+  .cue{display:flex;gap:12px;font-size:13.5px;margin-bottom:7px;align-items:baseline}
+  .cue b{color:var(--cyan);font-variant-numeric:tabular-nums;flex:none;font-weight:600;font-size:12.5px}
+  .cue span{color:var(--dim)}
+  .tmeta{font-size:12.5px;color:var(--dim2);margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}
+  .tmeta b{color:var(--dim)}
+  /* ---------- 影音延伸 ---------- */
+  .vnote{font-size:13px;color:var(--dim2);line-height:1.75;margin-bottom:16px;
+    border-left:2px solid var(--line2);padding-left:14px}
+  .vids{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:11px}
+  .vid{display:block;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:15px 17px;text-decoration:none;transition:.18s}
+  .vid:hover{border-color:#ff8fa3;transform:translateY(-2px);background:#1e1c27}
+  .vtop{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .vkind{font-size:10.5px;letter-spacing:.1em;background:#2a1418;border:1px solid #4a2028;
+    color:#ff8fa3;padding:3px 9px;border-radius:999px}
+  .vsearch{font-size:10.5px;letter-spacing:.1em;background:#1f1d29;border:1px solid var(--line);
+    color:var(--dim2);padding:3px 9px;border-radius:999px}
+  .vlen{font-size:11.5px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  .vid b{display:block;font-size:14.5px;color:var(--txt);font-weight:640;line-height:1.45;margin-bottom:4px}
+  .vby{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+  .vnt{display:block;font-size:12.5px;color:var(--dim2);line-height:1.6}
+
+  /* ---------- 人物誌 ---------- */
+  .people{display:grid;gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:15px;padding:19px 20px;background:var(--bg2)}
+  .prole{font-size:10.5px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .plife{font-size:12.5px;color:var(--dim2);margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .pcard p{font-size:14.5px;color:#d3cfe0;margin-bottom:11px}
+  .phere{background:rgba(250,75,110,.07);border-left:2px solid var(--accent);
+    padding:11px 14px;border-radius:0 9px 9px 0;font-size:14px;color:#e2dded;margin-bottom:12px}
+  .pkey{display:flex;gap:7px;flex-wrap:wrap}
+  .pkey a{font-size:12px;background:#232130;border:1px solid var(--line);color:var(--dim);
+    padding:5px 12px;border-radius:8px;text-decoration:none;transition:.16s}
+  .pkey a:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- 表格 ---------- */
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .tbl th{background:#1f1d29;color:var(--dim);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-align:left;padding:11px 14px;font-weight:600;border-bottom:1px solid var(--line)}
+  .tbl td{padding:12px 14px;border-bottom:1px solid var(--line);color:#d3cfe0;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tr:hover td{background:rgba(255,255,255,.022)}
+  .tbl .rec{color:var(--gold);white-space:nowrap;font-size:12.5px}
+  .tblwrap{overflow-x:auto}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;font-size:14px}
+  .kv dt{color:var(--dim2);white-space:nowrap}
+  .kv dd{color:#d8d4e4}
+
+  /* ---------- 通用小卡 ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+  .cards a,.cards div.nc{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-decoration:none;transition:.18s}
+  .cards a:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .cards b{display:block;font-size:14px;color:var(--txt);margin-bottom:3px;font-weight:640;line-height:1.4}
+  .cards span{font-size:12.5px;color:var(--dim2);line-height:1.5;display:block}
+
+  /* ---------- 時間軸 ---------- */
+  .tl{border-left:2px solid var(--line2);padding-left:20px;margin-left:6px}
+  .tlitem{position:relative;margin-bottom:20px}
+  .tlitem::before{content:'';position:absolute;left:-26px;top:8px;width:9px;height:9px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 0 4px var(--bg)}
+  .tlitem .ty{font-size:11.5px;letter-spacing:.14em;color:var(--gold);font-variant-numeric:tabular-nums}
+  .tlitem b{display:block;font-size:15px;margin:2px 0 4px}
+  .tlitem span{font-size:14px;color:var(--dim);line-height:1.65;display:block}
+
+  /* ---------- 路線圖 ---------- */
+  .road{display:grid;gap:12px}
+  .rstep{border:1px solid var(--line);border-radius:14px;padding:17px 19px;background:var(--bg2);
+    display:flex;gap:16px;align-items:flex-start}
+  .rnum{width:30px;height:30px;flex:none;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1a0d12;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .rstep b{display:block;font-size:15.5px;margin-bottom:5px}
+  .rstep p{font-size:14.5px;color:#d3cfe0;margin:0}
+
+  .srcs{font-size:12.5px;color:var(--dim2);line-height:2}
+  .srcs a{color:var(--dim);text-decoration:none;border-bottom:1px dotted var(--line2)}
+  .srcs a:hover{color:var(--accent2)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--dim2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .none{color:var(--dim2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc"><div class="tocTitle">目錄</div><div id="toc"></div></nav>
+<main id="main"></main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   資料區 —— 每張專輯只需要換掉這個 D 物件，其餘引擎完全不動
+   ═══════════════════════════════════════════════════════════════ */
+const D = {
+
+/* ── 基本識別 ── */
+artist:"María Dueñas, Wiener Symphoniker & Manfred Honeck",
+album:"Beethoven and Beyond",
+year:2023,
+label:"Deutsche Grammophon",
+catalog:"DG 4863512（2CD）",
+genre:"古典 · 小提琴協奏曲",
+styles:["裝飾奏專題","金色大廳現場","24bit/96kHz","DG 首張專輯"],
+moods:["專注","深夜","週末黑膠"],
+itunesTerm:"Maria Duenas Beethoven and Beyond",
+wiki:"https://en.wikipedia.org/wiki/Violin_Concerto_(Beethoven)",
+compiled:"2026-09-02",
+
+tagline:"貝多芬沒有替這首協奏曲寫裝飾奏——那是留給獨奏者的空白。二十歲的杜尼亞絲把這個空白當成整張唱片的題目：三個樂章全部用她自己寫的，第二張 CD 再收五位前輩留下的答案。這是一張以「該由誰來填空」為主題的首張專輯。",
+
+facts:[
+  ["錄音一","2023 年 1 月 27 日，維也納金色大廳現場（協奏曲、Ysaÿe、Kreisler）"],
+  ["錄音二","2023 年 1 月 28 日，Synchron Stage Vienna（Spohr、Saint-Saëns、Wieniawski）"],
+  ["錄音三","2022 年 7 月 22 日，柏林 Meistersaal（五首裝飾奏）"],
+  ["發行","2023 年 5 月 5 日 · DG 4863512（2CD）"],
+  ["內容","13 軌 · 約 1 小時 40 分"],
+  ["協奏曲裝飾奏","三個樂章全部由杜尼亞絲自己創作"],
+  ["CD2","Spohr、Ysaÿe、Saint-Saëns、Wieniawski、Kreisler 的第一樂章裝飾奏，共 17 分 57 秒"],
+  ["使用樂器","貝多芬用 Nicolò Gagliano；部分浪漫小品用 1710 年 Stradivari「Duc de Camposelice」"],
+  ["音質","24bit/96kHz 立體聲；Apple Music 另提供 Dolby Atmos 版本"]
+],
+
+/* ── 1 錄音製作全紀錄 ── */
+production:`這是杜尼亞絲的 DG 首張專輯，錄音時她二十歲。2022 年 9 月與 DG 簽下獨家合約，隔年五月就交出這張。
+
+**錄音分三批，地點三處，這一點在聆聽上有實際影響。**
+
+協奏曲本體加上 Ysaÿe 的《Berceuse》與 Kreisler 的《Liebesleid》，錄自 **2023 年 1 月 27 日維也納金色大廳的現場**——DG 的說法是取自那一系列三場音樂會。Spohr 的柔板、Saint-Saëns 的《Havanaise》與 Wieniawski 的《Légende》則是隔天（1 月 28 日）在 Synchron Stage Vienna 的錄音室完成的。而第二張 CD 那五首無伴奏裝飾奏，時間更早——**2022 年 7 月 22 日，柏林的 Meistersaal**，比協奏曲早了半年。
+
+所以你在同一張專輯裡會聽到三種空間：金色大廳的現場堂音、維也納錄音室的乾淨中頻、以及柏林一個房間裡的無伴奏獨奏。這不是缺點，但要知道。
+
+**團隊分兩組。** 執行製作是 Valérie Groß；第 1 到 8 軌由 Rainer Maillard 擔任製作人與混音，錄音師是 Juan Moreno；第 9 到 13 軌（那五首裝飾奏）則由 Lukas Kowalski 一人包辦製作、錄音與混音。全部出自 Emil Berliner Studios。內頁文字由 Mario-Felix Vogt 撰寫。
+
+**她用了兩把琴，而且分工明確。** 這件事她在 Presto 的訪談裡親口說明：「我其實是用兩把不同的小提琴錄這張專輯的……**貝多芬是用那把 Gagliano 錄的**，那把琴我已經拉了將近十年。但**專輯裡一些比較短的浪漫派小品我選擇用 Stradivarius**，因為我覺得那個聲音比較適合它們。」Gagliano 由德國音樂生活基金會（Deutsche Stiftung Musikleben）出借；那把 Strad 是 1710 年的「Duc de Camposelice」，2022 年 12 月起由日本音樂財團出借。
+
+（一個容易混淆的地方：她 2021 年拿下梅紐因大賽時獎品裡也有一把 Stradivari，但那是 Jonathan Moulds 私人收藏的另一把，跟這張唱片用的不是同一把。）
+
+還有一個延伸的發行策略值得記下來。2023 年 5 月到 7 月間，DG **另外發行了五個數位版本的貝多芬協奏曲**，各自把第一樂章換成 Spohr、Ysaÿe、Saint-Saëns、Wieniawski、Kreisler 的裝飾奏，二、三樂章仍用她自己的。換句話說，這張唱片的「裝飾奏題目」不只是收錄，而是真的做成了六種可以互換的版本。`,
+
+/* ── 2 深度樂評 ── */
+review:`先把這張唱片的題目講清楚，因為它比曲目表看起來的更精確。
+
+貝多芬沒有替 Op.61 寫裝飾奏。這在古典時期是常態而非疏漏——裝飾奏依慣例留給獨奏者即興或自撰，作曲家寫死反而是十九世紀中葉之後的事。於是這首協奏曲留下了一個持續兩百年的空白，而歷史上有超過一百位小提琴家與作曲家填過它。Martin Wulfhorst 的編目就收了一百多首。
+
+杜尼亞絲的做法是：**三個樂章全部用自己寫的**，然後在第二張 CD 上放五位前輩的第一樂章版本——Spohr、Ysaÿe、Saint-Saëns、Wieniawski、Kreisler。十七分五十七秒，五個答案並排。
+
+這個編排引來了樂評界最一致的一句保留意見。《The Strad》的 Charlotte Gardner 說得最直接：把裝飾奏「背對背孤立地排在一起效果沒那麼好」，她認為應該把每一首跟該作曲家自己的曲目放在一起聽。《The Classic Review》抱怨得更實際：協奏曲只切成三軌，你沒辦法把喜歡的那首裝飾奏插進去聽。我同意這個批評——**這是一張論證清楚但編排偷懶的唱片**。（不過 DG 後來那五個數位版本某種程度上補上了這一點。）
+
+至於演奏本身。《留聲機》的 David Threasher 給了很高的評價：「杜尼亞絲交出的表現堪稱不凡：每一道技術難關都從容跨過，音色與音準沒有任何閃失，詮釋自信而有說服力。」他的結語是「多麼好的一位演奏家，多麼好的一種展開錄音生涯的方式」。
+
+但幾份樂評同時點出了同一個保留，而且方向一致：**她把第一樂章拉到將近二十八分鐘。**《BBC 音樂雜誌》給四星，評語是「最終的印象比較像是一連串精緻的小品，而不是貝多芬完整的交響畫布」。Threasher 說終樂章「仍然一本正經，沒有再多加一點閃爍的光讓迴旋曲真正玩起來」。
+
+這個批評值得認真對待，因為它指向這張唱片真正的性格。二十八分鐘的第一樂章意味著她選擇把每一個句子都唱滿。《The Strad》的形容很準：「明亮、大量揉音的音色，驕傲的圓滑奏，充滿小重音的分句。」這是一種非常「歌唱」的貝多芬——優點是抒情段落極美，代價是那個由五下定音鼓長出來的、貫穿全樂章的節奏骨架被削弱了。
+
+順帶一提，這裡有一個對照組值得知道：貝多芬自己為鋼琴版 Op.61a 寫的第一樂章裝飾奏**用了定音鼓**——那是協奏曲史上罕見的「有伴奏的裝飾奏」，而且中段是一段軍樂式的進行曲。Kopatchinskaja 就是拿它來反推第一樂章應該用快速度的。杜尼亞絲走的是相反的路。
+
+錄音方面也有一則具體的保留。《The Classic Review》的 David A. McConnell：「DG 的錄音師把我們放得離演奏者太近了，好像坐在前幾排。整體聲音清楚但偏冷，缺少我們從 Decca 那些經典錄音裡認識的、這個廳應有的溫暖。」金色大廳的堂音在這張唱片上確實不太聽得出來。
+
+總結：這是一張非常好的首張專輯，題目選得聰明，技術完成度極高，而且它讓一個平常沒人談的問題變成了可以聽的東西。它不是這首協奏曲的首選錄音——那個位置目前還是留給更懂得經營結構的版本。但如果你想知道「裝飾奏」到底在爭什麼，這張是最方便的入口。`,
+
+/* ── 3 逐曲導聆（13 軌） ── */
+tracks:[
+/* ══ CD 1 ══ */
+{n:1, title:"貝多芬：D 大調小提琴協奏曲 Op. 61 · I. Allegro ma non troppo（裝飾奏：杜尼亞絲）", len:"27:55",
+ writer:"1806 年為 Franz Clement 而作｜1806 年 12 月 23 日維也納 Theater an der Wien 首演",
+ personnel:"María Dueñas（Nicolò Gagliano）· Wiener Symphoniker · Manfred Honeck｜2023-01-27 金色大廳現場",
+ note:`**開頭是五下定音鼓。** 這在當時完全沒有前例——單獨的定音鼓輕敲作為一首協奏曲的開端。（有些解說寫「四下」，那是不把木管進入的那一下算進去；兩種數法都有權威來源。）
+
+真正的震撼在幾秒之後：獨奏小提琴進來時，**在一個不屬於本調的音上（升 D）模仿那組鼓點**。這一下就宣告了那五下不只是導奏。Michael Steinberg 的說法是：整個極其廣闊的樂章都被這個節奏型浸透——第二個樂念底下密集的同音反覆是它的變體、樂團第一次爆發的節奏是它、木管唱出全曲最著名的抒情主題時小提琴在底下持續敲的也是它。
+
+還有一個時代背景值得知道：定音鼓經由土耳其軍樂進入西方音樂，直到十八世紀末仍被感受為帶有威脅性與侵略性。所以開頭那幾下可以聽成相當險惡的，與其後的田園牧歌形成刻意的反差。
+
+**二十七分五十五秒。** 這是本片最大的爭議點。第一樂章一般約二十一到二十五分鐘，她比多數版本慢得多。《BBC 音樂雜誌》的評語是最終印象「比較像一連串精緻的小品，而不是貝多芬完整的交響畫布」。你可以自己判斷這個交換值不值得。
+
+裝飾奏是她自己寫的。她的說明：「這是一個很深的分析過程——我得先仔細看這首曲子和它的結構，找出哪些主題對貝多芬最重要……但我一直試著忠於貝多芬自己的本質。」`,
+ cues:[["開頭","五下定音鼓。史上第一次有協奏曲這樣開始"],
+       ["獨奏進入","小提琴在升 D 上模仿鼓點——一個不屬於本調的音。第一個和聲震撼"],
+       ["樂團第一次強奏","注意那個節奏型：還是開頭那五下"],
+       ["抒情主題（木管）","全曲最有名的旋律。聽小提琴在底下持續敲的是什麼"],
+       ["裝飾奏","她自己寫的。與第 9–13 軌那五首歷史版本對照聽"],
+       ["裝飾奏之後","出乎意料的安靜重啟——抒情主題第一次由獨奏小提琴在低音域完整唱完。Tetzlaff 稱這是全曲最神聖的一刻"]]},
+
+{n:2, title:"貝多芬：協奏曲 · II. Larghetto（裝飾奏：杜尼亞絲）", len:"9:50",
+ writer:"G 大調｜91 小節，弦樂加弱音器",
+ note:`和聲幾乎靜止不動的九分五十秒。編制上長笛、小號、定音鼓全部退場——這個省略習慣與 Franz Clement 自己那首協奏曲一致。
+
+形式通常被描述為變奏曲：加弱音器的弦樂陳述聖詠般的主題，法國號接、單簧管接、獨奏低音管接，弦樂重述，最後獨奏與撥奏弦樂分享。**但 Hyperion 的解說提出一個重要修正**：這個印象在中途被推翻——獨奏者（不加弱音器，與加了弱音器的樂團小提琴形成對比）突然在 G 弦與 D 弦上帶進一個**全新的樂念**。所以它不是嚴格的變奏曲。
+
+《BBC 音樂雜誌》對這一軌的評語是正面的：「在這個充滿魔力的 Larghetto 裡，她把不做作的單純與豐富的情感結合在一起。」`,
+ cues:[["開頭","加弱音器的弦樂，聖詠般的主題。長笛、小號、定音鼓全部不在"],
+       ["法國號 → 單簧管 → 低音管","主題輪流換手，每次換一種音色"],
+       ["中途的新樂念","獨奏者不加弱音器，在低音弦上帶進一段全新的旋律。變奏曲的框架在此被打破"],
+       ["尾聲","弦樂去掉弱音器、以 forte 反駁。沉思結束了"]]},
+
+{n:3, title:"貝多芬：協奏曲 · III. Rondo. Allegro（裝飾奏：杜尼亞絲）", len:"11:53",
+ writer:"D 大調 6/8｜與第二樂章不間斷連接",
+ note:`第二樂章結束後不停頓（attacca）——獨奏者以一個顫音回應弦樂的反駁，即興出一座橋直接進入迴旋曲。
+
+主題是著名的「狩獵號角」音型，Hyperion 指出這個舞曲性的疊句可能借自 Clement。中段有一個 G 小調插部，是小提琴與低音管的對話——Kopatchinskaja 特別強調那些低音管獨奏「不是伴奏，是主導的獨奏聲部，反而是小提琴以精靈般的輕盈在伴隨它們」。
+
+兩個容易錯過的細節：① 號角音型再現之前，有**全曲唯一一處要求獨奏者撥奏的音符**；② 第三樂章裝飾奏之後，一段延長顫音帶出迴旋曲主題在**極遙遠的降 A 大調**上安靜重述——那是 D 大調的增四度異名同音，關係最遠的調——然後才是燦爛的收尾。
+
+《留聲機》對這一軌有保留：「仍然一本正經，沒有再多加一點閃爍的光讓迴旋曲真正玩起來。」`,
+ cues:[["開頭","不停頓地從上一樂章接進來。狩獵號角主題"],
+       ["G 小調插部","小提琴與低音管的對話。誰在主導？"],
+       ["唯一的撥奏","號角音型再現之前，全曲唯一一處要求獨奏撥弦"],
+       ["裝飾奏之後","主題在極遙遠的降 A 大調上安靜重述。與 D 大調關係最遠的調"],
+       ["尾聲","燦爛收束"]]},
+
+{n:4, title:"Spohr：小提琴、豎琴與管弦樂協奏交響曲 G 大調 WoO 13 · II. Adagio", len:"4:48",
+ writer:"Louis Spohr（1784–1859）｜豎琴：Volker Kempf",
+ personnel:"2023-01-28 錄於 Synchron Stage Vienna（使用 1710 年 Stradivari「Duc de Camposelice」）",
+ note:`「Beyond」的第一首。這裡開始換琴——她說較短的浪漫派小品用的是那把 Strad。
+
+Spohr 是這張唱片裡有趣的一位：他既是為貝多芬協奏曲寫過裝飾奏的人（第 9 軌），本人也是公開否定過這首協奏曲的人。小提琴與豎琴的組合在他的作品裡有私人理由——他的妻子 Dorette 是豎琴家。
+
+杜尼亞絲挑這首的動機她自己說過：「Spohr 和 Ysaÿe 這幾首對我來說完全是新的……身為年輕演奏家，我覺得自己有責任把不熟悉的曲目介紹給聽眾。」`,
+ cues:[["開頭","豎琴與小提琴的對話。換了琴，音色比前三軌更暗一點"],
+       ["中段","兩件樂器都是撥弦與弓弦的混合質地"],
+       ["尾聲","四分五十秒，全張最短的作品之一"]]},
+
+{n:5, title:"Ysaÿe：《Berceuse》Op. 20", len:"5:11",
+ writer:"Eugène Ysaÿe（1858–1931）｜搖籃曲",
+ personnel:"2023-01-27 金色大廳現場",
+ note:"這一軌回到金色大廳的現場錄音。Ysaÿe 是比利時學派的核心人物，他為貝多芬協奏曲寫的第一樂章裝飾奏（第 10 軌）直到 2009 年 Bärenreiter 版才首度出版。這首搖籃曲則是他抒情的一面。五分十一秒，是全張最適合單獨拿出來聽的小品之一。",
+ cues:[["開頭","搖籃曲的搖擺節奏"],
+       ["中段","音域往上走，張力累積"],
+       ["尾聲","回到開頭的安靜"]]},
+
+{n:6, title:"Saint-Saëns：《Havanaise》Op. 83", len:"10:21",
+ writer:"Camille Saint-Saëns（1835–1921）｜哈瓦那舞曲",
+ personnel:"2023-01-28 錄於 Synchron Stage Vienna",
+ note:`十分二十一秒，是「Beyond」裡最長也最外向的一首。Habanera 的切分節奏來自古巴，十九世紀末在法國音樂裡非常流行（比才《卡門》裡那首最有名）。
+
+Saint-Saëns 在這張唱片裡有一個特殊身分：**他是五位裝飾奏作者裡唯一不拉小提琴的**。杜尼亞絲自己在 Apple Music 的逐軌解說裡就是這樣介紹他的。聽完這首再去聽第 11 軌他的裝飾奏，會理解那是什麼意思——一個作曲家寫給小提琴的東西，和一個小提琴家寫給自己的東西，思路不一樣。`,
+ cues:[["開頭","慢速引子，小提琴的高音泛音"],
+       ["Habanera 節奏出現","那個切分的舞曲律動。與比才《卡門》同源"],
+       ["快速段落","技術密度最高的地方"],
+       ["尾聲","回到開頭的引子素材"]]},
+
+{n:7, title:"Wieniawski：《Légende》Op. 17", len:"8:01",
+ writer:"Henryk Wieniawski（1835–1880）｜傳說",
+ personnel:"2023-01-28 錄於 Synchron Stage Vienna",
+ note:"Wieniawski 十九歲就寫了給貝多芬協奏曲的裝飾奏（第 12 軌），而那份手稿生前沒有出版，一直到 2009 年才面世。這首《Légende》是他最常被演奏的小品之一，結構簡單：一段憂鬱的主旋律，中段轉激動，然後回來。杜尼亞絲說他的裝飾奏是五首裡「最炫技的」。",
+ cues:[["開頭","加弱音器的主題，g 小調"],
+       ["中段","轉激動，速度與音量都上去"],
+       ["再現","主題回來，這次更安靜"]]},
+
+{n:8, title:"Kreisler：《Liebesleid》（愛之悲）", len:"3:40",
+ writer:"Fritz Kreisler（1875–1962）｜《三首古維也納舞曲》第 2 首，改編為小提琴與管弦樂",
+ personnel:"2023-01-27 金色大廳現場",
+ note:`三分四十秒，全張最短的一軌，也是最恰當的收尾——在維也納的金色大廳，演奏一首以「古維也納」為題的曲子。
+
+Kreisler 是這張唱片的隱形主角：他 1894 年、十九歲時寫的貝多芬協奏曲裝飾奏（第 13 軌）**公認是至今最常被演奏的版本**。杜尼亞絲自己的評語是「最有名、也最常被演的那一首」。
+
+這首《Liebesleid》原本是給小提琴與鋼琴的，這裡是管弦樂版。它是那種第一次聽就會記住的旋律。`,
+ cues:[["開頭","維也納圓舞曲的節奏，但調性是小調"],
+       ["中段","轉大調，短暫的明亮"],
+       ["尾聲","回到小調。全張在此結束前的最後一句抒情"]]},
+
+/* ══ CD 2 ══ */
+{n:9, title:"CD2 · Spohr：貝多芬協奏曲第一樂章裝飾奏", len:"1:21",
+ writer:"Louis Spohr（1784–1859）｜無伴奏獨奏",
+ personnel:"2022-07-22 錄於柏林 Meistersaal",
+ note:`第二張 CD 開始。五首歷史裝飾奏，全部是無伴奏獨奏，全部只寫給第一樂章，總長十七分五十七秒。
+
+Spohr 這首只有一分二十一秒，是五首裡最短的。杜尼亞絲的評語：「聽起來有點像莫札特。」這個描述很準——它保留了古典時期裝飾奏那種節制的比例感，跟後面幾首浪漫派的擴張形成強烈對比。
+
+要記得一件事：Spohr 本人是公開否定過貝多芬這首協奏曲的。他還是寫了裝飾奏。`,
+ cues:[["整首","一分二十一秒。五首裡最短、最古典的一首"],
+       ["對照","聽完直接跳到第 10 軌，落差會很明顯"]]},
+
+{n:10, title:"CD2 · Ysaÿe：貝多芬協奏曲第一樂章裝飾奏", len:"4:04",
+ writer:"Eugène Ysaÿe（1858–1931）｜約作於 1889 年",
+ note:"比 Spohr 長了三倍。Ysaÿe 的手稿藏於摩根圖書館，這首第一樂章裝飾奏直到 2009 年 Bärenreiter 版才首度出版——也就是說，在那之前幾乎沒有人能演。杜尼亞絲的評語是「技術上要求很高」。比利時學派的和聲語言在這裡聽得很清楚。",
+ cues:[["開頭","比 Spohr 那首擴張得多"],
+       ["中段","雙音與和弦的密度提高"],
+       ["尾聲","接回樂團的顫音"]]},
+
+{n:11, title:"CD2 · Saint-Saëns：貝多芬協奏曲第一樂章裝飾奏", len:"4:18",
+ writer:"Camille Saint-Saëns（1835–1921）｜1898 年巴黎 Durand 出版",
+ note:`五首裡最特別的一首，因為**Saint-Saëns 是唯一不拉小提琴的作者**。杜尼亞絲自己就是這樣介紹它的。Bärenreiter 版把它定位為「一位不演奏小提琴的名作曲家之貢獻的範例」。
+
+差別聽得出來：它比較不像是從小提琴的手感長出來的，比較像是從音樂的結構長出來的。這正是這張唱片把五首並排的價值——同一個空白，作曲家和演奏家的填法不一樣。`,
+ cues:[["開頭","結構感比技巧感強"],
+       ["中段","主題的處理方式比較「作曲」而非「炫技」"],
+       ["對照","與第 12 軌 Wieniawski 那首連著聽，差別最明顯"]]},
+
+{n:12, title:"CD2 · Wieniawski：貝多芬協奏曲第一樂章裝飾奏", len:"4:14",
+ writer:"Henryk Wieniawski（1835–1880）｜1854 年作，時年 19 歲",
+ note:"十九歲寫的。手稿藏於海牙，生前未出版，2009 年 Bärenreiter 版才首度面世。杜尼亞絲的評語很簡短：「最炫技的一首。」波蘭學派的技術取向在這裡完全展開——四首裡技術密度最高的。有意思的是，杜尼亞絲寫她自己那三首的時候也是二十歲上下。",
+ cues:[["開頭","立刻進入高難度"],
+       ["中段","雙音、跳弓、極高把位"],
+       ["整首","五首裡最外向的一首"]]},
+
+{n:13, title:"CD2 · Kreisler：貝多芬協奏曲第一樂章裝飾奏", len:"4:00",
+ writer:"Fritz Kreisler（1875–1962）｜1894 年作，時年 19 歲",
+ note:`壓軸的是最有名的那一首。Kreisler 十九歲寫的，1928 年才出版，而它**公認是至今最常被演奏的版本**——維基百科、Tetzlaff、Eberle 三方說法一致（不過沒有任何統計數據，別引用百分比）。
+
+它的特色是**把第一與第二主題結合在一起**，慢速抒情與極快技巧段落交替。缺點是偏長——有演奏家就是因為嫌長而改用別的版本。
+
+Tetzlaff 對它有一段值得記下的批評：「Kreisler 的最常被演，但那是一首浪漫派的炫技裝飾奏，跟這首協奏曲底層的古典戲劇性關係不大。」他自己用的是貝多芬為鋼琴版寫的那首——那首裡有定音鼓。
+
+聽完這一軌，回頭去聽第 1 軌杜尼亞絲自己寫的那首。五個前輩的答案聽完之後，你比較有辦法判斷她的答案好不好。`,
+ cues:[["開頭","立刻認得出來——這是大多數人聽過的那一首"],
+       ["第一與第二主題結合","Kreisler 的招牌手法，也是它最被稱讚的地方"],
+       ["快慢交替","抒情段落與極快技巧段落輪流"],
+       ["聽完之後","回到第 1 軌。整張唱片的論證在這裡閉合"]]}
+],
+
+/* ── 4 人物誌 ── */
+people:[
+{role:"小提琴", name:"María Dueñas 瑪莉亞・杜尼亞絲", life:"2002 年 12 月 4 日生 · 西班牙格拉納達",
+ bio:`家中沒有職業音樂家。七歲進格拉納達的 Ángel Barrios 音樂院，十一歲拿到馬德里的獎學金赴德勒斯登韋伯音樂院，後來經指揮家 Vladimir Spivakov 推薦移居維也納。2016 年起師事 **Boris Kuschnir**。兩個妹妹 Julia（小提琴）與 Daniela（大提琴）也是音樂家。
+
+比賽紀錄相當密集：2017 年科崗大賽首獎、2018 年 Yankelevitch 大賽資深組首獎、2021 年 Getting to Carnegie 首獎。**2021 年 5 月 22 日，十八歲的她在美國維吉尼亞州里奇蒙拿下梅紐因國際小提琴大賽資深組首獎**，同時獲得觀眾獎；獎品包含兩萬美元、一把黃金時期 Stradivari 的兩年出借，以及一支 Christophe Landon 製作的琴弓。同年她也拿下特列季亞科夫大賽的大獎——決賽拉的正是貝多芬協奏曲。
+
+2022 年 9 月與 DG 簽下獨家合約，這張是首張專輯。之後的發行包括 2025 年的《帕格尼尼二十四首隨想曲》。2024 年獲 Opus Klassik 年度新秀獎。`,
+ here:`這張唱片真正屬於她的東西是那個題目，不是那個演奏。
+
+寫裝飾奏對她不是為了這張唱片才做的事。她在 Presto 的訪談裡說：「這一切其實是從裝飾奏開始的：我第一首是為莫札特第一號協奏曲寫的……那只是一種**把自己的一部分交給音樂**的方式；我覺得如果作曲家給了你這樣一個機會，你就應該拿。」
+
+而她對貝多芬這首的態度說得更狠：「**在貝多芬的協奏曲裡你不能依賴技巧；你必須揭露你自己。而那只能透過聲音做到。**」
+
+演奏上，《The Strad》的形容最準確：「明亮、大量揉音的音色，驕傲的圓滑奏，充滿小重音的分句。」這是一種非常歌唱的路線，代價是那個由定音鼓長出來的節奏骨架被削弱了——第一樂章二十七分五十五秒就是這個選擇的價格。
+
+另外記得：**貝多芬用的是 Gagliano，浪漫小品才換 Stradivari**。這是她自己說的分工。`,
+ key:[["Paganini: 24 Caprices","2025"],["Gargiulo: Estro","2024"],["El cant dels ocells","2024"]]},
+
+{role:"作曲", name:"Ludwig van Beethoven 貝多芬", life:"1770–1827｜Op. 61 作於 1806 年",
+ bio:`這首協奏曲寫給維也納小提琴家 **Franz Clement**，與第四號交響曲、第四號鋼琴協奏曲同屬 1806 年下半的密集創作期。自筆譜題頭上貝多芬寫了一句雙關的文字遊戲，把 Clement 的名字玩進「寬容（Clemenza）」裡。
+
+**1806 年 12 月 23 日在維也納 Theater an der Wien 首演**，是 Clement 的受益音樂會。首演的評價不好：一份 1807 年的樂評說「雖有美的段落，但脈絡常常完全支離破碎，某些平庸樂句無止盡重複容易令人疲乏」，並建議貝多芬把才能用在更好的地方。除了 1816 年一場未具名的演出之外，**貝多芬有生之年在維也納再沒聽過這首曲子**。
+
+（流傳很廣的那則軼事——Clement 幾乎是視奏、還在協奏曲中間表演倒持琴用單弦拉琴的雜耍——需要打折扣。倒持琴確實是他的招牌把戲，但「在協奏曲中間表演」有爭議，Hyperion 甚至以原始節目單反證：協奏曲排在上半場，夾在 Méhul 序曲與莫札特詠嘆調之間。）
+
+**復活發生在 1844 年 5 月 27 日的倫敦**：十二歲的約阿希姆在孟德爾頌指揮下於 Hanover Square Rooms 演出，背譜、自作裝飾奏。愛樂協會本來有禁用童星的規定，孟德爾頌親自擔保才破例。孟德爾頌隔天寫信說，觀眾在第一段大 tutti 之前打斷了三次，**連裝飾奏中途都被掌聲打斷**。
+
+Op.61 題獻給 Stephan von Breuning；1807 年應 Clementi 之請改編的鋼琴版 Op.61a 則題獻給他的妻子 Julie。同一首曲子的兩個版本，獻給一對夫妻。`,
+ here:`**他沒有為小提琴版寫裝飾奏——這是整張唱片存在的理由。**
+
+要注意這在當時是常態不是疏漏：古典時期的裝飾奏依慣例留給獨奏者。他自己確實為第一到第四號鋼琴協奏曲寫了裝飾奏，但小提琴協奏曲他留白了。
+
+**但他為鋼琴版 Op.61a 寫了。** 而那首第一樂章的裝飾奏是協奏曲史上罕見的東西——**它用了定音鼓**，是一段有伴奏的裝飾奏，中段甚至是一段軍樂式的進行曲。Kopatchinskaja 用它來反推第一樂章應該用快速度：如果慢，那段進行曲完全講不通。
+
+這件事在現代形成了一整條支線：把 Op.61a 的鋼琴裝飾奏改編回小提琴。Schneiderhan 在 1962 年與 Jochum、柏林愛樂的 DG 錄音是最有影響力的版本；Kremer 1993 年那版更誇張，改編成小提琴＋定音鼓＋鋼琴，而那台鋼琴在整張錄音的其他地方完全不出聲；Kopatchinskaja 則改成兩把小提琴＋大提琴＋定音鼓，第二小提琴是她自己疊錄的。
+
+杜尼亞絲沒有走這條路。她選擇自己寫。`,
+ key:[["Symphony No. 4","1806"],["Piano Concerto No. 4","1806"],["Razumovsky Quartets, Op. 59","1806"],["Fidelio","1805/1814"]]},
+
+{role:"指揮", name:"Manfred Honeck 曼弗雷德・霍內克", life:"1958 年 9 月 17 日生 · 奧地利 Nenzing",
+ bio:`九個孩子中的一個，先學小提琴後改中提琴，**曾任維也納愛樂／維也納國立歌劇院管弦樂團的中提琴手**——也就是說他是從樂團內部看過這首協奏曲無數次的人。他的兄弟 Rainer Honeck 是維也納愛樂的首席。
+
+早年曾是阿巴多在古斯塔夫馬勒青年管弦樂團的助理，1987 年創辦維也納 Jeunesse 管弦樂團。歷任蘇黎世歌劇院、挪威國家歌劇院、瑞典廣播交響、斯圖加特國立歌劇院。**2008–09 樂季起任匹茲堡交響樂團第九任音樂總監**，合約已延長至 2032–33 樂季。2018 年以蕭士塔高維契第五號與巴伯《慢板》拿下葛萊美最佳管弦樂演奏。`,
+ here:"杜尼亞絲稱他為 mentor——「在我剛搬到維也納的時候就相信我」。《泰晤士報》給這張四星的評語裡把他一起點名：「這場與維也納交響樂團及指揮霍內克的演出，其熱情與自信近乎驚人。」值得注意的是他的中提琴出身：這首協奏曲的樂團部分有大量內聲部的細節（尤其第二樂章那些換手的變奏），一個從樂團裡面出來的指揮處理這些會比較知道分寸。",
+ key:[["Shostakovich: Symphony No. 5 / Barber: Adagio","2017"],["Beethoven: Symphonies 5 & 7","2015"],["Bruckner: Symphony No. 9","2019"]]},
+
+{role:"樂團", name:"Wiener Symphoniker 維也納交響樂團", life:"1900 年 10 月 30 日創立 · 駐地維也納音樂廳",
+ bio:`**1900 年 10 月 30 日**創立，首場音樂會由 Ferdinand Löwe 指揮。駐地是**維也納音樂廳（Konzerthaus）**，但也常在金色大廳與河畔劇院演出——這張唱片就是在金色大廳錄的。現任首席指揮是 Petr Popelka，2024–25 樂季起，為樂團第十七任。
+
+**與維也納愛樂的區別**（這兩個團中文常被搞混）：維也納愛樂創立於 1842 年，團員必須先在維也納國立歌劇院管弦樂團任職至少三年才有資格入選，主場在金色大廳；維也納交響樂團是完全獨立的樂團，1900 年創立，是維也納這座城市的市屬樂團，主場在音樂廳。`,
+ here:"這張的協奏曲部分錄自 2023 年 1 月 27 日金色大廳的現場——那是他們的客場而非主場。《The Classic Review》對錄音有一則具體的保留：「DG 的錄音師把我們放得離演奏者太近了，好像坐在前幾排。整體聲音清楚但偏冷，缺少我們從 Decca 那些經典錄音裡認識的、這個廳應有的溫暖。」金色大廳的堂音在這張唱片上確實不太聽得出來，這一點值得在聽的時候留意。",
+ key:[]}
+],
+
+/* ── 5 完整 Credits ── */
+credits:[
+ ["小提琴","María Dueñas"],
+ ["樂團","Wiener Symphoniker"],
+ ["指揮","Manfred Honeck"],
+ ["豎琴（第 4 軌）","Volker Kempf"],
+ ["執行製作人","Valérie Groß"],
+ ["錄音製作人 · 剪輯 · 混音","Rainer Maillard（第 1–8 軌）／Lukas Kowalski（第 9–13 軌）"],
+ ["錄音師 / Tonmeister","Juan Moreno（第 1–8 軌）／Lukas Kowalski（第 9–13 軌）｜助理 Mario Niehren"],
+ ["錄音單位","Emil Berliner Studios"],
+ ["錄音地點與日期","金色大廳現場 2023-01-27（1、2、3、5、8 軌）｜Synchron Stage Vienna 2023-01-28（4、6、7 軌）｜柏林 Meistersaal 2022-07-22（9–13 軌）"],
+ ["使用樂器","Nicolò Gagliano（德國音樂生活基金會出借）—— 貝多芬協奏曲｜Stradivari「Duc de Camposelice」1710（日本音樂財團出借，2022 年 12 月起）—— 部分浪漫小品"],
+ ["內頁文字","Mario-Felix Vogt（英譯 John Moraitis）"],
+ ["攝影 · 設計","封面 Felix Broede｜內頁 Terry Linke｜設計 Anja Hoppe"],
+ ["格式","24bit/96kHz 立體聲；Apple Music 另提供 Dolby Atmos。DG 與 Qobuz、Presto 的規格頁只標示立體聲"],
+ ["版本","2CD Digipack DG 4863512（2023-05-05）｜2LP gatefold DG 486 3513（2023-06-09）｜另有簽名白標限定版"]
+],
+
+/* ── 6 評價與歷史地位 ── */
+reception:{
+ scores:[
+  ["Gramophone（2023 年 8 月號 · David Threasher）","「杜尼亞絲交出的表現堪稱不凡：每一道技術難關都從容跨過，音色與音準沒有任何閃失，詮釋自信而有說服力。」結語：「多麼好的一位演奏家，多麼好的一種展開錄音生涯的方式。」保留：終樂章「仍然一本正經，沒有再多加一點閃爍的光讓迴旋曲真正玩起來」"],
+  ["The Strad（2023 年 8 月號 · Charlotte Gardner）","「明亮、大量揉音的音色，驕傲的圓滑奏，充滿小重音的分句——二十歲的杜尼亞絲確實給了我們一個難忘、高度個人化的貝多芬協奏曲。」保留：認為把五首裝飾奏「背對背孤立地排在一起效果沒那麼好」，應該與各作曲家自己的曲目並置"],
+  ["BBC Music Magazine（2023 年 7 月號 · ★★★★）","「在這個充滿魔力的 Larghetto 裡，她把不做作的單純與豐富的情感結合在一起。」保留：第一樂章近二十八分鐘，「最終的印象比較像是一連串精緻的小品，而不是貝多芬完整的交響畫布」"],
+  ["The Classic Review（2023-05-19 · David A. McConnell）","「少有詮釋能與這種優雅和飽滿的抒情相匹敵。」但對錄音有具體批評：「DG 的錄音師把我們放得離演奏者太近了……整體聲音清楚但偏冷，缺少這個廳應有的溫暖。」"],
+  ["Presto Music（Recording of the Week · Katherine Cooper）","「她把一種近乎孩童般的驚奇與探索，和絕對的技術掌控結合在一起……別懷疑，她確實是個重量級的天才。」"],
+  ["The Times（2023-05-03 · ★★★★）","「這場與維也納交響樂團及指揮霍內克的演出，其熱情與自信近乎驚人。」"]
+ ],
+ chart:[
+  ["英國官方專門古典榜","2023-05-12 以第 3 名入榜，最高第 2 名，在榜十週"],
+  ["延伸發行","2023 年 5 至 7 月，DG 另發行五個數位版本的協奏曲，各自把第一樂章換成 Spohr、Ysaÿe、Saint-Saëns、Wieniawski、Kreisler 的裝飾奏"]
+ ],
+ awards:[
+  ["Gramophone Critics' Choice 2023","樂評人年度精選（注意：不是 Editor's Choice，也不是 Recording of the Month）"],
+  ["Opus Klassik 2024","年度新秀（Young Talent of the Year）得獎"],
+  ["Qobuzissime","Qobuz 最高推薦"],
+  ["Presto Music","2023 年 5 月 5 日 Recording of the Week；入選 2023 年度錄音與首張獨奏專輯短名單"],
+  ["ICMA 2024","協奏曲類提名（未得獎）"],
+  ["演奏家獎項","2021 梅紐因國際小提琴大賽資深組首獎＋觀眾獎（5 月 22 日，美國里奇蒙）"]
+ ],
+ legacy:`這張唱片的位置現在還不容易定，它才三年。但有兩件事已經清楚。
+
+**第一，它把一個平常沒人談的問題變成了可以聽的東西。** 貝多芬留下的那個空白有超過一百位小提琴家與作曲家填過——Martin Wulfhorst 的編目收了一百多首——但這些東西平常散落在各家錄音的第一樂章裡，沒有人把它們並排。杜尼亞絲做了，而且是在自己的首張專輯上做的。就這一點來說，這是一張有想法的唱片。
+
+**第二，它的執行不如它的構想。** 幾份主要樂評的保留意見高度一致：五首裝飾奏孤立地排在第二張 CD 上，聽起來像附錄而不是論證；協奏曲只切成三軌，你也沒辦法自己組合。DG 後來那五個數位版本某種程度上是在補救這件事。
+
+至於演奏本身在錄音史上的位置——第一樂章二十七分五十五秒的選擇，讓它不會成為這首協奏曲的首選版本。這首曲子的參考錄音競爭極其激烈：Menuhin 與福特萬格勒（1947）、Schneiderhan 與 Jochum（1962，用貝多芬自己的裝飾奏）、Faust 與阿巴多（2011）、Kopatchinskaja（2009）各自代表一種完整的立場。
+
+但作為一張首張專輯，《留聲機》那句話大概是最公允的判斷：「多麼好的一位演奏家，多麼好的一種展開錄音生涯的方式。」`
+},
+
+/* ── 7 脈絡與影響網絡 ── */
+context:{
+ era:`要理解這張唱片，先要理解「裝飾奏」在古典時期是什麼。
+
+那是一個留白。協奏曲寫到某個延長記號的地方，樂團停下來，獨奏者即興——展示技巧，也展示對這首曲子的理解。作曲家不寫死，因為那本來就不該由作曲家決定。貝多芬 1806 年寫這首協奏曲時遵循的就是這個慣例。
+
+**十九世紀中葉之後，這個慣例消失了。** 作曲家開始把裝飾奏寫進譜裡，原因之一正是對純炫技濫用的反動。於是貝多芬這個空白就變成了一個尷尬的遺產：每個演奏家都必須做選擇，而選擇本身變成一種表態。
+
+歷史上留下的答案非常多。約阿希姆（他就是 1844 年讓這首曲子復活的那個十二歲少年）寫了好幾套，風格內斂、完全由協奏曲自己的樂句加工而成。Kreisler 十九歲寫的那首後來成了最常被演奏的版本，但它是浪漫派的炫技裝飾奏。Ysaÿe、Saint-Saëns、Wieniawski 的版本長期沒有出版，要到 2009 年 Bärenreiter 版才面世。二十世紀後期還有 Schnittke 那首引用了布拉姆斯、貝爾格、蕭士塔高維契、巴爾托克的多元風格版本，配上十把小提琴與定音鼓。
+
+而貝多芬自己其實留下了線索：1807 年他把這首改編成鋼琴協奏曲 Op.61a 時**寫了裝飾奏，而且第一樂章那首用了定音鼓**。二十世紀有一整條支線在做「把它改編回小提琴」的事——Schneiderhan、Kremer、Kopatchinskaja、Tetzlaff、Faust 各有做法。
+
+杜尼亞絲二十歲時面對的就是這整片風景。她的選擇是：自己寫三首，然後把五個前輩的答案並排放在旁邊。`,
+ timeline:[
+  ["1805-04-07","Clement 首演自己的 D 大調協奏曲","同一場音樂會上貝多芬首次公開指揮《英雄》。據記載 Clement 那首當晚評價還比《英雄》好"],
+  ["1806 下半年","Op.61 完成","與第四號交響曲、第四號鋼琴協奏曲同期"],
+  ["1806-12-23","首演","維也納 Theater an der Wien，Clement 的受益音樂會。評價不佳"],
+  ["1807","改編為鋼琴協奏曲 Op.61a","應 Clementi 之請。貝多芬為它寫了裝飾奏，第一樂章那首用了定音鼓"],
+  ["1808-08","出版","維也納 Bureau des arts et d'industrie，Op.61 與 Op.61a 同時發行"],
+  ["1816","貝多芬生前最後一次聽聞此曲","此後直到他 1827 年去世，維也納再無演出紀錄"],
+  ["1844-05-27","復活","倫敦 Hanover Square Rooms，十二歲的約阿希姆，孟德爾頌指揮。背譜、自作裝飾奏"],
+  ["1854","Wieniawski 寫下裝飾奏","時年 19 歲。手稿生前未出版，2009 年才面世"],
+  ["1894","Kreisler 寫下裝飾奏","時年 19 歲。1928 年出版，日後成為最常被演奏的版本"],
+  ["1898","Saint-Saëns 的裝飾奏出版","巴黎 Durand。五位作者裡唯一不拉小提琴的"],
+  ["1962-05","Schneiderhan 錄下貝多芬自己的裝飾奏","柏林 Jesus-Christus-Kirche，Jochum 指揮柏林愛樂。把 Op.61a 的鋼琴裝飾奏改編回小提琴"],
+  ["2009","Bärenreiter 版首度出版 Ysaÿe 與 Wieniawski 的裝飾奏","在此之前幾乎沒有人能演"],
+  ["2021-05-22","杜尼亞絲奪得梅紐因大賽首獎","美國里奇蒙，資深組，時年 18 歲，同時獲觀眾獎"],
+  ["2022-07-22","五首裝飾奏錄音","柏林 Meistersaal"],
+  ["2022-09","與 DG 簽下獨家合約",""],
+  ["2023-01-27","金色大廳現場錄音","協奏曲、Ysaÿe、Kreisler"],
+  ["2023-05-05","專輯發行","DG 4863512"],
+  ["2023-05 至 07","五個數位替換版本陸續上線","各自把第一樂章換成一位前輩的裝飾奏"],
+  ["2024","Opus Klassik 年度新秀","杜尼亞絲得獎"]
+ ],
+ influencedBy:[
+  ["Franz Clement","Violin Concerto in D major","貝多芬必定聽過。同調、同編制（只用一支長笛、慢樂章省略小號與定音鼓），終樂章的舞曲疊句可能借自它"],
+  ["Fritz Kreisler","Beethoven: Violin Concerto","1926 與 1936 兩份錄音，用自己的裝飾奏。這張的第 13 軌就是那首"],
+  ["Joseph Joachim","Beethoven: Violin Concerto","1844 年讓這首曲子復活的人，也寫過多套裝飾奏"]
+ ],
+ influenced:[
+  ["Wolfgang Schneiderhan","Beethoven: Violin Concerto (Jochum)","1962，把貝多芬為鋼琴版寫的裝飾奏改編回小提琴，最有影響力的版本"],
+  ["Patricia Kopatchinskaja","Beethoven: Violin Concerto","2009，把貝多芬的裝飾奏改編成兩把小提琴＋大提琴＋定音鼓，第二小提琴自己疊錄"],
+  ["Isabelle Faust","Beethoven: Violin Concerto (Abbado)","2011，同樣用貝多芬含定音鼓的裝飾奏，但做了自己的刪節"],
+  ["Vadim Gluzman","Beethoven: Violin Concerto","2021，用 Schnittke 那首引用布拉姆斯、貝爾格、蕭士塔高維契、巴爾托克的多元風格裝飾奏"]
+ ],
+ covers:[
+  ["Veronika Eberle","Beethoven: Violin Concerto (Rattle / LSO)","2023，用 Jörg Widmann 新寫的裝飾奏——同一年的另一種答案"],
+  ["Gidon Kremer","Beethoven: Violin Concerto (Harnoncourt)","1993，改編成小提琴＋定音鼓＋鋼琴，而那台鋼琴在錄音其他地方完全不出聲"],
+  ["Christian Tetzlaff","Beethoven: Violin Concerto (Ticciati)","2018，自己把貝多芬的裝飾奏縮短，理由是「小提琴撐不起這麼大篇幅的獨奏」"]
+ ]
+},
+
+/* ── 8 版本／音質指南 ── */
+versions:[
+ {name:"本片：Dueñas / Honeck / 維也納交響", year:"2023", source:"DG 4863512 · 24/96 · 2CD",
+  note:"賣點是裝飾奏的專題編排，不是這首協奏曲的標準詮釋。第一樂章 27:55 偏慢，抒情段落極美但結構感被削弱。想理解裝飾奏這個問題，這是最方便的入口。", rec:4},
+ {name:"Schneiderhan / Jochum / 柏林愛樂", year:"1962（DG）", source:"柏林 Jesus-Christus-Kirche",
+  note:"三個樂章全部用貝多芬自己為鋼琴版 Op.61a 所寫的裝飾奏，由 Schneiderhan 改編回小提琴。想聽「作曲家自己想的裝飾奏」，這是起點。他的改編版 1968 年由 Henle 出版，後來成為一整個傳統。", rec:5},
+ {name:"Menuhin / Furtwängler / 琉森節慶", year:"1947（EMI）", source:"1947-08-28/29 琉森",
+  note:"用 Kreisler 的裝飾奏。二十世紀最被推崇的版本之一，速度寬廣但結構從不鬆散。音質是那個年代的水準。", rec:5},
+ {name:"Faust / Abbado / Orchestra Mozart", year:"2011（Harmonia Mundi）", source:"留聲機大獎 2012",
+  note:"用貝多芬含定音鼓的裝飾奏，但做了自己的刪節。當代錄音裡結構感最好的版本之一，也是想聽「定音鼓裝飾奏」最容易入手的一張。", rec:5},
+ {name:"Kopatchinskaja / Herreweghe / 香榭麗舍", year:"2009（Naïve）", source:"BBC 音樂雜誌 2010 大獎",
+  note:"最激進的一版。第一樂章裝飾奏改編成兩把小提琴＋大提琴＋定音鼓（第二小提琴是她自己疊錄的），而且她連正文都改——她研讀自筆譜摹本，採用了貝多芬自己寫下但沒被印行版選用的異文。極具爭議，也極有啟發。", rec:5},
+ {name:"Gluzman / Gaffigan / 琉森交響", year:"2021（BIS）", source:"Schnittke 裝飾奏",
+  note:"用 Schnittke 那首引用《英雄》、布拉姆斯、蕭士塔高維契、巴爾托克、貝爾格的多元風格裝飾奏，第一樂章加入十把小提琴與定音鼓。這是裝飾奏這條線走得最遠的地方。", rec:4},
+ {name:"Heifetz / Toscanini / NBC", year:"1940（HMV）", source:"自作裝飾奏，部分以 Auer 為基礎",
+  note:"速度極快，與本片正好相反的極端。歷史價值與技術示範價值都高，但錄音年代久遠。", rec:4},
+ {name:"Eberle / Rattle / 倫敦交響", year:"2023（LSO Live）", source:"Jörg Widmann 新作裝飾奏",
+  note:"與本片同一年的另一種答案：不是自己寫，也不用歷史版本，而是委託當代作曲家寫新的。兩張連著聽很有意思。", rec:4}
+],
+versionsNote:`實務建議：這張不適合當你的第一張貝多芬小提琴協奏曲。想要一個平衡、結構清楚的版本，Menuhin／福特萬格勒或 Faust／阿巴多更合適。這張的價值在題目。
+
+**如果你對裝飾奏這件事有興趣，最有效率的聽法是三張連著聽**：本片（她自己寫的＋五首歷史版本）、Schneiderhan／Jochum（貝多芬自己為鋼琴版寫的，含定音鼓）、Kopatchinskaja（把那首拆成四件樂器的極端版）。一個下午你就會知道這場爭論在爭什麼。
+
+格式方面：24/96 與 CD 的差異在這張上不大。Apple Music 有 Dolby Atmos 版本，但 DG 與 Qobuz、Presto 的規格頁只標示立體聲，所以那個 Atmos 應該是後製的空間音訊而非原生錄製——當成另一種聽法，不是升級。
+
+一個聆聽上的提醒：這張的錄音偏近場，《The Classic Review》形容為「清楚但偏冷」。如果你的系統本來就偏亮，這張可能會有點刺。可以把音量壓低一點聽。`,
+
+/* ── 9 聆聽路線圖 ── */
+roadmap:[
+ {title:"第一次聽 · 倒著聽", body:"不要從第 1 軌開始。先聽第二張 CD 那五首裝飾奏（第 9–13 軌，總共十七分鐘），從 Spohr 那首一分二十一秒的古典版本，一路聽到 Kreisler 那首四分鐘的浪漫版本。五個人怎麼填同一個空白，落差非常清楚。聽完再回頭聽第 1 軌的協奏曲，你會知道杜尼亞絲自己那首在做什麼。"},
+ {title:"第二次聽 · 追那五下定音鼓", body:"第 1 軌，二十七分五十五秒。全程只注意一件事：開頭那五下定音鼓的節奏型跑到哪裡去了。獨奏小提琴進來時在升 D 上模仿它；第二個樂念底下的同音反覆是它的變體；樂團第一次爆發的節奏是它；木管唱抒情主題時小提琴在底下敲的還是它。整個樂章都被這個東西浸透。"},
+ {title:"第三次聽 · 兩把琴的分工", body:"第 1–3 軌用的是 Gagliano，第 4、6、7 軌換成 1710 年的 Stradivari「Duc de Camposelice」。連著聽第 3 軌的結尾與第 4 軌的開頭，注意音色的轉折。她自己說換琴的理由是「那個聲音比較適合這些浪漫小品」——你可以判斷這個決定對不對。"},
+ {title:"進階 · 貝多芬自己那首", body:"貝多芬沒有為小提琴版寫裝飾奏，但為鋼琴版 Op.61a 寫了——而且第一樂章那首用了定音鼓，中段是一段軍樂式進行曲。去找 Schneiderhan／Jochum（DG, 1962）或 Faust／阿巴多（2011）。聽完你會發現一件事：貝多芬設想的裝飾奏和後世那些浪漫派的抒情擴張完全是兩回事。"},
+ {title:"重點單曲 · 只有二十分鐘的話", body:"第 2 軌（協奏曲的 Larghetto，九分五十秒）加第 13 軌（Kreisler 的裝飾奏，四分鐘）加第 8 軌（Kreisler 的《Liebesleid》，三分四十秒）。第一個是她最被稱讚的地方，後兩個讓你認識這張唱片的隱形主角。"},
+ {title:"情境 · 音量 · 訊源", body:"錄音偏近場、偏亮，系統本來就亮的話音量壓低一點會比較舒服。金色大廳的堂音在這張上不太明顯，所以喇叭與耳機的差別沒有一般現場錄音那麼大。第二張 CD 那五首無伴奏裝飾奏用耳機聽最好——那是全張最近距離的錄音，聽得到弓與弦的摩擦。不要一次聽完一小時四十分，協奏曲與小品分兩次比較合理。"}
+],
+
+/* ── 10 視覺與實體 ── */
+physical:{
+ "封面":"DG 的黃色卡杜什標準框，框內是杜尼亞絲手持小提琴的半身像，仰角、目光向上。攝影 Felix Broede，設計 Anja Hoppe。這是 DG 給新簽藝人的標準規格——把人放在最前面，曲目退到框線上方的小字。",
+ "版本":"2CD Digipack（DG 4863512，2023-05-05）；2LP gatefold 180g（DG 486 3513，2023-06-09，Optimal Media 壓片）；另有 DG 官方商店的簽名白標 2LP＋12 吋藝術印刷限定版。",
+ "內頁":"Mario-Felix Vogt 撰文，John Moraitis 英譯；內頁攝影 Terry Linke。",
+ "碟片配置":"CD1 是協奏曲加五首「Beyond」的小品，約 81 分鐘，屬於長時 CD；CD2 只有五首裝飾奏，17 分 57 秒。這個配置引來樂評的批評——《The Strad》認為裝飾奏孤立地排在一起效果不好，《The Classic Review》則抱怨協奏曲只切成三軌，聽眾無法自己把喜歡的裝飾奏插進去。",
+ "樂器":"貝多芬協奏曲用 Nicolò Gagliano，由德國音樂生活基金會出借，她已使用近十年；部分浪漫小品用 1710 年的 Stradivari「Duc de Camposelice」，2022 年 12 月起由日本音樂財團出借。注意這把 Strad 與她 2021 年梅紐因大賽獎品裡那把（Jonathan Moulds 私人收藏）不是同一把。",
+ "延伸發行":"2023 年 5 至 7 月，DG 另外上線五個數位版本的協奏曲，各自把第一樂章換成 Spohr、Ysaÿe、Saint-Saëns、Wieniawski、Kreisler 的裝飾奏，二、三樂章仍用她自己的。想自己組合的話，這是官方提供的方式。"
+},
+
+/* ── 影音延伸 ── */
+videos:[
+ {kind:"訪談", title:"María Dueñas about her album 'BEETHOVEN AND BEYOND'", by:"María Dueñas Violin（本人官方頻道）",
+  url:"https://www.youtube.com/watch?v=NrqbefHvNm0",
+  note:"她本人談這張專輯。想知道為什麼要收集這麼多裝飾奏、為什麼自己寫，從這裡開始。"},
+ {kind:"官方影片", title:"Beethoven: Violin Concerto — II. Larghetto（金色大廳現場）", by:"Deutsche Grammophon 官方頻道",
+  url:"https://www.youtube.com/watch?v=gOYqZODJuPA",
+  note:"就是這張唱片第 2 軌的同一場演出，但看得到影像。全張最被稱讚的樂章。"},
+ {kind:"官方影片", title:"Ysaÿe: Berceuse, Op. 20", by:"Deutsche Grammophon 官方頻道",
+  url:"https://www.youtube.com/watch?v=AMxxSdifmto",
+  note:"第 5 軌的影像版，同樣是金色大廳現場。"},
+ {kind:"官方影片", title:"Kreisler: Liebesleid（管弦樂改編版）", by:"Deutsche Grammophon 官方頻道",
+  url:"https://www.youtube.com/watch?v=cGSCcn05HjU",
+  note:"專輯最後一軌。在維也納演一首以「古維也納」為題的曲子。"},
+ {kind:"演出紀錄", title:"Senior Finals — Menuhin Competition Richmond 2021", by:"Menuhin Competition 官方頻道",
+  url:"https://www.youtube.com/watch?v=LelCi0kl_TQ",
+  note:"讓她一戰成名的那場決賽完整存檔。2021 年 5 月 22 日，她十八歲，同時拿下首獎與觀眾獎。"},
+ {kind:"曲目對照", title:"Fritz Kreisler — 3 Cadenzas for Beethoven's Violin Concerto", by:"MusicArchiver",
+  url:"https://www.youtube.com/watch?v=8sbv11p5gvE",
+  note:"與第 13 軌對照。Kreisler 其實寫了三個樂章的裝飾奏，這張唱片只收了第一樂章那首。"},
+ {kind:"官方影片", title:"DG 官方沒有為這張做 trailer 或錄音花絮", q:"Maria Duenas Beethoven and Beyond Deutsche Grammophon trailer",
+  note:"查證時 DG 官方頻道與官網的 Videos 分頁都只有三支演奏影片，沒有 trailer 或 making-of。金色大廳的全場音樂會影片是 DG STAGE+ 獨家，不在 YouTube。"},
+ {kind:"分析導讀", title:"貝多芬協奏曲裝飾奏的比較", q:"Beethoven violin concerto cadenza comparison Kreisler Joachim analysis",
+  note:"找不到經驗證且確為分析性質的影片，多數搜到的是演奏片段。書面資料更完整：Martin Wulfhorst 的裝飾奏編目收錄了超過一百首，是這個題目唯一的完整目錄。"}
+],
+
+/* ── 11 延伸聆聽 ── */
+further:[
+ {artist:"Wolfgang Schneiderhan", album:"Beethoven: Violin Concerto (Jochum)", why:"1962，用貝多芬自己為鋼琴版寫的含定音鼓裝飾奏。這條支線的起點"},
+ {artist:"Isabelle Faust", album:"Beethoven: Violin Concerto (Abbado)", why:"2011，同樣用貝多芬的裝飾奏，當代錄音裡結構感最好的之一"},
+ {artist:"Patricia Kopatchinskaja", album:"Beethoven: Violin Concerto (Herreweghe)", why:"2009，最激進的一版——連正文都改，用了自筆譜上沒被印行版選用的異文"},
+ {artist:"Yehudi Menuhin", album:"Beethoven: Violin Concerto (Furtwängler)", why:"1947 琉森，用 Kreisler 的裝飾奏。二十世紀最被推崇的版本之一"},
+ {artist:"Rachel Barton Pine", album:"Beethoven and Clement: Violin Concertos", why:"把 Clement 自己那首 D 大調協奏曲與貝多芬並置。聽完你會理解兩者的關係有多近"},
+ {artist:"María Dueñas", album:"Paganini: 24 Caprices", why:"她 2025 年的專輯，另一種完全不同的技術展示"},
+ {artist:"Veronika Eberle", album:"Beethoven: Violin Concerto (Rattle / LSO)", why:"2023 年的另一種答案：委託 Jörg Widmann 寫新的裝飾奏"},
+ {artist:"Manfred Honeck", album:"Shostakovich: Symphony No. 5 / Barber: Adagio", why:"指揮自己的葛萊美得獎錄音"}
+],
+
+/* ── 12 資料來源 ── */
+sources:[
+ {title:"Deutsche Grammophon — 本片官方頁", url:"https://www.deutschegrammophon.com/en/catalogue/products/beethoven-and-beyond-dueas-12950"},
+ {title:"Presto Music — 曲目、時長、樂評摘錄與獎項", url:"https://www.prestomusic.com/classical/products/9473915--beethoven-and-beyond"},
+ {title:"Presto Music — 杜尼亞絲專訪（談裝飾奏與用琴）", url:"https://www.prestomusic.com/classical/articles/5304--interview-maria-duenas-on-beethoven-and-beyond"},
+ {title:"Discogs — 完整 credits 與版本資料", url:"https://www.discogs.com/release/27398892-Mar%C3%ADa-Due%C3%B1as-Wiener-Symphoniker-Manfred-Honeck-Beethoven-And-Beyond"},
+ {title:"Gramophone — David Threasher 樂評", url:"https://www.gramophone.co.uk/review/maria-duenas-beethoven-and-beyond"},
+ {title:"The Strad — Charlotte Gardner 樂評", url:"https://www.thestrad.com/reviews/maria-duenas-beethoven-and-beyond/16679.article"},
+ {title:"The Classic Review — David A. McConnell 樂評", url:"https://theclassicreview.com/album-reviews/review-beethoven-violin-concerto-maria-duenas-wiener-symphoniker-honeck/"},
+ {title:"Wikipedia — Beethoven: Violin Concerto", url:"https://en.wikipedia.org/wiki/Violin_Concerto_(Beethoven)"},
+ {title:"Wikipedia — María Dueñas", url:"https://en.wikipedia.org/wiki/Mar%C3%ADa_Due%C3%B1as_(violinist)"},
+ {title:"Hyperion — Op. 61 樂曲解說（Ateş Orga）", url:"https://www.hyperion-records.co.uk/dw.asp?dc=W17226_315094"},
+ {title:"BSO — Op. 61 曲目解說（Marc Mandel）", url:"https://www.bso.org/works/violin-concerto-2"},
+ {title:"San Francisco Symphony — Op. 61 曲目解說（Michael Steinberg）", url:"https://www.sfsymphony.org/Data/Event-Data/Program-Notes/B/Beethoven-Violin-Concerto-in-D-major-Opus-61"},
+ {title:"Martin Wulfhorst — 貝多芬協奏曲裝飾奏完整編目（收錄逾百首）", url:"https://wulfhorst-web.com/Editions/Beethoven-Cadenzas/beethoven-cadenzas.html"},
+ {title:"Kopatchinskaja — 談 Op. 61 的詮釋與自筆譜異文（SPCO PDF）", url:"https://www.thespco.org/wp-content/uploads/2015/10/Kopatchinskaja-Beethoven-interpretation.pdf"},
+ {title:"The Strad — Christian Tetzlaff 談貝多芬協奏曲的裝飾奏", url:"https://www.thestrad.com/christian-tetzlaff-on-beethovens-violin-concerto-cadenza/1560.article"},
+ {title:"josephjoachim.com — 1844 年倫敦首演的一手史料（含孟德爾頌書信與當時樂評）", url:"https://josephjoachim.com/2013/07/03/philharmonic-debut/"},
+ {title:"The Violin Channel — 2021 梅紐因大賽首獎報導", url:"https://theviolinchannel.com/maria-duenas-1st-prize-2021-menuhin-competition-richmond-senior-division/"}
+]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   渲染引擎 —— 以下不需要修改
+   ═══════════════════════════════════════════════════════════════ */
+const E = s => String(s==null?'':s);
+const has = x => Array.isArray(x) ? x.length>0 : (x && Object.keys(x).length>0);
+const amURL = t => 'https://music.apple.com/tw/search?term=' + encodeURIComponent(t);
+const ytURL = t => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(t);
+const P = txt => E(txt).split(/\n\s*\n/).map(x=>`<p>${x.trim()}</p>`).join('');
+
+document.title = `${D.album} · 深度導聆`;
+
+const SEC = [];
+function sec(id, zh, en, html){ if(html) SEC.push({id, zh, en, html}); }
+
+/* 1 · 錄音製作全紀錄 */
+sec('production','錄音製作全紀錄','Production', D.production ? `<div class="prose">${P(D.production)}</div>` : '');
+
+/* 2 · 深度樂評 */
+sec('review','深度樂評','Critique', D.review ? `<div class="prose">${P(D.review)}</div>` : '');
+
+/* 3 · 逐曲導聆 */
+sec('tracks','逐曲導聆','Track by Track', has(D.tracks) ? D.tracks.map((t,i)=>`
+  <div class="trk" data-i="${i}">
+    <div class="trkhead">
+      <span class="tn">${t.n||i+1}</span>
+      <span class="tt"><b>${E(t.title)}</b>${t.writer?`<span>${E(t.writer)}</span>`:''}</span>
+      <span class="tlen">${E(t.len)}</span>
+      <span class="tcar">▶</span>
+    </div>
+    <div class="trkbody">
+      ${t.note?P(t.note):''}
+      ${has(t.cues)?`<div class="cues">${t.cues.map(c=>`<div class="cue"><b>${E(c[0])}</b><span>${E(c[1])}</span></div>`).join('')}</div>`:''}
+      ${t.personnel?`<div class="tmeta"><b>編制：</b>${E(t.personnel)}</div>`:''}
+    </div>
+  </div>`).join('') : '');
+
+/* 4 · 人物誌 */
+sec('people','人物誌 · 作曲家／演奏家／主唱','People', has(D.people) ? `<div class="people">${
+  D.people.map(p=>`
+  <div class="pcard">
+    <div class="prole">${E(p.role)}</div>
+    <div class="pname">${E(p.name)}</div>
+    <div class="plife">${E(p.life)}</div>
+    ${p.bio?P(p.bio):''}
+    ${p.here?`<div class="phere"><b style="color:var(--accent)">在這張專輯裡 · </b>${E(p.here)}</div>`:''}
+    ${has(p.key)?`<div class="pkey">${p.key.map(k=>`<a href="${amURL(p.name+' '+k[0])}" target="_blank" rel="noopener">${E(k[0])}${k[1]?` · ${k[1]}`:''}</a>`).join('')}</div>`:''}
+  </div>`).join('')}</div>` : '');
+
+/* 5 · 完整 Credits */
+sec('credits','完整 Credits','Credits', has(D.credits) ?
+  `<dl class="kv">${D.credits.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl>` : '');
+
+/* 6 · 評價與歷史地位 */
+let recHTML = '';
+if(has(D.reception)){
+  const R = D.reception;
+  if(has(R.scores)) recHTML += `<div class="tblwrap"><table class="tbl"><thead><tr><th>來源</th><th>評價</th></tr></thead><tbody>${
+    R.scores.map(s=>`<tr><td>${E(s[0])}</td><td>${E(s[1])}</td></tr>`).join('')}</tbody></table></div>`;
+  if(has(R.chart)) recHTML += `<div style="margin-top:16px"><dl class="kv">${
+    R.chart.map(c=>`<dt>${E(c[0])}</dt><dd>${E(c[1])}</dd>`).join('')}</dl></div>`;
+  if(has(R.awards)) recHTML += `<div style="margin-top:16px" class="cards">${
+    R.awards.map(a=>`<div class="nc"><b>${E(a[0])}</b><span>${E(a[1])}</span></div>`).join('')}</div>`;
+  if(R.legacy) recHTML += `<div class="prose" style="margin-top:20px">${P(R.legacy)}</div>`;
+}
+sec('reception','評價與歷史地位','Reception & Legacy', recHTML);
+
+/* 7 · 脈絡與影響網絡 */
+let ctxHTML = '';
+if(has(D.context)){
+  const C = D.context;
+  if(C.era) ctxHTML += `<div class="prose">${P(C.era)}</div>`;
+  if(has(C.timeline)) ctxHTML += `<div class="tl" style="margin-top:22px">${
+    C.timeline.map(t=>`<div class="tlitem"><div class="ty">${E(t[0])}</div><b>${E(t[1])}</b><span>${E(t[2])}</span></div>`).join('')}</div>`;
+  const grp = (title, arr) => has(arr) ? `<div style="margin-top:24px">
+    <div style="font-size:11px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase;margin-bottom:9px">${title}</div>
+    <div class="cards">${arr.map(x=>`<a href="${amURL(x[0]+' '+(x[1]||''))}" target="_blank" rel="noopener">
+      <b>${E(x[1]||x[0])}</b><span>${E(x[1]?x[0]:'')}${x[2]?` — ${E(x[2])}`:''}</span></a>`).join('')}</div></div>` : '';
+  ctxHTML += grp('影響了這張的作品', C.influencedBy);
+  ctxHTML += grp('被這張影響的作品', C.influenced);
+  ctxHTML += grp('翻唱 · 取樣 · 引用', C.covers);
+}
+sec('context','脈絡與影響網絡','Context & Influence', ctxHTML);
+
+/* 8 · 版本／音質指南 */
+sec('versions','版本／音質指南','Editions & Sound', has(D.versions) ? `<div class="tblwrap">
+  <table class="tbl"><thead><tr><th>版本</th><th>年份</th><th>母帶／載體</th><th>說明</th><th>推薦</th></tr></thead>
+  <tbody>${D.versions.map(v=>`<tr>
+    <td><b style="color:var(--txt)">${E(v.name)}</b></td><td>${E(v.year)}</td>
+    <td>${E(v.source)}</td><td>${E(v.note)}</td>
+    <td class="rec">${'★'.repeat(v.rec||0)}${'☆'.repeat(Math.max(0,5-(v.rec||0)))}</td></tr>`).join('')}
+  </tbody></table></div>${D.versionsNote?`<div class="prose" style="margin-top:18px">${P(D.versionsNote)}</div>`:''}` : '');
+
+/* 9 · 聆聽路線圖 */
+sec('roadmap','聆聽路線圖','How to Listen', has(D.roadmap) ? `<div class="road">${
+  D.roadmap.map((r,i)=>`<div class="rstep"><div class="rnum">${i+1}</div>
+    <div><b>${E(r.title)}</b><p>${E(r.body)}</p></div></div>`).join('')}</div>` : '');
+
+/* 10 · 視覺與實體 */
+sec('physical','視覺與實體','Artwork & Object', has(D.physical) ?
+  `<dl class="kv">${Object.entries(D.physical).map(([k,v])=>`<dt>${E(k)}</dt><dd>${E(v)}</dd>`).join('')}</dl>` : '');
+
+/* 11 · 影音延伸 —— 介紹、紀錄片、訪談；不是聽音樂的連結 */
+sec('videos','影音延伸','Watch', has(D.videos) ? `
+  <div class="vnote">以下都是「認識這張唱片」的影音資料——官方介紹、紀錄片、分析與訪談，不是拿來聽音樂的。
+  標示「搜尋」的項目會帶你到 YouTube 的搜尋結果頁（影片會下架、網址會失效，用搜尋比較耐放）。</div>
+  <div class="vids">${D.videos.map(v=>`
+    <a class="vid" href="${v.url ? E(v.url) : ytURL(v.q || (D.artist+' '+D.album))}" target="_blank" rel="noopener">
+      <div class="vtop">
+        <span class="vkind">${E(v.kind||'影片')}</span>
+        ${v.url ? '' : '<span class="vsearch">搜尋</span>'}
+        ${v.len ? `<span class="vlen">${E(v.len)}</span>` : ''}
+      </div>
+      <b>${E(v.title)}</b>
+      ${v.by ? `<span class="vby">${E(v.by)}</span>` : ''}
+      ${v.note ? `<span class="vnt">${E(v.note)}</span>` : ''}
+    </a>`).join('')}</div>` : '');
+
+/* 12 · 延伸聆聽 */
+sec('further','延伸聆聽','Go Deeper', has(D.further) ? `<div class="cards">${
+  D.further.map(f=>`<a href="${amURL(f.artist+' '+f.album)}" target="_blank" rel="noopener">
+    <b>${E(f.album)}</b><span>${E(f.artist)}${f.why?`<br>${E(f.why)}`:''}</span></a>`).join('')}</div>` : '');
+
+/* 13 · 資料來源 */
+sec('sources','資料來源','Sources', has(D.sources) ? `<div class="srcs">${
+  D.sources.map(s=>s.url?`<a href="${E(s.url)}" target="_blank" rel="noopener">${E(s.title)}</a>`:E(s.title)).join(' · ')}</div>` : '');
+
+/* ---------- HERO ---------- */
+const heroHTML = `
+  ${D.backLink!==false?`<a class="back" href="${E(D.backLink||'../index.html')}">← 回專輯推薦</a>`:''}
+  <div class="hero">
+    <div class="hart" id="hart"><div class="ph">${E(D.album).slice(0,2)}</div></div>
+    <div class="hmeta">
+      <div class="kicker">深度導聆 · Deep Listening</div>
+      <h1>${E(D.album)}</h1>
+      <div class="who">${E(D.artist)}</div>
+      <div class="yl">${E(D.year)}${D.label?` · ${E(D.label)}`:''}${D.catalog?` · ${E(D.catalog)}`:''}</div>
+      <div class="chips">
+        ${D.genre?`<span class="chip g">${E(D.genre)}</span>`:''}
+        ${(D.styles||[]).map(s=>`<span class="chip">${E(s)}</span>`).join('')}
+        ${(D.moods||[]).map(s=>`<span class="chip c">${E(s)}</span>`).join('')}
+      </div>
+      <div class="btns">
+        <a class="btn am" href="${amURL(D.itunesTerm || (D.artist+' '+D.album))}" target="_blank" rel="noopener">▶ 在 Apple Music 聽</a>
+        ${has(D.videos)?`<a class="btn yt" href="#videos">▶ 影音延伸 · ${D.videos.length}</a>`:''}
+        ${D.wiki?`<a class="btn" href="${E(D.wiki)}" target="_blank" rel="noopener">Wikipedia</a>`:''}
+      </div>
+    </div>
+  </div>
+  ${D.tagline?`<div class="tagline">${E(D.tagline)}</div>`:''}
+  ${has(D.facts)?`<dl class="facts">${D.facts.map(f=>`<div><dt>${E(f[0])}</dt><dd>${E(f[1])}</dd></div>`).join('')}</dl>`:''}`;
+
+document.getElementById('main').innerHTML = heroHTML + SEC.map((s,i)=>`
+  <section id="${s.id}">
+    <div class="shead"><span class="snum">${String(i+1).padStart(2,'0')}</span>
+      <h2>${s.zh}</h2><span class="sen">${s.en}</span></div>
+    ${s.html}
+  </section>`).join('') + `
+  <footer><span>${E(D.artist)} — ${E(D.album)}</span><span>由 Claude 整理 · ${E(D.compiled||'')}</span></footer>`;
+
+document.getElementById('toc').innerHTML = SEC.map(s=>`<a href="#${s.id}">${s.zh.split(' · ')[0]}</a>`).join('');
+
+/* 逐曲展開 */
+document.querySelectorAll('.trkhead').forEach(h=>{
+  h.onclick = ()=> h.parentElement.classList.toggle('open');
+});
+
+/* 目錄高亮 */
+const links = [...document.querySelectorAll('#toc a')];
+const obs = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-10% 0px -75% 0px'});
+SEC.forEach(s=>{ const el=document.getElementById(s.id); if(el) obs.observe(el); });
+
+/* 封面：iTunes Search API（JSONP，可在 file:// 直接跑） */
+(function(){
+  if(D.cover){ document.getElementById('hart').innerHTML = `<img src="${D.cover}" alt="">`; return; }
+  const cb = '__amcb1';
+  const s = document.createElement('script');
+  window[cb] = j => {
+    const r = (j.results||[])[0];
+    if(r && r.artworkUrl100)
+      document.getElementById('hart').innerHTML =
+        `<img src="${r.artworkUrl100.replace('100x100bb','1000x1000bb')}" alt="">`;
+    s.remove(); delete window[cb];
+  };
+  s.src = `https://itunes.apple.com/search?term=${encodeURIComponent(D.itunesTerm||(D.artist+' '+D.album))}`
+        + `&entity=album&media=music&limit=1&country=tw&callback=${cb}`;
+  s.onerror = ()=>{ s.remove(); };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>
